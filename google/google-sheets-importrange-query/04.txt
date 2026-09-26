@@ -1,0 +1,6 @@
+=VLOOKUP(
+  A2,
+  IMPORTRANGE("URL", "シート1!A:E"),
+  3,
+  FALSE
+)

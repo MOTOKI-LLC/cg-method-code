@@ -1,0 +1,6 @@
+seedRandom(index,true);
+temp = thisComp.layer("ヌル 1").effect("スライダー制御")("スライダー");
+var x = thisComp.layer(index).transform.position[0];
+var y = thisComp.layer(index).transform.position[1];
+var z = thisComp.layer(index).transform.position[2]+random(temp);
+[x,y,z];

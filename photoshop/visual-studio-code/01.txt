@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "extendscript",
+      "request": "launch",
+      "name": "Run current script",
+      "program": "${file}"  // 現在開いているスクリプトファイルを実行対象に
+    }
+  ]
+}

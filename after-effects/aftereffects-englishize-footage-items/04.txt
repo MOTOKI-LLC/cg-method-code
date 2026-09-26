@@ -1,0 +1,5 @@
+// 変更前
+"$/AE/EGG/LStr/1306=フッテージ"
+
+// 変更後
+"$/AE/EGG/LStr/1306=Footage"

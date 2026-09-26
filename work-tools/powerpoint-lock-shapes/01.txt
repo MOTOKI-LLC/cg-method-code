@@ -1,0 +1,133 @@
+'図形をロックする
+Public Sub lockShapes()
+    Dim sh As Shape
+    Dim n As Integer, m As Integer, k As Integer
+
+    'エラーチェック
+    Call preCheck
+
+    '選択した図形をカット
+    ActiveWindow.Selection.ShapeRange.Cut
+
+    'ダミーマスターを作る
+    Call makeDummyMaster(n)
+
+    '選択した図形をダミーマスターに貼り付け
+    ActivePresentation.Designs(n).SlideMaster.Shapes.Paste
+
+    '選択したスライドにダミーマスターを適用
+    m = ActiveWindow.Selection.SlideRange.SlideIndex
+    k = ActiveWindow.Selection.SlideRange.CustomLayout.index
+    ActivePresentation.Slides(m).CustomLayout = ActivePresentation.Designs(n).SlideMaster.CustomLayouts(k)
+
+    '余分なダミーマスターを削除
+    Call cleanDummyMaster
+
+    'ダミーマスターの名前を整理
+    Call renameDummyMaster
+
+End Sub
+
+'エラーチェック
+Private Sub preCheck()
+
+    '表示がスライドでない時は終了
+    If cView <> "Slide" Then
+        Debug.Print "スライド表示でない"
+        End
+    End If
+
+    '選択範囲がシェイプでないときは終了
+    If ActiveWindow.Selection.Type <> ppSelectionShapes Then
+        Debug.Print "選択なし"
+        End
+    End If
+
+End Sub
+
+
+'ダミーマスターを作る
+Private Sub makeDummyMaster(ByRef n As Integer)
+    Dim i As Integer, j As Integer
+    Dim d As Design
+
+    i = ActiveWindow.Selection.SlideRange.SlideIndex
+    j = ActivePresentation.Slides(i).Design.index
+
+    Set d = ActivePresentation.Designs.Clone(ActivePresentation.Designs.item(j))
+
+    d.Name = "DummyMST" & 0
+    n = d.index
+
+    Set d = Nothing
+
+End Sub
+
+
+'余分なダミーマスターを削除
+Private Sub cleanDummyMaster()
+    Dim d As Design
+    Dim cl As CustomLayout
+    Dim i As Integer
+    Dim numD As Integer
+
+    '不使用のダミーマスターを削除
+    numD = ActivePresentation.Designs.Count
+    For i = numD To 1 Step -1
+        Set d = ActivePresentation.Designs(i)
+        If InStr(d.Name, "DummyMST") <> 0 Then
+
+            On Error Resume Next
+            For Each cl In d.SlideMaster.CustomLayouts
+                cl.Delete
+            Next
+            On Error GoTo 0
+
+            If d.SlideMaster.CustomLayouts.Count = 0 Then d.Delete
+
+        End If
+    Next
+
+    Set d = Nothing
+
+End Sub
+
+'ダミーマスターの名前修正
+Private Sub renameDummyMaster()
+    Dim d As Design
+    Dim i As Integer
+
+    i = 0
+    For Each d In ActivePresentation.Designs
+        If InStr(d.Name, "DummyMST") <> 0 Then
+            i = i + 1
+            d.Name = "DummyMST" & i & "tmp"
+        End If
+    Next
+
+    i = 0
+    For Each d In ActivePresentation.Designs
+        If InStr(d.Name, "DummyMST") <> 0 Then
+            i = i + 1
+            d.Name = "DummyMST" & i
+        End If
+    Next
+
+End Sub
+
+'表示されているビュータイプを判定する関数
+Private Function cView() As String
+    Dim p As Pane
+
+    For Each p In ActiveWindow.Panes
+        If p.ViewType = ppViewSlide Then
+            cView = "Slide"
+            Exit Function
+        ElseIf p.ViewType = ppViewSlideMaster Then
+            cView = "Master"
+            Exit Function
+        End If
+    Next
+    cView = "Others"
+
+End Function

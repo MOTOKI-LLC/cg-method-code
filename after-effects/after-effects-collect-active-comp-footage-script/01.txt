@@ -1,0 +1,26 @@
+app.beginUndoGroup("アクティブなコンポで使われているフッテージアイテムをまとめる");
+app.activeViewer.setActive();  
+var List = [];
+var myComp = app.project.activeItem;
+var myCompName = app.project.activeItem.name;
+for(i = 1; i <= myComp.numLayers; i++){
+    try{
+        var myItemName =myComp.layer(i).source.name;
+        List.push(myItemName);
+    } catch(e){
+    }
+}
+for (var j=0; j<=List.length; j++){
+    var itemName = List[j];
+    if (app.project.numItems>0){
+        for (var i=1; i<=app.project.numItems; i++){
+            var myItem = app.project.items[i];
+            if ( myItem.name.indexOf(itemName)> -1){
+                    List.push(myItem);
+            }
+        }
+    }
+}
+var size = List.length;
+var itemFolder = app.project.rootFolder.items.addFolder(myCompName);
+for (var i=0; i

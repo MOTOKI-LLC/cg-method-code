@@ -1,0 +1,7 @@
+app.beginUndoGroup("AnimationPreset");
+var activeComp = app.project.activeItem ; 
+var activeLayer = activeComp.selectedLayers ; 
+var presetPath = ("C:\\Users\\user\\Desktop\\集中線.ffx");
+var addPreset = File(presetPath);
+activeLayer[0].applyPreset(addPreset);
+app.endUndoGroup();

@@ -1,0 +1,24 @@
+< !doctype html >
+    < html >
+    < head >
+    < meta charset = "utf-8" >
+    < link rel = "stylesheet"
+href = "css/topcoat-desktop-dark.min.css" / >
+    < link id = "hostStyle"
+rel = "stylesheet"
+href = "css/styles.css" / >
+    < script type = "text/javascript"
+src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" > < /script> < script >
+    $(function() {
+        $(".tab li").click(function() {
+            var num = $(".tab li").index(this);
+            $(".tabContent").removeClass('active');
+            $(".tabContent").eq(num).addClass('active');
+            $(".tab li").removeClass('active');
+            $(this).addClass('active')
+        });
+    }); < /script> < title > < /title> < /head> < body class = "hostElt" >
+    < ul class = "tab" >
+    < li class = "topcoat-button--large hostFontSize active" > メニューA < /li> < li class = "topcoat-button--large hostFontSize" > メニューB < /li> < li class = "topcoat-button--large hostFontSize" > メニューC < /li> < /ul> < script type = "text/javascript"
+src = "js/include.js" > < /script> < script type = "text/javascript" >
+    include("C:/Users/Namae/AppData/Roaming/Adobe/CEP/extensions/custompanel/contents.html"); < /script>

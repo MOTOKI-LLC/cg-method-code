@@ -1,0 +1,8 @@
+{
+  "name": "スタイルCSV書き出し",
+  "id": "style-csv-exporter",
+  "api": "1.0.0",
+  "editorType": ["figma"],
+  "main": "code.js",
+  "ui": "ui.html"
+}

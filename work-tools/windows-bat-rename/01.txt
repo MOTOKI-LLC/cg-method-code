@@ -1,0 +1,28 @@
+Const ForReading = 1 
+Const ForWriting = 2
+Const ForAppending = 8
+ 
+Set FSO = CreateObject("Scripting.FileSystemObject")
+ShowSubfolders FSO.GetFolder("置換対象のパス")
+  
+Set FSO = Nothing
+ 
+Sub ShowSubFolders(Folder)
+    For Each File in Folder.Files
+        Fname = File.name
+            Dim fs
+            Dim fn
+            Set fs = WScript.CreateObject("Scripting.FileSystemObject")
+            Set fn = fs.GetFile(Folder & "\" & Fname)
+            Dim rename
+            rename = Fname
+            rename = Replace(rename,"変更前の単語","変更後の単語")
+            fn.Name = rename
+            Set fs = Nothing
+            Set fn = Nothing
+    Next
+  
+    For Each Subfolder in Folder.SubFolders
+        ShowSubFolders Subfolder
+    Next
+End Sub

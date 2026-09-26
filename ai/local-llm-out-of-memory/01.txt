@@ -1,0 +1,6 @@
+$cs = Get-CimInstance Win32_ComputerSystem
+"{0:N1} GB 搭載" -f ($cs.TotalPhysicalMemory/1GB)
+
+Get-CimInstance Win32_VideoController |
+  Select-Object Name,@{n='VRAM_GB';e={[math]::Round($_.AdapterRAM/1GB,1)}} |
+  Format-Table -AutoSize

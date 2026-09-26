@@ -1,0 +1,16 @@
+#InstallKeybdHook
+
+IniFile = %A_WorkingDir%\setting.ini
+
+psid = Photoshop.Application
+
+IfExist, %IniFile%
+{
+IniRead, psid, setting.ini, photoshop, version
+}
+
+script1:
+app:= ComObjCreate(psid)
+app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+MsgBox,%psid%
+return

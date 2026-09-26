@@ -1,0 +1,5 @@
+num = thisComp.layer("ヌル 1").effect("スライダー制御")("スライダー");
+$.evalFile("file://C:\\Users\\min\\Desktop\\text.txt");
+if (num == 1) text.fillColor = text1;
+if (num == 2) text.fillColor = text2;
+if (num == 3) text.fillColor = text3;

@@ -1,0 +1,51 @@
+app.bringToFront();
+main();
+
+function main() {
+    var folderObj = new Object();
+    var sourceFolder = Folder.selectDialog('フォルダを選択してください:', Folder(folderObj));
+    var docs = sourceFolder.getFiles("*.psd");
+    var fileArray = new Array();
+    var len = docs.length;
+
+    for (var i = 0; i < len; i++) {
+        var doc = docs[i];
+        fileArray.push(doc);
+    }
+
+    for (var i = 0; i < fileArray.length; i++) {
+        var doc = open(fileArray[i]);
+        var docName = doc.name;
+        if (docName.indexOf(".") != -1) {
+            var basename = docName.match(/(.*)\.[^\.]+$/)[1]
+        } else {
+            var basename = docName
+        }
+        doc.mergeVisibleLayers(); //表示レイヤーを結合
+        preferences.rulerUnits=Units.PIXELS; //単位をピクセルに
+ 
+        //幅1000pxより大きい場合は比率を維持しつつ幅1000pxに
+        if(doc.width>1000){
+        doc.resizeImage(1000, undefined, undefined, ResampleMethod.AUTOMATIC, 0);
+        }
+          //高さ1000pxより大きい場合は比率を維持しつつ高さ1000pxに
+        if(doc.height>1000){
+        doc.resizeImage(undefined, 1000, undefined, ResampleMethod.AUTOMATIC, 0);
+        }  
+        
+        exportJpg(doc, sourceFolder, basename + '.jpg');
+        doc.close(SaveOptions.DONOTSAVECHANGES);
+    }
+}
+
+function exportJpg(doc, folder, name) {
+    var file = new File(folder.fsName + "/" + name);
+    var options = new ExportOptionsSaveForWeb();
+    options.format = SaveDocumentType.JPEG;
+    options.includeProfile = false;
+    options.interlaced = false;
+    options.optimized = true;
+    options.lossy = 0;
+    options.quality = 100;
+    doc.exportDocument(file, ExportType.SAVEFORWEB, options);
+}

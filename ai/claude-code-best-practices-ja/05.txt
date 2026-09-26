@@ -1,0 +1,9 @@
+---
+name: api-conventions
+description: サービス用のREST API設計規約
+---
+# API規約
+- URLパスにはkebab-caseを使用
+- JSONプロパティにはcamelCaseを使用
+- リストエンドポイントには常にページネーションを含める
+- URLパスでAPIをバージョン管理（/v1/、/v2/）

@@ -1,0 +1,56 @@
+on splitString(str, delimiter)
+    set OldDelims to AppleScript's text item delimiters
+    set AppleScript's text item delimiters to delimiter
+    set stringList to every text item of str
+    set AppleScript's text item delimiters to OldDelims
+    return stringList
+end splitString
+
+on getRealPath(input_file_path)
+    set smbPrefix to "/Volumes/"
+    if input_file_path starts with smbPrefix then
+        set file_path to text items 2 thru -1 of splitString(input_file_path, smbPrefix) as string
+        set mount_name to text item 1 of splitString(file_path, "/") as string
+        set shell_command to "mount | grep \" on " & smbPrefix & mount_name & "\""
+        set mount_path to do shell script shell_command
+        set mount_path to text items 2 thru -1 of splitString(mount_path, "@") as string
+        set mount_path to text item 1 of splitString(mount_path, " on /Volumes") as string
+        set file_path to text items 2 thru -1 of splitString(file_path, mount_name & "/") as string
+        return "smb://" & mount_path & "/" & file_path
+    end if
+    return input_file_path
+end getRealPath
+
+on searchReplace(theText, SearchString, ReplaceString)
+    set OldDelims to AppleScript's text item delimiters
+    set AppleScript's text item delimiters to SearchString
+    set newText to text items of theText
+    set AppleScript's text item delimiters to ReplaceString
+    set newText to newText as text
+    set AppleScript's text item delimiters to OldDelims
+    return newText
+end searchReplace
+
+on toWindowsPath(file_path)
+    set win_path to file_path
+    set win_path to searchReplace(win_path, "<", "")
+    set win_path to searchReplace(win_path, ">.", "")
+    set win_path to searchReplace(win_path, ">", "")
+    set win_path to searchReplace(win_path, "smb://", "\\\\")
+    set win_path to searchReplace(win_path, "/", "\\")
+    return win_path
+end toWindowsPath
+
+on run {input, parameters}
+    set results to ""
+    repeat with input_file in input
+        set real_path to getRealPath(the POSIX path of input_file)
+        if real_path starts with "smb://" then
+            set results to results & toWindowsPath(real_path) & return
+        else
+            display dialog "ローカルパスをWindows用パスに変換できません" buttons {"OK"} default button "OK"
+            return ""
+        end if
+    end repeat
+    return results
+end run

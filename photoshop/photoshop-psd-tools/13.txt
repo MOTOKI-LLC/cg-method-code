@@ -1,0 +1,8 @@
+# 名前でレイヤーを検索
+def find_layer_by_name(psd, name):
+    for layer in psd.descendants():
+        if layer.name == name:
+            return layer
+    return None
+
+target_layer = find_layer_by_name(psd, "背景")

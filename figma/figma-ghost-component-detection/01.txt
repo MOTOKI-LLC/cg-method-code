@@ -1,0 +1,7 @@
+// ノード情報を取得する関数内
+// 修正前：.../nodes?depth=0&ids=
+// 修正後：.../nodes?depth=1&ids=
+function fetchNodesByIds(fileKey, nodeIds) {
+  var base = 'https://api.figma.com/v1/files/' + fileKey + '/nodes?depth=1&ids=';
+  // ...
+}

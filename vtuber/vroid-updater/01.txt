@@ -1,0 +1,8 @@
+D：
+　L VRoid Studio Update
+　　L config.ini
+　　L VRoidStudioUpdate.bat
+　　L wget.ps1
+
+　L VRoid Studio
+　　L bin

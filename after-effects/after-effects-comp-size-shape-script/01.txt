@@ -1,0 +1,23 @@
+/*########################################################################################################################
+#   コンポサイズのシェイプを作成
+#   @author suimin 
+########################################################################################################################*/
+app.beginUndoGroup("コンポサイズのシェイプを作成");
+var activeComp = app.project.activeItem;
+if (activeComp == null) {
+    alert("コンポジションを選択してください。")
+}
+else {
+    var comp = app.project.activeItem;
+    var customShape = comp.layers.addShape();
+    customShape.name = "Custom Shape"
+    customShape.label = 0  //ラベルをグレーに
+    customShape.adjustmentLayer = true
+    customShape.property("position").expression = "x=thisComp.width;\ry=thisComp.height;\r[x/2,y/2]"
+    var shapeProperty = customShape.property("ADBE Root Vectors Group");
+    var customShapePath = shapeProperty.addProperty("ADBE Vector Shape - Rect")
+    customShapePath(2).expression = "x=thisComp.width;\ry=thisComp.height;\r[x,y]"
+    var fill = shapeProperty.addProperty("ADBE Vector Graphic - Fill")
+    fill.property("ADBE Vector Fill Color").setValue([0, 0, 0, 0]); //塗りを黒に
+}
+app.endUndoGroup();

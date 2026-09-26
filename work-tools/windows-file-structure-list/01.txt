@@ -1,0 +1,7 @@
+project/
+├── src/
+│   ├── index.js
+│   └── utils.js
+├── docs/
+│   └── README.md
+└── package.json

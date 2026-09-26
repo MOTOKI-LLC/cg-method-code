@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        padding: 12px;
+        font-size: 13px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: pre;
+      }
+      #now {
+        background: #f6f6f6;
+        padding: 8px;
+        border-radius: 6px;
+        min-height: 1.5em;
+      }
+      button {
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+      }
+      #exportBtn[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <button id="startBtn">開始</button>
+      <button id="cancelBtn">中止</button>
+      <button id="exportBtn" disabled>CSVエクスポート</button>
+    </div>
+
+    <div id="progress" class="mono">待機中</div>
+    <div id="now" class="mono"></div>
+
+    <script>
+      // ==== CSV：巨大データでも軽いチャンク方式 ====
+      const toCsvCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const toCsvIdCell = (v) =>
+        `"'\u200B${String(v ?? "").replace(/"/g, '""')}"`;
+      const headers = [
+        "親コンポ名",
+        "親ノードID",
+        "バリアント名",
+        "バリアントID",
+        "レイヤーパス",
+      ];
+
+      const csvChunks = []; // Blobパーツ
+      let rowsCount = 0;
+
+      function resetCsv() {
+        csvChunks.length = 0;
+        rowsCount = 0;
+        const headerLine = headers.map(toCsvCell).join(",") + "\n";
+        csvChunks.push("\uFEFF" + headerLine); // BOM + header
+      }
+      function pushCsvRows(objs) {
+        let buf = "";
+        for (const r of objs) {
+          buf +=
+            [
+              toCsvCell(r.parentName),
+              toCsvIdCell(r.parentId),
+              toCsvCell(r.variantName),
+              toCsvIdCell(r.variantId),
+              toCsvCell(r.path),
+            ].join(",") + "\n";
+        }
+        csvChunks.push(buf);
+        rowsCount += objs.length;
+      }
+      function saveCsv() {
+        const blob = new Blob(csvChunks, { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `components_${new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace(/[:T]/g, "-")}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      // ==== UI要素 ====
+      const progEl = document.getElementById("progress");
+      const nowEl = document.getElementById("now");
+      const exportBtn = document.getElementById("exportBtn");
+
+      // 本体 → UI
+      onmessage = (event) => {
+        const msg = event.data && event.data.pluginMessage;
+        if (!msg) return;
+
+        if (msg.type === "progress") {
+          const { phase, current, total, produced, elapsedMs } = msg;
+          const rps = elapsedMs
+            ? (produced / (elapsedMs / 1000)).toFixed(1)
+            : "-";
+          progEl.textContent = `フェーズ:${phase} 進捗:${current}/${total} 出力:${produced}件 速度:${rps}/s 経過:${human(
+            elapsedMs
+          )}`;
+        }
+
+        if (msg.type === "append") {
+          pushCsvRows(msg.rows);
+          exportBtn.disabled = rowsCount === 0;
+
+          // 最新1行だけ上書き表示
+          const last = msg.rows[msg.rows.length - 1];
+          nowEl.textContent = `${last.variantName || last.parentName}  —  ${
+            last.path
+          }`;
+        }
+
+        if (msg.type === "done") {
+          nowEl.textContent = msg.cancelled
+            ? `中止。累計${rowsCount}行 / 経過${human(msg.elapsedMs)}`
+            : `完了。累計${rowsCount}行 / 経過${human(
+                msg.elapsedMs
+              )}（CSVエクスポート可）`;
+          exportBtn.disabled = rowsCount === 0;
+        }
+      };
+
+      function human(ms) {
+        const s = Math.floor(ms / 1000);
+        const m = Math.floor(s / 60);
+        const h = Math.floor(m / 60);
+        const sec = s % 60;
+        const min = m % 60;
+        return (h ? h + "h " : "") + (m ? min + "m " : "") + sec + "s";
+      }
+
+      // ボタン
+      document.getElementById("startBtn").onclick = () => {
+        resetCsv();
+        nowEl.textContent = "処理を開始しました…";
+        exportBtn.disabled = true;
+        parent.postMessage({ pluginMessage: { type: "start" } }, "*");
+      };
+      document.getElementById("cancelBtn").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+      };
+      document.getElementById("exportBtn").onclick = () => saveCsv();
+    </script>
+  </body>
+</html>

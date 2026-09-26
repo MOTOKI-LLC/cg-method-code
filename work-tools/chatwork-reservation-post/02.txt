@@ -1,0 +1,9 @@
+function sendMessageTest() {
+  var client = ChatworkClient.factory({
+    token: 'チャットワークAPIトークン'
+  });
+  client.sendMessage({
+    room_id: 送りたいルームID,
+    body: '[To:77777777]nテストです。nnデータのパスです。n[info]C:\Users\ユーザー名\Desktop\[/info]'
+  });
+}

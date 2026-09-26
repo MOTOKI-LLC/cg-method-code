@@ -1,0 +1,5 @@
+# Ubuntu/Debian
+apt-get install liblcms2-2
+
+# macOS
+brew install little-cms2

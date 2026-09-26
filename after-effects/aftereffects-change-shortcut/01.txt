@@ -1,0 +1,5 @@
+// 変更前
+"Preview" = "(Pad0)(PadInsert)(macControl+0)"
+
+// 変更後
+"Preview" = "(Shift+Space)(PadInsert)(macControl+0)"

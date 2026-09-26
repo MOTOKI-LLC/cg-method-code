@@ -1,0 +1,14 @@
+# レイヤー情報の取得
+print(f"名前: {layer.name}")
+print(f"可視性: {layer.visible}")
+print(f"不透明度: {layer.opacity}")  # 0-255
+print(f"位置: ({layer.left}, {layer.top})")
+print(f"サイズ: {layer.width}x{layer.height}")
+print(f"バウンディングボックス: {layer.bbox}")  # (left, top, right, bottom)
+
+# レイヤー属性の編集（書き込み可能）
+layer.name = "新しい名前"
+layer.visible = False
+layer.opacity = 128
+layer.left = 100
+layer.top = 50

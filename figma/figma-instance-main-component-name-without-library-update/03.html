@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        color: #333;
+        background: #fff;
+      }
+      .header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .header h1 {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: #18a0fb;
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #0c8ce9;
+      }
+      .btn-danger {
+        background: #f24822;
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #d93b17;
+      }
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+      .actions {
+        padding: 8px 16px;
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .summary {
+        padding: 8px 16px;
+        font-size: 11px;
+        color: #888;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .list {
+        overflow-y: auto;
+        max-height: 400px;
+      }
+      .item {
+        padding: 10px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+      }
+      .item:hover {
+        background: #f7f7f7;
+      }
+      .item-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #999;
+        width: 70px;
+        flex-shrink: 0;
+      }
+      .name {
+        font-family: "SF Mono", "Menlo", monospace;
+        font-size: 11px;
+        word-break: break-all;
+      }
+      .name-instance {
+        color: #f24822;
+      }
+      .name-main {
+        color: #14ae5c;
+      }
+      .arrow {
+        color: #999;
+        font-size: 10px;
+      }
+      .key {
+        font-size: 10px;
+        color: #bbb;
+        font-family: monospace;
+      }
+      .empty {
+        padding: 40px 16px;
+        text-align: center;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Instance Name Checker</h1>
+      <button class="btn btn-primary" id="scanBtn">スキャン</button>
+    </div>
+    <div class="actions" id="actionsBar" style="display: none">
+      <button class="btn btn-danger" id="renameAllBtn">
+        すべてメイン名に合わせる
+      </button>
+    </div>
+    <div class="summary" id="summary" style="display: none"></div>
+    <div class="list" id="list"></div>
+
+    <script>
+      const listEl = document.getElementById("list");
+      const summaryEl = document.getElementById("summary");
+      const actionsBar = document.getElementById("actionsBar");
+      let currentResults = [];
+
+      document.getElementById("scanBtn").addEventListener("click", () => {
+        parent.postMessage({ pluginMessage: { type: "scan" } }, "*");
+        listEl.innerHTML =
+          '<div class="empty">スキャン中...</div>';
+      });
+
+      document
+        .getElementById("renameAllBtn")
+        .addEventListener("click", () => {
+          if (!currentResults.length) return;
+          const items = currentResults.map((r) => ({
+            instanceId: r.instanceId,
+            newName: r.mainName,
+          }));
+          parent.postMessage(
+            { pluginMessage: { type: "rename-all", items } },
+            "*"
+          );
+        });
+
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+
+        if (msg.type === "scan-result") {
+          currentResults = msg.results;
+
+          if (!msg.results.length) {
+            listEl.innerHTML =
+              '<div class="empty">差分なし — すべて一致しています</div>';
+            summaryEl.style.display = "none";
+            actionsBar.style.display = "none";
+            return;
+          }
+
+          summaryEl.style.display = "block";
+          summaryEl.textContent = `${msg.results.length} 件の名前不一致を検出`;
+          actionsBar.style.display = "flex";
+
+          listEl.innerHTML = msg.results
+            .map(
+              (r) => `
+            <div class="item" data-id="${r.instanceId}">
+              <div class="item-row">
+                <span class="label">Instance</span>
+                <span class="name name-instance">${escapeHtml(r.instanceName)}</span>
+              </div>
+              <div class="item-row">
+                <span class="label">Main</span>
+                <span class="name name-main">${escapeHtml(r.mainName)}</span>
+              </div>
+              <div class="key">key: ${escapeHtml(r.componentKey)}</div>
+            </div>
+          `
+            )
+            .join("");
+
+          listEl.querySelectorAll(".item").forEach((el) => {
+            el.addEventListener("click", () => {
+              parent.postMessage(
+                {
+                  pluginMessage: {
+                    type: "focus",
+                    instanceId: el.dataset.id,
+                  },
+                },
+                "*"
+              );
+            });
+          });
+        }
+
+        if (msg.type === "rename-all-done") {
+          parent.postMessage({ pluginMessage: { type: "scan" } }, "*");
+        }
+      };
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+    </script>
+  </body>
+</html>

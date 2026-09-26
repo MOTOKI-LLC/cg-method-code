@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>外部スタイル参照を調査</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Hiragino Kaku Gothic ProN", Meiryo, "Noto Sans JP", Arial, sans-serif;
+        color: #111;
+        background: #fff;
+      }
+      .container {
+        padding: 16px;
+      }
+      h1 {
+        font-size: 14px;
+        margin: 0 0 6px;
+        font-weight: 700;
+      }
+      p {
+        font-size: 12px;
+        margin: 0 0 12px;
+        color: #555;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      button {
+        appearance: none;
+        border: 1px solid #ccc;
+        background: #0b62ff;
+        color: #fff;
+        font-size: 13px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .status {
+        font-size: 11px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" role="main" aria-labelledby="title">
+      <h1 id="title">外部スタイル調査</h1>
+      <p>全ページ・全レイヤーを走査し、外部スタイル参照をCSVに書き出します。</p>
+      <div class="actions">
+        <button id="run" type="button">全体をスキャンしてCSV出力</button>
+        <span
+          id="status"
+          class="status"
+          role="status"
+          aria-live="polite"
+        ></span>
+      </div>
+    </div>
+
+    <script>
+      let csv = "",
+        filename = "";
+      const runBtn = document.getElementById("run");
+      const statusEl = document.getElementById("status");
+
+      function setLoading(on, text) {
+        runBtn.disabled = !!on;
+        statusEl.textContent = text || "";
+      }
+
+      function requestExport() {
+        if (runBtn.disabled) return;
+        setLoading(true, "ファイル全体を走査中…");
+        parent.postMessage({ pluginMessage: { type: "export" } }, "*");
+      }
+
+      runBtn.addEventListener("click", requestExport);
+
+      // Enter キーでも実行
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          requestExport();
+        }
+      });
+
+      onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (!msg) return;
+
+        if (msg.type === "download") {
+          csv = msg.csv;
+          filename = msg.filename;
+
+          try {
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            setLoading(false, "ダウンロード完了");
+          } catch (err) {
+            alert("ダウンロードに失敗しました。");
+            setLoading(false, "");
+          } finally {
+            parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+          }
+        }
+
+        if (msg.type === "error") {
+          setLoading(false, "");
+          alert(msg.message || "エラーが発生しました。");
+        }
+      };
+    </script>
+  </body>
+</html>

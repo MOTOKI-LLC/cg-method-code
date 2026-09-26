@@ -1,0 +1,22 @@
+from PIL import Image
+from psd_tools import PSDImage
+
+# 新しいPSDを作成
+psd = PSDImage.new(mode='RGB', size=(640, 480), depth=8)
+
+# PIL画像からレイヤーを作成
+pil_image = Image.open('input.png')
+layer = psd.create_pixel_layer(
+    pil_image,
+    name="Layer 1",
+    top=0,
+    left=0,
+    opacity=255
+)
+
+# グループを作成
+group = psd.create_group(name="Group 1")
+group.append(layer)
+
+# 保存
+psd.save('new_image.psd')

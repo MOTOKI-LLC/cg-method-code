@@ -1,0 +1,28 @@
+{
+Gui, 1:Add, Button,W200 Gscript1, アラート1
+Gui, 1:Add, Button,W200 Gscript2, アラート2
+Gui, 1:Add, Button,W200 Gscript2, アラート3
+Gui,1:Show,,スクリプトランチャー
+return
+}
+
+script1:
+Gui, 1:
+#IfWinActive ahk_class Photoshop
+app:=ComObjCreate("Photoshop.Application")
+app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+return
+
+script2:
+Gui, 1:
+#IfWinActive ahk_class Photoshop
+app:=ComObjCreate("Photoshop.Application")
+app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+return
+
+script3:
+Gui, 1:
+#IfWinActive ahk_class Photoshop
+app:=ComObjCreate("Photoshop.Application")
+app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+return

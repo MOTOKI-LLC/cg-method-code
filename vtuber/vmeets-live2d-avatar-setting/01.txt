@@ -1,0 +1,5 @@
+ "CameraPosition": {
+        "PositionX": 0,
+        "PositionY": 0.8,
+        "PositionZ": 12
+ }

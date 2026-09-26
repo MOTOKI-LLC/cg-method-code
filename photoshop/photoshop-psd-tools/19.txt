@@ -1,0 +1,5 @@
+for layer in psd:
+    if layer.kind == 'pixel':
+        # レイヤーを合成して出力（マスクとクリッピングレイヤーを含む）
+        layer_image = layer.composite()
+        layer_image.save(f'{layer.name}.png')

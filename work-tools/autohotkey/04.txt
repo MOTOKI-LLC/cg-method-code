@@ -1,0 +1,12 @@
+Run, C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+
+Sleep, 100
+
+Loop, {
+  Sleep, 20
+  IfWinExist, ahk_class Chrome_WidgetWin_1
+  {
+    WinMinimize, ahk_class Chrome_WidgetWin_1
+    Break
+  }
+}

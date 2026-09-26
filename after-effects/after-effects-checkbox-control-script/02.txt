@@ -1,0 +1,6 @@
+props = app.project.activeItem.selectedProperties;
+for (var i = 0; i < props.length; i++){
+  if (props[i].canSetExpression){
+    props[i].expression = "wiggle(50,100);";
+  }
+}

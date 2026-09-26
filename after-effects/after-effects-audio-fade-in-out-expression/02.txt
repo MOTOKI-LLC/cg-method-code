@@ -1,0 +1,9 @@
+fadeTime = 1;
+audio.audioLevelsMin = -48;
+audio.audioLevelsMax = 0;
+layerDuration = outPoint - inPoint;
+singleFrame = thisComp.frameDuration;
+animateIn = linear(time, inPoint, (inPoint + fadeTime), audio.audioLevelsMin, audio.audioLevelsMax);
+animateOut = linear(time, (outPoint - fadeTime), (outPoint-singleFrame), audio.audioLevelsMax, audio.audioLevelsMin);
+if(time < (layerDuration/2+inPoint)){[animateOut,animateOut];
+}else{[animateOut,animateOut];}

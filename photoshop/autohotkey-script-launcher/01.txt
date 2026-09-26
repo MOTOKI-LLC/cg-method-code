@@ -1,0 +1,6 @@
+#IfWinActive ahk_class Photoshop
+; Ctrl+Shift+A でスクリプト実行
+^+a::
+    app:=ComObjCreate("Photoshop.Application")
+    app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+Return

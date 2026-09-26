@@ -1,0 +1,9 @@
+from pathlib import Path
+from PIL import Image
+
+for src in Path("対象のフォルダー").glob("*.png"):
+    im = Image.open(src)
+    # 画素を変えない
+    im.save(src.with_suffix(".webp"), "WEBP", lossless=True)
+    # 小さくしたい場合
+    # im.save(src.with_suffix(".webp"), "WEBP", quality=80)

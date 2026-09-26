@@ -1,0 +1,119 @@
+/*---- 初期設定ここから ----*/
+
+// チャットワークAPIトークンを設定
+var ChatworkToken = 'APIトークン';
+// 設定用シートのシート名
+var SHEETNAME = 'シート1';
+
+/*---- 初期設定ここまで ----*/
+
+// 管理用メニューを追加
+function onOpen() {
+  SpreadsheetApp.getUi()
+      .createMenu('管理用')
+      .addItem('いますぐ実行', 'myFunction')
+      .addToUi();
+}
+
+// 予約投稿のメインのファンクション
+function myFunction(){
+  // スプレッドシート読込->json取得
+  var sheet = getSheet();
+  var json = convertSheet2Json(sheet);
+  // シート書き出し配列を定義
+  var values = [];
+  // 現在の日時取得
+  var now = new Date();
+  var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  // シートをクリア
+  sheet.clearContents();
+  
+  // １行目はフィールド名を挿入
+  values[0] = [ '日時', 'ルームID', 'メッセージ','ファイルデータ', '投稿日時'];
+  // jsonの内容を2行目以降に追加
+  for each(var obj in json){  
+    // メッセージ送信
+    if( obj.msg && obj.room_id && obj.sent_date == "" && obj.estimated_date > yesterday && obj.estimated_date < now ){
+      sendMessage( obj.room_id, obj.msg );
+      if(obj.file_date  !== ""){
+        uploadImage( obj.room_id, obj.file_date );
+      }  
+      obj.sent_date = now;
+    }
+    var line = [ obj.estimated_date, obj.room_id, obj.msg, obj.file_date, obj.sent_date];
+    values.push( line );
+  }
+  // シートに貼付け
+  sheet.getRange(1,1,values.length,values[0].length).setValues( values );
+}
+
+function getSheet(){
+  var book = SpreadsheetApp.getActiveSpreadsheet();
+  return book.getSheetByName(SHEETNAME);
+}
+
+// シートを読み込んでjson形式で返す
+function convertSheet2Json(sheet) {
+  // シートを読み込んで二次元配列を返す
+  var values = readSheet(sheet);
+  if( values == false ) return false;
+  // create json
+  var jsonArray = [];
+  for(var i=0; i<values.length; i++) {
+    var json = new Object();
+    json['estimated_date'] = values[i][0];
+    json['room_id'] = values[i][1];
+    json['msg'] = values[i][2];
+    json['file_date'] = values[i][3];
+    json['sent_date'] = values[i][4];
+    jsonArray.push(json);
+  }
+  return jsonArray;
+}
+
+// シートを読み込んで二次元配列を返す
+function readSheet(sheet){
+  var lastRow = sheet.getLastRow();
+  if( lastRow <= 1 ) return false;
+  var rowIndex = 2;
+  var colStartIndex = 1;
+  var colNum = 5;
+  var range = sheet.getRange(rowIndex, colStartIndex, lastRow, colNum);
+  var values = range.getValues();
+  return values;
+}
+
+// メッセージ送信
+function sendMessage(room_id, strBody){
+  var params = {
+    headers : {"X-ChatworkToken" : ChatworkToken},
+      method : "post",
+      payload : {
+        body : strBody,
+        self_unread : "1"
+      }
+  };
+  var url = "https://api.Chatwork.com/v2/rooms/" + room_id + "/messages";
+  UrlFetchApp.fetch(url, params);
+}
+
+//画像のアップロード
+function uploadImage(room_id, file_date) {
+   var boundary = 'boundary';
+   var type = file_date.split('.');
+   if (type[type.length - 1].toLowerCase() == 'jpeg') {var file_type ='image/jpeg'}
+   if (type[type.length - 1].toLowerCase() == 'png') {var file_type ='image/png'}
+   if (type[type.length - 1].toLowerCase() == 'gif') {var file_type ='image/gif'}
+   if (type[type.length - 1].toLowerCase() == 'mp4') {var file_type ='audio/mp4'}
+      
+   var file = DriveApp.getFilesByName(file_date).next();    
+   var params = {
+     headers : {"X-ChatworkToken" : ChatworkToken},
+     method : "post",
+     payload: {'file':Utilities.newBlob(file.getBlob().getBytes(), file_type, file_date) },
+     muteHttpExceptions : true,
+   };
+  
+   var url = "https://api.Chatwork.com/v2/rooms/" + room_id + "/files";  
+   UrlFetchApp.fetch(url, params);
+ }

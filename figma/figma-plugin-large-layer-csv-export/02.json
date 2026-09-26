@@ -1,0 +1,108 @@
+figma.showUI(__html__, { visible: true, width: 440, height: 220 });
+
+let isCancelled = false;
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+// レイヤーパス
+function getLayerPath(node) {
+  const path = [];
+  let cur = node;
+  while (cur && cur.type !== "PAGE" && cur.type !== "DOCUMENT") {
+    path.unshift(cur.name);
+    cur = cur.parent;
+  }
+  return path.join(" / ");
+}
+
+// UI → 本体
+figma.ui.onmessage = (msg) => {
+  if (!msg || typeof msg !== "object") return;
+  if (msg.type === "start") {
+    isCancelled = false;
+    run();
+  }
+  if (msg.type === "cancel") {
+    isCancelled = true;
+  }
+};
+
+// メイン処理
+async function run() {
+  const t0 = Date.now();
+  let produced = 0;
+
+  const report = (phase, current, total) => {
+    figma.ui.postMessage({
+      type: "progress",
+      phase,
+      current,
+      total,
+      produced,
+      elapsedMs: Date.now() - t0,
+    });
+  };
+
+  const exclude = new Set();
+
+  // 1) COMPONENT_SET を先に
+  const sets = figma.root.findAll((n) => n.type === "COMPONENT_SET");
+  const SET_BATCH = 16; // 環境に合わせて調整
+  for (let i = 0; i < sets.length; i += SET_BATCH) {
+    if (isCancelled) break;
+    const batch = sets.slice(i, i + SET_BATCH);
+
+    const rows = [];
+    for (const setNode of batch) {
+      const children = Array.isArray(setNode.children) ? setNode.children : [];
+      for (const child of children) {
+        rows.push({
+          parentName: setNode.name,
+          parentId: setNode.id,
+          variantName: child.name,
+          variantId: child.id,
+          path: getLayerPath(child),
+        });
+        exclude.add(child.id);
+      }
+    }
+    if (rows.length) {
+      produced += rows.length;
+      figma.ui.postMessage({ type: "append", rows });
+    }
+    report("COMPONENT_SET", Math.min(i + SET_BATCH, sets.length), sets.length);
+    await sleep(0);
+  }
+
+  // 2) 孤立 COMPONENT（セット配下でないもの）
+  const comps = figma.root.findAll((n) => n.type === "COMPONENT");
+  const COMP_BATCH = 64;
+  for (let i = 0; i < comps.length; i += COMP_BATCH) {
+    if (isCancelled) break;
+    const batch = comps.slice(i, i + COMP_BATCH);
+
+    const rows = [];
+    for (const comp of batch) {
+      if (exclude.has(comp.id)) continue;
+      rows.push({
+        parentName: comp.name,
+        parentId: comp.id,
+        variantName: "",
+        variantId: "",
+        path: getLayerPath(comp),
+      });
+    }
+    if (rows.length) {
+      produced += rows.length;
+      figma.ui.postMessage({ type: "append", rows });
+    }
+    report("COMPONENT", Math.min(i + COMP_BATCH, comps.length), comps.length);
+    await sleep(0);
+  }
+
+  figma.ui.postMessage({
+    type: "done",
+    cancelled: isCancelled,
+    produced,
+    elapsedMs: Date.now() - t0,
+  });
+}

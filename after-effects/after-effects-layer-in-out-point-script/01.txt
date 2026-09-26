@@ -1,0 +1,10 @@
+comp = app.project.activeItem
+layer = myComp.selectedLayers
+for(i = 0; i < layer.length; i++){
+    layerIndex = layer[i].index
+    var start = comp.layer(layerIndex).startTime;
+    var end = comp.layer(layerIndex).outPoint
+    comp.layer(layerIndex).stretch = 100;
+    comp.layer(layerIndex).inPoint = start;
+    comp.layer(layerIndex).outPoint = end;
+}

@@ -1,0 +1,30 @@
+using UnityEngine;
+
+public class PlaySound : MonoBehaviour
+{
+    public AudioClip sound01;
+    public AudioClip sound02;
+
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        // AudioSourceコンポーネントを取得
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    void Update()
+    {
+        // 左クリックで sound01 を再生
+        if (Input.GetMouseButtonUp(0))
+        {
+            audioSource.PlayOneShot(sound01);
+        }
+
+        // 右クリックで sound02 を再生
+        if (Input.GetMouseButtonUp(1))
+        {
+            audioSource.PlayOneShot(sound02);
+        }
+    }
+}

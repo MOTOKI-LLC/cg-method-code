@@ -1,0 +1,23 @@
+' キャプチャしたファイルがあるフォルダ(最後の文字は"\")
+Const SOURCE_FOLDER = "E:\Encode\input\"
+
+' エンコードが終わったファイルを移すフォルダ(最後の文字は"\") ※必ず SOURCE_FOLDER と違う場所にする
+Const MOVE_FOLDER = "E:\Encode\tmp\"
+
+' エンコードしたデータを出力するフォルダ(最後の文字は"\")
+Const OUTPUT_FOLDER = "E:\Encode\output\"
+
+' プロファイル番号(メニューの一番上が0)
+Const OUTPUT_PROFILE = 0
+
+' 出力プラグイン番号(メニューの一番上が0)
+Const OUTPUT_PLUGIN = 0
+
+' 出力ファイルの拡張子
+Const OUTPUT_EXT = ".mp4"
+
+' AviUtlのフルパス
+Const AVIUTL_PATH = ur'C:/Program File (x86)/AviUtl/aviutl100/aviutl.exe'
+
+' AviUtl Controlのフルパス(最後の文字は"\")
+Const AUC_FOLDER = "C:/Program File (x86)/AviUtl/aviutl100/auc/"

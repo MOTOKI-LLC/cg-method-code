@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>ノードIDで選択</title>
+    <style>
+      body {
+        font: 13px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Hiragino Sans", "Noto Sans JP", "メイリオ", sans-serif;
+        margin: 12px;
+      }
+      textarea {
+        width: 100%;
+        height: 110px;
+        box-sizing: border-box;
+      }
+      .row {
+        margin: 10px 0;
+      }
+      .btn {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        background: #f7f7f7;
+        cursor: pointer;
+        border-radius: 6px;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .muted {
+        color: #666;
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+      .stack {
+        display: grid;
+        gap: 8px;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid #e5e5e5;
+        margin: 14px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stack">
+      <div class="row">
+        <h3 style="margin: 0 0 8px">レイヤーIDで選択</h3>
+        <textarea
+          id="idsInput"
+          placeholder="複数行にIDを貼り付けてください（例：I123:45）"
+        ></textarea>
+        <div class="grid">
+          <span class="muted">各行を1つのIDとして処理します。</span>
+          <button id="selectBtn" class="btn">選択</button>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <h3 style="margin: 0 0 8px">現在の選択からID取得</h3>
+        <div class="grid">
+          <span class="muted">「名前 ID」形式で出力します。</span>
+        </div>
+        <textarea id="output" readonly></textarea>
+        <div style="text-align: right">
+          <button id="getBtn" class="btn">取得</button>
+          <button id="copyBtn" class="btn">コピー</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function splitLines(text) {
+        return text.split(/\r?\n/);
+      }
+      function post(type, payload) {
+        parent.postMessage(
+          { pluginMessage: Object.assign({ type: type }, payload || {}) },
+          "*"
+        );
+      }
+
+      document.getElementById("selectBtn").onclick = function () {
+        var raw = document.getElementById("idsInput").value;
+        var ids = splitLines(raw);
+        post("select-by-id", { ids: ids });
+      };
+
+      document.getElementById("getBtn").onclick = function () {
+        post("get-selected-ids", {});
+      };
+
+      document.getElementById("copyBtn").onclick = function () {
+        var text = document.getElementById("output").value;
+        if (!text) {
+          alert("コピーする内容がありません");
+          return;
+        }
+        // Clipboard API（Figmaデスクトップ/ブラウザ双方で動作）
+        navigator.clipboard.writeText(text).then(
+          function () {
+            alert("コピーしました");
+          },
+          function () {
+            // フォールバック
+            var ta = document.getElementById("output");
+            ta.focus();
+            ta.select();
+            try {
+              document.execCommand("copy");
+              alert("コピーしました");
+            } catch (e) {
+              alert("コピーに失敗しました");
+            }
+          }
+        );
+      };
+
+      // プラグイン本体からのメッセージ受信
+      window.onmessage = function (event) {
+        var msg =
+          event.data && event.data.pluginMessage
+            ? event.data.pluginMessage
+            : null;
+        if (!msg) return;
+        if (msg.type === "selected-ids" && msg.ids) {
+          document.getElementById("output").value = msg.ids.join("\n");
+        }
+      };
+    </script>
+  </body>
+</html>

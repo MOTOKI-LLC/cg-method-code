@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="https://unpkg.com/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
+  <!-- 共通ノード／エッジスタイル -->
+  <?!= include('css'); ?>
+</head>
+<body>
+  <h2 class="title-header">
+    Prefab 参照構造ビューア
+    <span class="legend">
+      <span class="legend-item">
+        <span class="legend-color parent"></span> 親Prefab
+      </span>
+      <span class="legend-item">
+        <span class="legend-color variant"></span> Variant
+      </span>
+      <span class="legend-item">
+        <span class="legend-color standalone"></span> 単独Prefab
+      </span>
+    </span>
+  </h2>
+
+  <!-- プルダウンメニュー -->
+  <label for="prefabSelect">親Prefabを選択：</label>
+  <select id="prefabSelect">
+    <option value="">（すべて表示）</option>
+  </select>
+
+  <label><input type="radio" name="direction" value="down" checked> 親→子</label>
+  <label><input type="radio" name="direction" value="up"> 子→親</label>
+
+  <div id="cy" class="graph-area"></div>
+
+  <?!= include('js'); ?>
+</body>
+</html>

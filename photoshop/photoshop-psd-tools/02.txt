@@ -1,0 +1,7 @@
+from psd_tools import PSDImage
+
+# PSDファイルを開く
+psd = PSDImage.open('example.psd')
+
+# ファイル情報を表示
+print(psd)  # PSDImage(mode=RGB size=101x55 depth=8 channels=3)

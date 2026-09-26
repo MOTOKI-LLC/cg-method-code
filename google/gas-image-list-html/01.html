@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>画像一覧</title>
+  <?!= include('css'); ?>
+</head>
+<body>
+  <table border="1">
+    <tr>
+      <th>画像</th><th>名前</th><th>備考</th>
+    </tr>
+    <? productData.forEach(function(option) { ?>
+      <tr>
+        <td><a href="<?= option[2] ?>"><img src="<?= option[1] ?>"></a></td>
+        <td><?= option[0] ?></td>
+        <td><?= option[3] ?></td>
+      </tr>
+    <? }); ?>
+  </table>
+</body>
+</html>

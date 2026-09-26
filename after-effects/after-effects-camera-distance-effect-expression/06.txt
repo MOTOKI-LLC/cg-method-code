@@ -1,0 +1,8 @@
+x=transform.position[0];
+y=transform.position[1];
+z=transform.position[2];
+Cx=thisComp.layer("camControl").transform.position[0];
+Cy=thisComp.layer("camControl").transform.position[1];
+Cz=thisComp.layer("camControl").transform.position[2];
+howFar=Math.sqrt(Math.pow(x-Cx,2)+Math.pow(y-Cy,2)+Math.pow(z-Cz,2));
+-.001*thisComp.layer("fadeControl").effect("lumAmount")("スライダ")*howFar;

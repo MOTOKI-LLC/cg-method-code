@@ -1,0 +1,5 @@
+cd C:Users\ユーザー名\Desktop\wsasayaki
+
+wsasayaki 変換前データ.wav 変換後データ.wav
+
+pause

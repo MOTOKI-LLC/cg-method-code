@@ -1,0 +1,20 @@
+.square_btn {
+  display: inline-block;
+  font-family: "メイリオ", sans-serif;
+  font-size: 24px;
+  line-height: 1.5;
+  padding: 8px 64px;
+  text-decoration: none;
+  background: #efefef;
+  color: #444444;
+  border-bottom: 4px solid #b7b7b7;
+  border-radius: 12px;
+}
+.square_btn:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 3px;
+}
+.square_btn:active {
+  transform: translateY(4px);
+  border-bottom-color: transparent;
+}

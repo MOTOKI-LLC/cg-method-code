@@ -1,0 +1,5 @@
+//暗さ
+var value = thisComp.layer(index)
+str =" "+ thisComp.layer(index).name;
+if (comp("master").layer("controll").effect("状態制御")("スライダー")== str) 0 else 100
+if (comp("master").layer("controll").effect("状態制御")("スライダー")== 6) 0

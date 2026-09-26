@@ -1,0 +1,13 @@
+a=thisLayer.index;
+b=thisComp.numLayers;
+
+for(i=a+1; i <=b; i++) {
+  curLay=thisComp.layer(i);
+  if(curLay.inPoint <=time && curLay.outPoint > time) {
+    curLay.name;
+    break;
+  }
+  else {
+    ""
+  }
+}

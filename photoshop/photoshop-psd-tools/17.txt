@@ -1,0 +1,8 @@
+# 複数のレイヤーを新しいグループにまとめる
+layer1 = psd[0]
+layer2 = psd[1]
+
+group = psd.create_group(
+    layer_list=[layer1, layer2],
+    name="New Group"
+)

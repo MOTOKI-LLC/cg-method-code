@@ -1,0 +1,7 @@
+if layer.kind == 'type':
+    # テキスト内容を取得
+    print(f"テキスト: {layer.text}")
+    
+    # スタイル情報（読み取り専用）
+    print(f"エンジン辞書: {layer.engine_dict}")
+    print(f"リソース辞書: {layer.resource_dict}")

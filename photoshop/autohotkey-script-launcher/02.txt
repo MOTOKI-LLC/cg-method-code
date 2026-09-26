@@ -1,0 +1,6 @@
+#IfWinActive ahk_class illustrator
+; Ctrl+Shift+A でスクリプト実行
+^+a::
+    app:=ComObjCreate("Illustrator.Application")
+    app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+Return

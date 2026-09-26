@@ -1,0 +1,8 @@
+function Get-Rel($root) {
+  Get-ChildItem $root -Recurse -File | Get-FileHash -Algorithm SHA256 |
+    Select-Object @{n='rel';e={$_.Path.Substring($root.Length)}},Hash
+}
+
+$a = Get-Rel "元のフォルダー"
+$b = Get-Rel "戻した先のフォルダー"
+Compare-Object $a $b -Property rel,Hash | Select-Object SideIndicator,rel

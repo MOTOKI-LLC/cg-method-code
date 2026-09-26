@@ -1,0 +1,6 @@
+//"$$$/Copy=のコピー"
+//"$$$/LayerGroupNameTemplate=グループ >>"
+//"$$$/LayerName/Background=背景"
+//"$$$/LayerName/Layer0=レイヤー 0"
+//"$$$/LayerNameTemplate=レイヤー >>"
+//"$$$/ContentGeneratorNames/Layer/SolidColor=べた塗り >>"

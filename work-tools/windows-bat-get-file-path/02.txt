@@ -1,0 +1,5 @@
+move /Y  C:\Users\min\Desktop\copy\neko_1.avi C:\Users\min\Desktop\base\1\neko_1.avi
+move /Y  C:\Users\min\Desktop\copy\neko_2.avi C:\Users\min\Desktop\base\2\neko_2.avi
+move /Y  C:\Users\min\Desktop\copy\neko_3.avi C:\Users\min\Desktop\base\3\neko_3.avi
+move /Y  C:\Users\min\Desktop\copy\neko_4.avi C:\Users\min\Desktop\base\4\neko_4.avi
+pause

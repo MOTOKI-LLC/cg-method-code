@@ -1,0 +1,8 @@
+# 1回限りのクエリ
+claude -p "このプロジェクトが何をするか説明して"
+
+# スクリプト用の構造化出力
+claude -p "すべてのAPIエンドポイントをリストして" --output-format json
+
+# リアルタイム処理用のストリーミング
+claude -p "このログファイルを分析して" --output-format stream-json

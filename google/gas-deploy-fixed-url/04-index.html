@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+     <h1>Hello world!</h1>
+     version 3.0
+     <? var url = ScriptApp.getService().getUrl(); ?>
+     <button type="button" onclick="window.open(<?=url?>)">最新版へ</button>
+  </body>
+</html>

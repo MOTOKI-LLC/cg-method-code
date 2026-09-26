@@ -1,0 +1,6 @@
+親フォルダ
+　　L子フォルダ
+　　　　L孫フォルダA
+　　　　　LfileA_001.png
+　　　　L孫フォルダB
+         LfileB_001.png

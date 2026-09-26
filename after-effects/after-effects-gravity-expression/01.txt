@@ -1,0 +1,7 @@
+seedRandom(index,true)
+mGravBase=9.81; //basic gravity
+mGravVar=random(-1,1); //gravity variation
+mAccel=time*(mGravBase+mGravVar);
+X=value[0];
+Y=value[1]+Math.pow(mAccel,2);
+[X,Y]

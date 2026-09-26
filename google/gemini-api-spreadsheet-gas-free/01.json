@@ -1,0 +1,38 @@
+11:15:41	お知らせ	実行開始
+11:15:42	情報	HTTP ステータス: 200
+11:15:42	情報	レスポンス本文: {
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "こんにちは！GASからGeminiへの通信テストですね。\n\nどのようなテストをしたいか、具体的に教えていただけますか？\n\n例えば、以下のような情報があると、より的確なアドバイスができます。\n\n*   **Gemini API のどの機能を試したいか？** (テキスト生成、画像生成、埋め込みなど)\n*   **GAS でどのような処理をしたいか？** (スプレッドシートのデータを Gemini に渡す、Gemini の結果をスプレッドシートに書き込むなど)\n*   **現在どのようなコードを書いていて、どのような問題に直面しているか？**\n\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "MAX_TOKENS",
+      "avgLogprobs": -0.18370489346778998
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 11,
+    "candidatesTokenCount": 118,
+    "totalTokenCount": 129,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 11
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 118
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.0-flash",
+  "responseId": "zb8jad_nGM_jz7IPtYn28Qc"
+}
+11:15:43	お知らせ	実行完了

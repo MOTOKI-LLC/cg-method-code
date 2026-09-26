@@ -1,0 +1,6 @@
+[script1]
+hotkey=!a
+[script2]
+hotkey=!b
+[script3]
+hotkey=!c

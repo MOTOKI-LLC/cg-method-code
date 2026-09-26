@@ -1,0 +1,37 @@
+Sub Pre_InsertFromFile2()
+　'各ファイルのデザインテンプレートがスライドごとにばらばらな場合
+　Dim newPre As Presentation '新規プレゼンテーション
+　Dim myPre As Presentation '既存プレゼンテーション
+　Dim myDes As Design 'デザイン
+　Dim i As Long
+　Dim j As Long
+　Dim fd As FileDialog 'ファイルダイアログ
+　'任意の*.pptファイル呼び出し
+　Set fd = Application.FileDialog(msoFileDialogOpen)
+　With fd
+　　.InitialFileName = "C:" '"E:\Office\PowerPoint\VBAコード"
+　　.Filters.Add "PowerPoint File", "*.ppt;*.pptx;*.pptm;*.pps", 1
+　　If .Show <> -1 Then Exit Sub
+　End With
+　'新規プレゼンテーション
+　Set newPre = Presentations.Add
+　For i = 1 To fd.SelectedItems.Count
+　　Set myPre = Presentations.Open(fd.SelectedItems.Item(i), _
+　　　　　　　　　　　　　　msoTrue, , msoFalse)
+　　With myPre.Slides
+　　　For j = 1 To .Count
+　　　　With .Item(j)
+　　　　　Set myDes = .Design 'デザインコピー
+　　　　End With
+　　　　'既存プレゼンから新規プレゼンテーションに1枚1枚挿入
+　　　　With newPre.Slides
+　　　　　.InsertFromFile myPre.FullName, .Count, j, j
+　　　　　With .Item(.Count)
+　　　　　　.Design = myDes '1枚1枚デザイン貼り付け
+　　　　　End With
+　　　　End With
+　　　Next j
+　　End With
+　　myPre.Close
+　Next i
+End Sub

@@ -1,0 +1,5 @@
+"select * where Col2 = '東京' and Col4 > 1000"
+
+"select * where Col2 = '東京' or Col2 = '大阪'"
+
+"select * where Col2 = '東京' order by Col4 desc"

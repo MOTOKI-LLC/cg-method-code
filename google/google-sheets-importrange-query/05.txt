@@ -1,0 +1,6 @@
+=COUNTIF(IMPORTRANGE("URL", "シート1!B:B"), "東京")
+
+=SUMIF(
+  IMPORTRANGE("URL", "シート1!B:B"), "東京",
+  IMPORTRANGE("URL", "シート1!D:D")
+)

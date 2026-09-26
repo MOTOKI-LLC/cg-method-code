@@ -1,0 +1,12 @@
+REM ファイルを実行ディレクトリへ移動
+for /r %~dp1 %%j in (*) do (  
+    move /-y "%%j" %~dp1
+)  
+
+REM フォルダの削除
+for /d %%i in (*) do (  
+    pushd .  
+    cd %%i  
+    popd  
+    rd /s /q "%%i"  
+)

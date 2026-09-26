@@ -1,0 +1,5 @@
+Status  FriendlyName                        InstanceId
+------  ------------                        ----------
+OK      Generic MassStorageClass USB Device USBSTOR\DISK&VEN_GENERIC&PROD_MASSSTORAGECLASS&REV_1539\000000001539&0
+OK      WPBSN4M8-1TGP                       SCSI\DISK&VEN_NVME&PROD_WPBSN4M8-1TGP\5&18C90B50&0&000000
+Unknown SM328x SM328x USB Device            USBSTOR\DISK&VEN_SM328X&PROD_SM328X&REV_1100\8&2D3203BC&0

@@ -1,0 +1,45 @@
+/*########################################################################################################################
+#   PSDを1クリックでインポートするスクリプト
+#   @author suimin 
+########################################################################################################################*/
+var sequences = new Array()
+var sequence_file = File.openDialog();
+if (sequence_file != null) {
+    sequences[sequences.length] = sequence_file;
+}
+import_sequences();
+main();
+function import_sequences() {
+    for (i = 0; i < sequences.length; i++) {
+        var io = new ImportOptions(sequences[i])
+        if (io.canImportAs(ImportAsType.COMP)) {
+            io.importAs = ImportAsType.COMP;
+        } else {
+            io.ImportAs = ImportAsType.FOOTAGE;
+        }
+        app.project.importFile(io);
+    }
+}
+function main() {
+    var psdFolderName = app.project.activeItem.name + " レイヤー";
+    for (var i = 1; i <= app.project.items.length; i++) {
+        var srcCompos = [];
+        srcCompos.push(app.project.item(i));
+        if ((app.project.item(i) instanceof FolderItem) && (app.project.item(i).name === psdFolderName)) {
+            myFunc(app.project.item(i).items);
+        }
+    }
+    //フォルダの削除
+    for (var i = 1; i <= app.project.items.length; i++) {
+        if ((app.project.item(i) instanceof FolderItem) && (app.project.item(i).name === psdFolderName)) {
+            app.project.item(i).remove()
+        }
+    }
+    //フォルダ内のアイテム移動
+    function myFunc(items) {
+        var num = items.length;
+        for (var i = 1; i <= num; i++) {
+            items[1].parentFolder = items[1].parentFolder.parentFolder;
+        }
+    }
+}

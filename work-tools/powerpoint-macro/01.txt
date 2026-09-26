@@ -1,0 +1,5 @@
+Sub グリッド線に合わせる設定のオンオフを切り替える()
+With ActivePresentation
+.SnapToGrid = Not .SnapToGrid
+End With
+End Sub

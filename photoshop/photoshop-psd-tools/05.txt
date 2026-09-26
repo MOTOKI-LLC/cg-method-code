@@ -1,0 +1,12 @@
+# ピクセルレイヤーの確認
+if layer.kind == 'pixel':
+    # レイヤーを画像として出力
+    layer_image = layer.composite()
+    layer_image.save(f'{layer.name}.png')
+    
+    # NumPy配列として取得
+    pixels = layer.numpy()
+    print(pixels.shape)  # (height, width, channels)
+    
+    # PIL Imageとして取得
+    pil_image = layer.topil()

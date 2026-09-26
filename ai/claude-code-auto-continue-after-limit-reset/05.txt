@@ -1,0 +1,5 @@
+Usage Credits
+OFF
+
+制限リセット時に自動的に続行する
+ON

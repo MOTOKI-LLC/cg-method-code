@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: sans-serif; }
+      input { width: 100%; padding: 8px; margin-top: 10px; }
+      button { margin-top: 15px; padding: 8px 12px; }
+    </style>
+  </head>
+  <body>
+    <label>フォルダのURLを入力してください：</label>
+    <input type="text" id="folderUrl" placeholder="https://drive.google.com/drive/folders/xxxxx">
+    <button onclick="submit()">実行</button>
+
+    <script>
+      function submit() {
+        const url = document.getElementById('folderUrl').value;
+        google.script.run.withSuccessHandler(() => {
+          google.script.host.close();
+        }).withFailureHandler((e) => {
+          alert('エラー：' + e.message);
+        }).processFolderUrl(url);
+      }
+    </script>
+  </body>
+</html>

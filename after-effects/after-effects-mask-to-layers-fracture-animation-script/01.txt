@@ -1,0 +1,27 @@
+seedRandom(thisComp.layer("TRANSFORM").effect("seedRandom")("スライダー") + index);
+X = transform.anchorPoint[0] - width / 2;
+Y = transform.anchorPoint[1] - height / 2;
+Z = 0;
+if (thisComp.layer("TRANSFORM").effect("3D")("チェックボックス") == 0) {
+  temp1 = +[X, Y] + [wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"))[0], wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"))[1]];
+  temp2 = value + [X, Y];
+  trans = thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
+  spd = thisComp.layer("TRANSFORM").effect("speed")("スライダー");
+  end = 100 - (index * spd / 100);
+  if (thisComp.layer("TRANSFORM").effect("ease")("チェックボックス") == 0) {
+    linear(trans, 0, end, temp1, temp2);
+  } else {
+    ease(trans, 0, end, temp1, temp2);
+  }
+} else {
+  temp1 = +[X, Y, Z] + wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"));
+  temp2 = value + [X, Y, Z];
+  trans = thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
+  spd = thisComp.layer("TRANSFORM").effect("speed")("スライダー");
+  end = 100 - (index * spd / 100);
+  if (thisComp.layer("TRANSFORM").effect("ease")("チェックボックス") == 0) {
+    linear(trans, 0, end, temp1, temp2);
+  } else {
+    ease(trans, 0, end, temp1, temp2);
+  }
+}

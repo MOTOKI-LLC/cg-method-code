@@ -1,0 +1,40 @@
+Sub resizeA4()
+''図形をA4にリサイズ
+takasa = 28.355 * 19.05:   '高さ指定。5.3cm
+haba = 28.355 * 27.51: '幅指定。7.07cm
+With ActiveWindow.Selection
+If .Type = ppSelectionNone Or _
+.Type = ppSelectionSlides Then Exit Sub
+With .ShapeRange
+.LockAspectRatio = msoFalse: '縦横比を固定をしない。
+.Height = takasa: '高さ設定
+.Width = haba: '幅設定
+'縦横比を固定にしたい場合は.LcokAspect~の行を削除し、
+'幅基準（高さはなり）ならば、.Heightの行も削除する。
+End With
+End With
+''図形を中心に移動
+Dim sld_w As Single ''スライドの横幅
+Dim sld_h As Single ''スライドの高さ
+Dim shp_w As Single ''Shapeの横幅
+Dim shp_h As Single ''Shapeの高さ
+Dim msg As String
+With ActiveWindow.Selection
+''図形が選択されていない場合はマクロを終了
+If .Type = ppSelectionNone _
+Or .Type = ppSelectionSlides Then
+msg = "中央に配置したいShapeを選択してください。"
+MsgBox msg
+Exit Sub
+End If
+''スライドのサイズを取得
+sld_w = .SlideRange.Master.Width
+sld_h = .SlideRange.Master.Height
+''図形のサイズを取得
+shp_w = .ShapeRange.Width
+shp_h = .ShapeRange.Height
+''図形の位置を移動
+.ShapeRange.Left = (sld_w - shp_w) / 2
+.ShapeRange.Top = (sld_h - shp_h) / 2
+End With
+End Sub

@@ -1,0 +1,33 @@
+<!-- wp:code -->
+<pre class="wp-block-code"><code>Sub 画像置換()
+Dim Pres As Presentation
+Dim Sld As Slide
+Dim shp As Shape
+Dim l As Single
+Dim t As Single
+Dim h As Single
+Dim w As Single
+Dim strName As String
+'画像のパス
+Dim A As Variant
+A = Array("C:Users\namae\Desktop1.png", "C:Users\namae\Desktop2.png", "C:Users\namae\Desktop3.png")
+Dim idx As Integer
+For Each Sld In ActivePresentation.Slides
+For Each shp In Sld.Shapes
+If shp.Type = msoPicture Then
+l = shp.Left
+t = shp.Top
+h = shp.Height
+w = shp.Width
+strName = shp.Name
+shp.Delete
+Set shp = Sld.Shapes.AddPicture(A(idx), msoFalse, msoCTrue, l, t, w, h)
+idx = idx + 1
+If idx > UBound(A) Then idx = 0
+shp.Name = strName
+End If
+Next shp
+Next Sld
+End Sub
+</code></pre>
+<!-- /wp:code -->

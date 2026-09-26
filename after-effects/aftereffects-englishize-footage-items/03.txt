@@ -1,0 +1,7 @@
+// 変更前
+"$/AE/EGG/LStr/0293=%sログ"
+"$/AE/EGG/LStr/0405=%sログ"
+
+// 変更後
+"$/AE/EGG/LStr/0293=%sLog"
+"$/AE/EGG/LStr/0405=%sLog"

@@ -1,0 +1,19 @@
+lay = app.project.activeItem.selectedLayers;
+for (i = 0; i < lay.length; i++) {
+  var myComp = app.project.activeItem;
+  var myTextLayer = lay[i];
+  var mySourceText = myTextLayer.property("ADBE Text Properties").property("ADBE Text Document");
+  var myTextDoc = mySourceText.value;
+  var myColor = [0 / 255, 0 / 255, 0 / 255];
+
+  //文字の設定
+  myTextDoc.fillColor = myColor; //塗り
+  myTextDoc.applyStroke = true; //線をON
+  myTextDoc.strokeColor = [255 / 255, 255 / 255, 255 / 255]; //線
+  mySourceText.setValue(myTextDoc);
+
+  //境界線の設定
+  app.executeCommand(9008);
+  myTextLayer.property("Layer Styles").property("Stroke")("Color").setValue(myColor);
+  myTextLayer.property("Layer Styles").property("Stroke")("Size").setValue(8);
+}

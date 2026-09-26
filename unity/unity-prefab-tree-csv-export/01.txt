@@ -1,0 +1,6 @@
+/
+└─ Prefabs
+    └─ sample
+        ├─ sample 1.prefab
+        ├─ sample 2.prefab
+        └─ sample 3.prefab

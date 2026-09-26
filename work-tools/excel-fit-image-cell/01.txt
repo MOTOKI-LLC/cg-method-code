@@ -1,0 +1,12 @@
+Sub FitPicsWidth()
+Dim sp As Shape
+For Each sp In ActiveSheet.Shapes
+If sp.Type = msoPicture Then
+sp.LockAspectRatio = msoTrue
+sp.Top = sp.TopLeftCell.Top
+sp.Left = sp.TopLeftCell.Left
+sp.Height = sp.TopLeftCell.Height
+sp.Width = sp.TopLeftCell.Width
+End If
+Next
+End Sub

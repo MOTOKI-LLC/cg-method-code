@@ -1,0 +1,32 @@
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#Persistent ;スクリプトの常駐
+#SingleInstance force ;同じスクリプトの複数プロセス実行の許可/禁止
+#NoEnv ;環境変数を変数として参照しない
+#InstallKeybdHook ;常にキーボードフックを使う
+#UseHook
+
+; ; コメント　行の途中だと正しくコメントされない場合がある
+; + Shift
+; ^ Control
+; ! Alt
+; # Windowsキー
+; 上下左右  {Up}{Down}{Left}{Right}
+
+
+;AutoHotKeyの設定変更
+vk1D & R::Reload      ;リロード
+vk1D & E::Edit        ;編集
+
+
+;Caps LockをEnterキーにする
+vkF0::Enter
+
+
+;半角/全角→Delete/BackSpace
+vkF3::send {Backspace}
+vkF4::send {Backspace}
+^vkF3::send {Del} 
+^vkF4::send {Del} 
+
+</code></pre>
+<!-- /wp:code -->

@@ -1,0 +1,6 @@
+set_special_action_anim shizuku 'idle_01.mtn' 1
+set_special_action_anim shizuku 'pinchOut03.mtn' 2
+set_special_action_anim shizuku 'pinchOut01.mtn' 3
+set_special_action_anim shizuku 'pinchIn03.mtn' 4
+set_special_action_anim shizuku 'shake02.mtn' 5
+set_special_action_anim shizuku 'tapBody02.mtn' 6

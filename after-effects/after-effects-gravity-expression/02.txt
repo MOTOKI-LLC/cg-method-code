@@ -1,0 +1,6 @@
+props = app.project.activeItem.selectedProperties;
+for (var i = 0; i < props.length; i++){
+  if (props[i].canSetExpression){
+    props[i].expression = "seedRandom(index,true); mGravBase=9.81;mGravVar=random(-1,1); mAccel=time*(mGravBase+mGravVar); X=value[0]; Y=value[1]+Math.pow(mAccel,2); [X,Y]";
+  }
+}

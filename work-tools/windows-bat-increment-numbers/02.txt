@@ -1,0 +1,10 @@
+@echo off 
+setlocal enabledelayedexpansion 
+set count=1001
+for /f "tokens=*" %%n IN ('dir /b *.jsx') do (call :sub "%%n")
+exit /b
+
+:sub
+set name=%1
+ren %1 %count:~-3%%name:~4%
+set /a count+=1

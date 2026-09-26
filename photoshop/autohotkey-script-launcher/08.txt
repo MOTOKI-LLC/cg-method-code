@@ -1,0 +1,58 @@
+#InstallKeybdHook
+
+; バージョン定義
+Default:="Photoshop.Application"
+CC2019:="Photoshop.Application.130"
+CC2018:="Photoshop.Application.120"
+CC2017:="Photoshop.Application.110"
+CC2015:="Photoshop.Application.90"
+CC2014:="Photoshop.Application.80"
+CC:="Photoshop.Application.70"
+CS6:="Photoshop.Application.60"
+
+; 実行するスクリプト
+script1:="C:\Users\min\Desktop\alert.jsx"
+
+; Photoshopスクリプト実行関数
+PScript(Version, Script) {
+    app := ComObjCreate(Version)
+    app.DoJavaScriptFile(Script)
+    MsgBox, %Version%
+    return
+}
+
+; Photoshopのバージョンを順番に試して実行
+go(Script) {  
+    Try {
+        PScript(Default, Script)
+    } Catch e {
+        Try {
+            PScript(CC2019, Script)
+        } Catch e {
+            Try {
+                PScript(CC2018, Script)
+            } Catch e {
+                Try {
+                    PScript(CC2017, Script)
+                } Catch e {
+                    Try {
+                        PScript(CC2015, Script)
+                    } Catch e {
+                        Try {
+                            PScript(CC2014, Script)
+                        } Catch e {
+                            Try {
+                                PScript(CC, Script)
+                            } Catch e {
+                                PScript(CS6, Script)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+; スクリプトを実行
+go(script1)

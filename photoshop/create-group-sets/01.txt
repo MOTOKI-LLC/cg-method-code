@@ -1,0 +1,25 @@
+(function () {
+    if (!app.documents.length) {
+        alert("ドキュメントを開いてから実行してください。");
+        return;
+    }
+    var doc = app.activeDocument;
+    function findGroup(groups, name) {
+        for (var i = 0; i < groups.length; i++) {
+            if (groups[i].name === name) return groups[i];
+        }
+        return null;
+    }
+    function ensureGroup(groups, name) {
+        var group = findGroup(groups, name);
+        if (!group) {
+            group = groups.add();
+            group.name = name;
+        }
+        return group;
+    }
+    var face = ensureGroup(doc.layerSets, "顔");
+    ensureGroup(face.layerSets, "塗り");
+    ensureGroup(face.layerSets, "線画");
+    ensureGroup(doc.layerSets, "見本");
+}());

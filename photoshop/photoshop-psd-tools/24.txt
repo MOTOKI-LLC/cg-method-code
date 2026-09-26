@@ -1,0 +1,10 @@
+# ベクターマスク情報
+if layer.has_vector_mask():
+    vector_mask = layer.vector_mask
+    print(vector_mask)
+
+# ライブシェイププロパティ
+if layer.has_origination():
+    for shape in layer.origination:
+        # Rectangle, RoundedRectangle, Ellipse, Line など
+        print(type(shape).__name__)

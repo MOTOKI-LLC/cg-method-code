@@ -1,0 +1,7 @@
+if layer.kind == 'shape':
+    # ベクターマスク情報
+    print(layer.vector_mask)
+    
+    # ライブシェイププロパティ
+    for shape in layer.origination:
+        print(shape)

@@ -1,0 +1,74 @@
+<style>
+/* =====================  共通リセット  ===================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* =====================  操作エリア  ===================== */
+#header { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.selectpicker { width: 200px; }
+
+/* ===== 画像グリッド ===== */
+#btn-search {
+    background-color: #333;
+    border-color: #333;
+}
+.btn.btn-info {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* ===== 画像グリッド ===== */
+#grid{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+/* 画面幅に応じて列数を自動調整 */
+@media (max-width: 1280px){ #grid{ grid-template-columns: repeat(4, minmax(0,1fr)); } }
+@media (max-width: 992px) { #grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
+@media (max-width: 768px) { #grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+
+/* ===== カード ===== */
+#grid .list_item{ position: relative; }
+
+#grid img.card{
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: filter .5s;
+}
+
+/* ===== ホバー時のエフェクト ===== */
+#grid .list_item:hover img.card{ filter: brightness(50%); }
+
+#grid .list_item:hover::after {
+  content: attr(data-alt) '\A' attr(data-name) '\A ID : ' attr(data-id);
+  white-space: pre-wrap;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 90%;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* =====================  モーダル画像  ===================== */
+.iziModal{
+  position: fixed !important;          /* 念のため固定 */
+  left: 50% !important;
+  top : 50% !important;
+  transform: translate(-50%,-50%) !important;
+  margin: 0 !important;
+  max-width : 90vw !important;         /* 画面幅 90% まで拡大可 */
+  width     : auto   !important;       /* 幅は内容に合わせて伸縮 */
+}
+.iziModal-content {
+  padding: 1em!important;
+}
+.modal_card {
+    width: 100%;
+}
+</style>

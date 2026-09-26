@@ -1,0 +1,6 @@
+var str = thisComp.name.split("_")[1];
+num = Number(str);
+$.evalFile("file://C:\\Users\\min\\Desktop\\text.txt");
+if (num == 1) text.sourceText = text1;
+if (num == 2) text.sourceText = text2;
+if (num == 3) text.sourceText = text3;

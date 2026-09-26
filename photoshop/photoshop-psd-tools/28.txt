@@ -1,0 +1,22 @@
+from pathlib import Path
+from psd_tools import PSDImage
+
+def batch_convert_psd_to_png(input_dir, output_dir):
+    """ディレクトリ内の全PSDファイルをPNGに変換"""
+    input_path = Path(input_dir)
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    for psd_file in input_path.glob('*.psd'):
+        try:
+            psd = PSDImage.open(psd_file)
+            image = psd.composite()
+            
+            output_file = output_path / f"{psd_file.stem}.png"
+            image.save(output_file)
+            print(f"Converted: {psd_file.name} -> {output_file.name}")
+        except Exception as e:
+            print(f"Error converting {psd_file.name}: {e}")
+
+# 使用例
+batch_convert_psd_to_png('input_psds', 'output_pngs')

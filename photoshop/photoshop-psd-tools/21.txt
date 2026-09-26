@@ -1,0 +1,9 @@
+from psd_tools.constants import ChannelID
+
+# RGB個別チャンネル
+red = layer.topil(ChannelID.CHANNEL_0)
+green = layer.topil(ChannelID.CHANNEL_1)
+blue = layer.topil(ChannelID.CHANNEL_2)
+
+# アルファチャンネル
+alpha = layer.topil(ChannelID.TRANSPARENCY_MASK)

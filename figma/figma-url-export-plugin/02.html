@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 16px;
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        white-space: pre;
+        margin-top: 8px;
+      }
+      input,
+      button {
+        margin: 8px 0;
+        padding: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>fileKey を入力（デスクトップ用）</h3>
+    <input
+      type="text"
+      id="fileKeyInput"
+      placeholder="例: FoijeBRjomQCWZ4rLFxnSv"
+    />
+
+    <button id="send">リンクを生成</button>
+
+    <h3>選択ノードのURL一覧（タブ区切り）</h3>
+    <textarea id="output" readonly></textarea>
+    <button id="copy">コピー</button>
+
+    <script>
+      // 送信ボタン押下 → fileKeyを送る
+      document.getElementById("send").onclick = () => {
+        const fileKey = document.getElementById("fileKeyInput").value.trim();
+        parent.postMessage({ pluginMessage: { fileKey } }, "*");
+      };
+
+      // プラグインから受信
+      window.onmessage = (event) => {
+        const { urls, error } = event.data.pluginMessage;
+        const output = document.getElementById("output");
+
+        if (error) {
+          output.value = error;
+          return;
+        }
+
+        const text = urls.map((u) => `${u.name}\t${u.url}`).join("\n");
+        output.value = text;
+      };
+
+      // コピー処理
+      document.getElementById("copy").onclick = () => {
+        const textarea = document.getElementById("output");
+        textarea.select();
+        document.execCommand("copy");
+      };
+    </script>
+  </body>
+</html>

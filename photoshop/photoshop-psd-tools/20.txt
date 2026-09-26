@@ -1,0 +1,7 @@
+# レイヤーとマスクを別々にエクスポート（合成なし）
+layer_image = layer.topil()
+layer_image.save('layer_no_mask.png')
+
+if layer.has_mask():
+    mask_image = layer.mask.topil()
+    mask_image.save('mask.png')

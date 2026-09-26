@@ -1,0 +1,81 @@
+Sub ImageImport()
+Dim cntL As Integer, cntT As Integer
+Dim flgAspect As Boolean
+Dim SL As Single, SR As Single, ST As Single, SB As Single
+Dim ML As Single, MT As Single
+Dim xlApp As Object
+Dim dlgOpen As Variant
+Dim myPre As Presentation
+Dim Sld As Slide
+Dim n As Long
+Dim i As Integer, j As Integer
+Dim sldWidth As Single, sldHeight As Single
+Dim realWidth As Single, realHeight As Single
+Dim myWidth As Single, myHeight As Single
+Dim myLeft As Single, myTop As Single
+Dim myPic As Shape
+cntL = 2 '★横方向枚数2～6などで変更
+cntT = 1 '★縦方向枚数2～6などで変更
+flgAspect = True '★縦横比を固定するときはTrue,しないときはFalseで変更
+SL = 0 'スライド左余白
+SR = 0 'スライド右余白
+ST = 0 'スライド上余白
+SB = 0 'スライド下余白
+ML = 0 '左右間隔
+MT = 0 '上下間隔
+Set myPre = ActivePresentation
+With myPre
+sldHeight = .SlideMaster.Height
+sldWidth = .SlideMaster.Width
+End With
+realWidth = sldWidth - SL - SR
+realHeight = sldHeight - ST - SB
+myWidth = realWidth / cntL - ML
+myHeight = realHeight / cntT - MT
+Set xlApp = CreateObject("Excel.Application")
+dlgOpen = xlApp.GetOpenFileName("gif,*.gif,jpg,*.jpg,jpg,*.jpeg,bmp,*.bmp,png,*.png,wmf,*.wmf,tiff,*.tiff", , , , True)
+With myPre.Slides '新規スライド
+j = 1
+i = 1
+Set Sld = .Add(.Count + 1, ppLayoutBlank)
+End With
+If IsArray(dlgOpen) Then
+For n = LBound(dlgOpen) To UBound(dlgOpen)
+If i > cntT Then 'さらに新規スライド
+i = 1
+With myPre.Slides
+Set Sld = .Add(.Count + 1, ppLayoutBlank)
+End With
+End If
+myLeft = SL + (j - 1) * realWidth / cntL
+myTop = ST + (i - 1) * realHeight / cntT
+Set myPic = Sld.Shapes.AddPicture _
+(FileName:=dlgOpen(n), _
+LinkToFile:=msoFalse, _
+SaveWithDocument:=msoTrue, _
+Left:=myLeft, Top:=myTop)
+With myPic
+.LockAspectRatio = flgAspect
+.Height = myHeight
+If flgAspect = False Then
+.Width = myWidth
+Else
+If .Width > myWidth Then
+.Width = myWidth
+End If
+End If
+End With
+If j < cntL Then '横にずらす
+j = j + 1
+Else '改行
+j = 1
+i = i + 1
+End If
+Next n
+End If
+xlApp.Quit
+Set dlgOpen = Nothing
+Set xlApp = Nothing
+Set Sld = Nothing
+Set myPre = Nothing
+End Sub

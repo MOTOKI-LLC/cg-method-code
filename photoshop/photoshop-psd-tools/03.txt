@@ -1,0 +1,7 @@
+# 全レイヤーをループ
+for layer in psd:
+    print(f"レイヤー名: {layer.name}")
+    print(f"レイヤータイプ: {layer.kind}")
+    print(f"サイズ: {layer.width}x{layer.height}")
+    print(f"可視性: {layer.visible}")
+    print("---")

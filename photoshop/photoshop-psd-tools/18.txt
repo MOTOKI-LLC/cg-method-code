@@ -1,0 +1,7 @@
+# PSD全体を合成
+image = psd.composite()
+image.save('output.png')
+
+# 特定のビューポートで合成
+viewport = (0, 0, 300, 300)  # (x1, y1, x2, y2)
+image = psd.composite(viewport=viewport)

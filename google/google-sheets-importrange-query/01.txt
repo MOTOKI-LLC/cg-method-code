@@ -1,0 +1,5 @@
+=QUERY(
+  IMPORTRANGE("URL", "シート1!A:E"),
+  "select Col1, Col3 where Col2 = '東京'",
+  1
+)

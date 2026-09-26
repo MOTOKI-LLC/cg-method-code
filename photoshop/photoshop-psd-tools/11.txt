@@ -1,0 +1,8 @@
+from psd_tools.constants import BlendMode
+
+# ブレンドモードの確認
+print(layer.blend_mode)
+
+# ブレンドモードの変更
+if layer.blend_mode == BlendMode.NORMAL:
+    layer.blend_mode = BlendMode.SCREEN

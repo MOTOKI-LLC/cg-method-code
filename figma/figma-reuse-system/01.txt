@@ -1,0 +1,9 @@
+Styles / Variables → 色や数値などの共通定義
+  ↓ デザイン要素で利用
+Main Component → Instance（元との関連を保って配置）
+  ├ Variants：複数の状態をComponent Setに整理
+  ├ Properties：変更可能な文字・表示・入れ替え等を定義
+  └ Nesting：内部に別のコンポーネントを配置
+
+Assets：コンポーネントを探してInstanceを配置
+Library：コンポーネント・スタイル・変数を別ファイルへ共有

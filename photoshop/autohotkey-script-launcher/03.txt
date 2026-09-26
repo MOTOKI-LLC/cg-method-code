@@ -1,0 +1,9 @@
+;Ctrl+Shift+A
+^+a::
+alert=
+(
+alert ("こんにちは！ねむいねこだよ");
+)
+app:=ComObjCreate("Photoshop.Application")
+app.DoJavaScript(alert)
+Return

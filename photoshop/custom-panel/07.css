@@ -1,0 +1,38 @@
+/* ボタンを中央寄せ */
+div { text-align: center; }
+
+/* ボタンサイズの統一 */
+.topcoat-button--large--cta, .topcoat-button--large {
+    width: 100%;
+}
+
+/* タブデザイン */
+ul.tab {
+    width: 100%;
+    list-style: none;
+    padding-left: 0;
+}
+ul.tab li {
+    float: left;
+    height: 30px;
+    text-align: center;
+    width: 33.3%;
+    padding: 5px;
+    background-color: #595b5b;
+    color: #fff;
+    cursor: pointer;
+}
+ul.tab li:hover {
+    background-color: #539fe1;
+}
+ul.tab li.active {
+    background-color: #368bdc;
+}
+div.tabContent {
+    clear: both;
+    width: 100%;
+    display: none;
+}
+div.tabContent.active {
+    display: block;
+}

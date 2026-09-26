@@ -1,0 +1,6 @@
+{
+  "language": "japanese",
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  }
+}

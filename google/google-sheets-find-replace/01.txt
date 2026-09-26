@@ -1,0 +1,6 @@
+=SUBSTITUTE(A2, "株式会社", "")          株式会社を消す
+=SUBSTITUTE(A2, "-", "")               ハイフンを消す
+=SUBSTITUTE(A2, "-", "", 1)            1つ目のハイフンだけ消す
+
+=REGEXREPLACE(A2, "\d+", "")           数字をまとめて消す
+=REGEXREPLACE(A2, "[ 　]+", "")        半角と全角の空白を消す

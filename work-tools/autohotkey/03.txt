@@ -1,0 +1,12 @@
+Run, %USERPROFILE%\AppData\Local\LINE\bin\LineLauncher.exe
+
+Sleep, 5000
+
+Loop, {
+  Sleep, 20
+  IfWinExist, LINE ahk_class Qt5QWindowIcon
+  {
+    WinClose, LINE ahk_class Qt5QWindowIcon
+    Break
+  }
+}

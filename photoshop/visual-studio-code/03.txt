@@ -1,0 +1,11 @@
+# 初期化
+npm init -y
+
+# TypeScriptの導入
+npm install -D typescript
+
+# Adobe用の型定義ファイル（外部リポジトリ）
+npm install -D ten-A/types-for-adobe
+
+# tsconfig.json を作成
+./node_modules/.bin/tsc --init

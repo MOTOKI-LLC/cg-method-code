@@ -1,0 +1,8 @@
+from psd_tools.constants import Tag
+
+# タグ付きブロックにアクセス
+tagged_blocks = layer.tagged_blocks
+
+# 特定のタグの情報を取得
+if Tag.LAYER_ID in tagged_blocks:
+    layer_id = tagged_blocks[Tag.LAYER_ID]

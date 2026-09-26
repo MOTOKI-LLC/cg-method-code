@@ -1,0 +1,52 @@
+#InstallKeybdHook
+
+IniFile=%A_WorkingDir%settings.ini
+
+IfExist, %IniFile%
+{
+IniRead, script1, settings.ini, Script1, hotkey
+Hotkey, %script1%, script1
+
+IniRead, script2, settings.ini, Script2, hotkey
+Hotkey, %script2%, script2
+
+IniRead, script3, settings.ini, Script3, hotkey
+Hotkey, %script3%, script3
+}
+
+Gui, Add, Button,X20 W200 Gscript1, ボタン1
+Gui, Add, Hotkey,X+10 W70 vScript1, %Script1%
+
+Gui, Add, Button,X20 W200 Gscript2, ボタン2
+Gui, Add, Hotkey,X+10 W70 vScript2, %Script2%
+
+Gui, Add, Button,X20 W200 Gscript3, ボタン3
+Gui, Add, Hotkey,X+10 W70 vScript3, %Script3%
+
+Gui, Add, Button,X20 W200 Gsave, 保存
+
+Gui, Show,,test
+
+return
+
+
+save:
+Gui, Submit, NoHide
+IniWrite, %Script1%, %IniFile%, Script1, hotkey
+IniWrite, %Script2%, %IniFile%, Script2, hotkey
+IniWrite, %Script3%, %IniFile%, Script3, hotkey
+msgbox, 保存されました。
+return
+
+script1:
+msgbox, Hotkey スクリプト1
+return
+
+script2:
+msgbox, Hotkey スクリプト2
+return
+
+script3:
+msgbox, Hotkey スクリプト3
+return
+﻿

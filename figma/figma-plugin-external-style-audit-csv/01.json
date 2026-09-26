@@ -1,0 +1,9 @@
+{
+  "name": "外部スタイル参照を調査",
+  "id": "check-external-styles",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "permissions": ["currentuser"]
+}

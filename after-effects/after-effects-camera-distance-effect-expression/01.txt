@@ -1,0 +1,9 @@
+cc=effect("targetControl")("スライダ");
+num=Math.floor(cc);
+nxtNum=num+1;
+start=effect("Target-"+num)("レイヤー").position;
+end=effect("Target-"+nxtNum)("レイヤー").position;
+if(effect("ease")("チェックボックス")==0){
+linear(cc,num,nxtNum,start,end)}
+else{
+ease(cc,num,nxtNum,start,end);}

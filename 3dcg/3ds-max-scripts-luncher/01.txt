@@ -1,0 +1,7 @@
+[settings]
+extension=all
+uncheck_old=on
+view_extension=on
+use_default_path=on
+use_unique_path=on
+unique_path=C:\Users\ユーザー名\AppData\Local\Autodesk\3dsMax\2017 - 64bit\JPN\usermacros;

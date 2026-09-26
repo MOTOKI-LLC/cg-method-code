@@ -1,0 +1,39 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:StartProcess
+if "%~1" equ "" goto EndProcess
+
+:: ファイル名に "Android" という文字列が含まれる場合
+echo %~n1 | find "Android" 1>nul
+if not ERRORLEVEL 1 (
+  set ID=01_
+  goto Process
+)
+
+:: ファイル名に "iOS" という文字列が含まれる場合
+echo %~n1 | find "iOS" 1>nul
+if not ERRORLEVEL 1 (
+  set ID=02_
+  goto Process
+)
+
+:: ファイル名に "Windows Phone" という文字列が含まれる場合
+echo %~n1 | find "Windows Phone" 1>nul
+if not ERRORLEVEL 1 (
+  set ID=03_
+  goto Process
+)
+:: それ以外
+  set ID=00_
+
+:Process
+echo リネーム前のファイル名: "%~n1%~x1" 
+echo リネーム後のファイル名: "%ID%%~n1%~x1"
+ren "%~n1%~x1" "%ID%%~n1%~x1"
+
+:NextProcess
+shift
+goto StartProcess
+
+:EndProcess

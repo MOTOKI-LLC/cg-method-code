@@ -1,0 +1,7 @@
+from PIL import Image, ImageChops, ImageStat
+
+a = Image.open("元.png").convert("RGB")
+b = Image.open("変換後.webp").convert("RGB")
+d = ImageChops.difference(a, b)
+print("一致:", d.getbbox() is None)
+print("平均差:", [round(x, 2) for x in ImageStat.Stat(d).mean])

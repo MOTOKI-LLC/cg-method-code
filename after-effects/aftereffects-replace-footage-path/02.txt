@@ -1,0 +1,23 @@
+Option Explicit
+
+Dim filename, instream, outstream, text
+
+filename = WScript.Arguments(0)
+
+Set instream = CreateObject("ADODB.Stream")
+instream.Type = 2
+instream.Charset = "UTF-8"
+instream.Open
+instream.LoadFromFile filename
+text = instream.ReadText(-1)
+instream.Close
+
+text = Replace(text, "置換前の文字列", "置換後の文字列")
+
+Set outstream = CreateObject("ADODB.Stream")
+outstream.Type = 2
+outstream.Charset = "UTF-8"
+outstream.Open
+outstream.WriteText text
+outstream.SaveToFile filename, 2
+outstream.Close

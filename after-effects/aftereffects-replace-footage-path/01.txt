@@ -1,0 +1,5 @@
+// 変更前
+C:\Users\namae\Desktop\test.psd
+
+// 変更後
+C:\Users\namae\Desktop\新しいフォルダー\test.psd

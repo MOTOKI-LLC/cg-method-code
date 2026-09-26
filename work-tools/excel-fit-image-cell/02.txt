@@ -1,0 +1,12 @@
+Sub FitPicsHight()
+Dim pic As Shape
+For Each pic In ActiveSheet.Shapes
+With pic.TopLeftCell
+pic.LockAspectRatio = msoTrue
+pic.Top = .Top
+pic.Left = .Left
+pic.Width = .Width
+pic.Height = .Height
+End With
+Next
+End Sub

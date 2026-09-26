@@ -1,0 +1,28 @@
+{
+Gui,+AlwaysOnTop
+Gui, Add, Tab3,, General|View|Settings
+
+Gui, 1:Add, Button,W200 Gscript1, アラート1
+Gui, 1:Add, Button,W200 Gscript1, アラート2
+Gui, 1:Add, Button,W200 Gscript3, アラート3
+
+Gui, Tab, 2
+Gui, 1:Add, Button,W200 Gscript1, アラート4
+Gui, 1:Add, Button,W200 Gscript1, アラート5
+Gui, 1:Add, Button,W200 Gscript1, アラート6
+
+Gui, Tab, 3
+Gui, 1:Add, Button,W200 Gscript1, アラート7
+Gui, 1:Add, Button,W200 Gscript1, アラート8
+Gui, 1:Add, Button,W200 Gscript1, アラート9
+
+Gui,1:Show,,スクリプトランチャー
+return
+}
+
+script1:
+Gui,1:
+#IfWinActive ahk_class Photoshop
+app:=ComObjCreate("Photoshop.Application")
+app.DoJavaScriptFile("C:\Users\min\Desktop\alert.jsx")
+return

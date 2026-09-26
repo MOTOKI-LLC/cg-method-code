@@ -1,0 +1,22 @@
+from pathlib import Path
+from psd_tools import PSDImage
+
+def export_all_layers(psd_path, output_dir):
+    """PSDファイルの全レイヤーを個別の画像ファイルとして出力"""
+    psd = PSDImage.open(psd_path)
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    for i, layer in enumerate(psd.descendants()):
+        if layer.kind in ('pixel', 'shape'):
+            try:
+                image = layer.composite()
+                # ファイル名をサニタイズ
+                safe_name = "".join(c for c in layer.name if c.isalnum() or c in (' ', '-', '_'))
+                image.save(output_path / f"{i:03d}_{safe_name}.png")
+                print(f"Exported: {layer.name}")
+            except Exception as e:
+                print(f"Error exporting {layer.name}: {e}")
+
+# 使用例
+export_all_layers('example.psd', 'output_layers')

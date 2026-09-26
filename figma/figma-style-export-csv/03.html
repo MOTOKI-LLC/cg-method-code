@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+        padding: 12px;
+      }
+      .hint {
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div>スタイル情報をCSVに変換中…自動的にダウンロードが始まります。</div>
+    <div class="hint">
+      ダウンロードできない場合は、ポップアップを許可してください。
+    </div>
+
+    <script>
+      // 受信したCSV文字列をBlobにして保存
+      window.onmessage = (event) => {
+        const msg = event.data?.pluginMessage;
+        if (!msg) return;
+
+        if (msg.type === "save-csv") {
+          const filename = msg.filename || "styles.csv";
+          const content = msg.content || "";
+          const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          // URL開放 & Figma側へ完了通知
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          parent.postMessage({ pluginMessage: { type: "done" } }, "*");
+        }
+      };
+    </script>
+  </body>
+</html>

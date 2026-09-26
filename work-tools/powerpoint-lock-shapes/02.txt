@@ -1,0 +1,64 @@
+'ロックした図形を元に戻す
+Public Sub unlockShapes()
+    Dim i As Integer
+    Dim sld As Slide, sh As ShapeRange
+
+    Call preCheckMaster
+
+    ActiveWindow.Selection.ShapeRange.Cut
+
+    i = ActiveWindow.View.Slide.Design.index
+
+    Call ShowSlide
+
+    For Each sld In ActivePresentation.Slides
+        If sld.Design.index = i Then
+            Set sh = sld.Shapes.Paste
+            sh.ZOrder msoSendToBack
+            sh.Select
+            Set sh = Nothing
+            End
+        End If
+    Next
+
+End Sub
+
+'エラーチェック
+Private Sub preCheckMaster()
+
+    '表示がスライドでない時は終了
+    If cView <> "Master" Then
+        Debug.Print "マスター表示でない"
+        End
+    End If
+
+    '選択範囲がシェイプでないときは終了
+    If ActiveWindow.Selection.Type <> ppSelectionShapes Then
+        Debug.Print "選択なし"
+        End
+    End If
+
+    'ダミースライド以外を選択しているときは終了
+    If InStr(ActiveWindow.View.Slide.Design.Name, "DummyMST") = 0 Then
+        Debug.Print "ダミースライドを選択していない"
+        End
+    End If
+
+End Sub
+
+'表示されているビュータイプを判定する関数
+Private Function cView() As String
+    Dim p As Pane
+
+    For Each p In ActiveWindow.Panes
+        If p.ViewType = ppViewSlide Then
+            cView = "Slide"
+            Exit Function
+        ElseIf p.ViewType = ppViewSlideMaster Then
+            cView = "Master"
+            Exit Function
+        End If
+    Next
+    cView = "Others"
+
+End Function

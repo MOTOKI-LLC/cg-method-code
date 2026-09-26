@@ -1,0 +1,9 @@
+/*
+<javascriptresource>
+<name>アラート</name>
+<menu>automate</menu>
+<category>Layers</category>
+<enableinfo>true</enableinfo>
+</javascriptresource>
+*/
+alert("アラート！");

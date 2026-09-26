@@ -1,0 +1,20 @@
+preferences.rulerUnits = Units.PIXELS;
+var doc = activeDocument;
+var layer = doc.activeLayer;
+var name = layer.name;
+var w = doc.width;
+var h = doc.height;
+
+var b = doc.activeLayer.bounds;
+var x1 = parseInt(b[0], 10);
+var y1 = parseInt(b[1], 10);
+var x2 = parseInt(b[2], 10);
+var y2 = parseInt(b[3], 10);
+
+var newDoc = documents.add(w, h, 72, name, NewDocumentMode.RGB, DocumentFill.TRANSPARENT);
+activeDocument = doc;
+layer.duplicate(newDoc);
+activeDocument = newDoc;
+newDoc.crop([x1, y1, x2, y2]);
+
+newDoc.layers.getByName('レイヤー 1').remove();

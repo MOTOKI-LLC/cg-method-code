@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile("style").getContent(); ?>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2 onclick="startNewConversation()">新規会話</h2>
+      <div id="historyList"></div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <label for="modelSelect">モデル選択：</label>
+        <select id="modelSelect">
+          <option value="gpt-4.1">gpt-4.1</option>
+          <option value="gpt-4.1-mini" selected>gpt-4.1-mini</option>
+          <option value="gpt-4.1-nano">gpt-4.1-nano</option>
+          <option value="o4-mini">o4-mini</option>
+          <option value="gpt-4o">gpt-4o</option>
+          <option value="gpt-4o-mini">gpt-4o-mini</option>
+          <option value="gpt-4o-realtime-preview">gpt-4o-realtime-preview</option>
+          <option value="gpt-4o-mini-tts">gpt-4o-mini-tts</option>
+        </select>
+      </div>
+      <div class="chat-box" id="chatLog"></div>
+      <div class="input-area">
+        <textarea id="inputText" rows="5" placeholder="メッセージを入力..."></textarea>
+        <button onclick="sendMessage()">送信</button>
+      </div>
+    </div>
+    <?!= HtmlService.createHtmlOutputFromFile("script").getContent(); ?>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+$.localize = true;
+
+//=================================================================
+// グローバル変数
+//=================================================================
+
+// ローカライズされたUI文字列
+var strTitle = localize("$$$/JavaScripts/LayerCompsToFiles/Title=レイヤーカンプをファイルへ");
+var strButtonRun = localize("$$$/JavaScripts/LayerCompsToFiles/Run=実行");
+var strButtonCancel = localize("$$$/JavaScripts/LayerCompsToFiles/Cancel=キャンセル");
+var strHelpText = localize("$$$/JavaScripts/LayerCompsToFiles/Help=各レイヤーカンプをファイルとして保存するフォーマットと場所を指定してください。");
+var strLabelDestination = localize("$$$/JavaScripts/LayerCompsToFiles/Destination=保存先:");
+var strButtonBrowse = localize("$$$/JavaScripts/LayerCompsToFiles/Browse=&参照...");
+var strLabelFileNamePrefix = localize("$$$/JavaScripts/LayerCompsToFiles/FileNamePrefix=ファイル名プレフィックス:");
+var strCheckboxSelectionOnly = localize("$$$/JavaScripts/LayerCompsToFiles/SelectedOnly=&選択したレイヤーカンプのみ");
+var strCheckboxNumericPrefix = '数値プレフィックスを追加';
+var strCheckboxLowerCase = '小文字のファイル名で保存';
+var strLabelFileType = localize("$$$/JavaScripts/LayerCompsToFiles/FileType=ファイル形式:");
+var strCheckboxIncludeICCProfile = localize("$$$/JavaScripts/LayerCompsToFiles/IncludeICC=&ICCプロファイルを含む");
+var strJPEGOptions = localize("$$$/JavaScripts/LayerCompsToFiles/JPEGOptions=JPEGオプション:");
+var strLabelQuality = localize("$$$/JavaScripts/LayerCompsToFiles/Quality=品質:");
+var strPSDOptions = localize("$$$/JavaScripts/LayerCompsToFiles/PSDOptions=PSDオプション:");
+var strCheckboxMaximizeCompatibility = localize("$$$/JavaScripts/LayerCompsToFiles/Maximize=&互換性を最大化");
+var strTIFFOptions = localize("$$$/JavaScripts/LayerCompsToFiles/TIFFOptions=TIFFオプション:");
+var strLabelImageCompression = localize("$$$/JavaScripts/LayerCompsToFiles/ImageCompression=画像圧縮:");
+var strNone = localize("$$$/JavaScripts/LayerCompsToFiles/None=なし");
+var strAlertSpecifyDestination = localize("$$$/JavaScripts/LayerCompsToFiles/SpecifyDestination=保存先を指定してください。");
+var strAlertNoLayerCompsFound = localize("$$$/JavaScripts/LayerCompsToFiles/NoComps=ドキュメントにレイヤーカンプが見つかりません！");
+var strAlertWasSuccessful = localize("$$$/JavaScripts/LayerCompsToFiles/Success= が成功しました。");
+
+// メイン関数の実行
+main();
+
+///////////////////////////////////////////////////////////////////////////////
+// メイン処理
+///////////////////////////////////////////////////////////////////////////////
+function main() {
+    if (app.documents.length <= 0) {
+        alert(strAlertNoLayerCompsFound);
+        return 'cancel';
+    }
+
+    var exportInfo = {};
+    initExportInfo(exportInfo);
+
+    // レイヤーカンプの取得
+    var docRef = app.activeDocument;
+    var compsCount = docRef.layerComps.length;
+    if (compsCount < 1) {
+        alert(strAlertNoLayerCompsFound);
+        return 'cancel';
+    }
+
+    for (var compsIndex = 0; compsIndex < compsCount; compsIndex++) {
+        var compRef = docRef.layerComps[compsIndex];
+        if (exportInfo.selectionOnly && !compRef.selected) continue;
+        compRef.apply();
+        var duppedDocument = app.activeDocument.duplicate();
+
+        // ファイル名の生成
+        var fileNameBody = exportInfo.fileNamePrefix + "_" + zeroSuppress(compsIndex, 4) + "_" + compRef.name;
+        fileNameBody = fileNameBody.replace(/[:/\\*?"<>|\r\n]/g, "_");
+        if (exportInfo.lowerCase) fileNameBody = fileNameBody.toLowerCase();
+
+        saveFile(duppedDocument, fileNameBody, exportInfo);
+        duppedDocument.close(SaveOptions.DONOTSAVECHANGES);
+    }
+    alert(strTitle + strAlertWasSuccessful);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ファイル保存処理
+///////////////////////////////////////////////////////////////////////////////
+function saveFile(docRef, fileNameBody, exportInfo) {
+    var saveFile = new File(exportInfo.destination + "/" + fileNameBody + ".psd");
+    var psdSaveOptions = new PhotoshopSaveOptions();
+    psdSaveOptions.embedColorProfile = exportInfo.icc;
+    docRef.saveAs(saveFile, psdSaveOptions, true, Extension.LOWERCASE);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ゼロ埋め関数
+///////////////////////////////////////////////////////////////////////////////
+function zeroSuppress(num, digit) {
+    var tmp = num.toString();
+    while (tmp.length < digit) {
+        tmp = "0" + tmp;
+    }
+    return tmp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// エクスポート情報の初期化
+///////////////////////////////////////////////////////////////////////////////
+function initExportInfo(exportInfo) {
+    exportInfo.destination = "";
+    exportInfo.fileNamePrefix = "layerComp";
+    exportInfo.selectionOnly = false;
+    exportInfo.lowerCase = false;
+    exportInfo.icc = true;
+}

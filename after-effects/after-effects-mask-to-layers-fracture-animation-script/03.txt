@@ -1,0 +1,8 @@
+seedRandom(thisComp.layer("TRANSFORM").effect("seedRandom")("スライダー")+index);
+temp=wiggle(thisComp.layer("TRANSFORM").effect("RotationFreq")("スライダー"),thisComp.layer("TRANSFORM").effect("Rotation")("スライダー"));
+trans=thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
+spd=thisComp.layer("TRANSFORM").effect("speed")("スライダー");
+end=100-(index*spd/100);
+if(thisComp.layer("TRANSFORM").effect("ease")("チェックボックス")==0){
+linear(trans,0,end,temp,0);}
+else{ease(trans,0,end,temp,0);}

@@ -1,0 +1,5 @@
+# 最初のレイヤーを取得
+first_layer = psd[0]
+
+# ネストしたレイヤーにアクセス
+nested_layer = psd[0][0]

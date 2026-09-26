@@ -1,0 +1,7 @@
+# Mac・Linux・WSL
+rm -rf ~/.claude
+rm ~/.claude.json
+
+# プロジェクトの中で
+rm -rf .claude
+rm -f .mcp.json

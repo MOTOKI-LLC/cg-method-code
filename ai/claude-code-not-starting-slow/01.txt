@@ -1,0 +1,5 @@
+# Mac・Linux
+which -a claude
+
+# Windows（PowerShell）
+where.exe claude

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+<ribbon startFromScratch="false">
+<tabs>
+<tab id="MyTab1" label="my menu">
+<group id="Group1" label="tool_01">
+<button id="Button1-1" label="画像一括挿入" imageMso="MacroPlay" size="normal" onAction="ImportImage" />
+<button id="Button1-2" label="画像一括置換" imageMso="MacroPlay" size="normal" onAction="ReplaceImage" />
+<button id="Button1-3" label="複数pptを一つにまとめる" imageMso="MacroPlay" size="normal" onAction="Pre_InsertFromFile1" />
+</group>
+<group id="Group2" label="tool_02">
+<button id="Button2-1" label="図形をA4にリサイズ" imageMso="MacroPlay" size="normal" onAction="ResizeA4" />
+<button id="Button2-2" label="図形をロック" imageMso="MacroPlay" size="normal" onAction="lockShapes" />
+<button id="Button2-3" label="図形のロック解除" imageMso="MacroPlay" size="normal" onAction="unlockShapes" />
+<button id="Button2-4" label="グリッド表示ON・OFF" imageMso="MacroPlay" size="normal" onAction="ToggleGrid" />
+<button id="Button2-5" label="グリッド吸着ON・OFF" imageMso="MacroPlay" size="normal" onAction="SnapGrid" />
+</group>
+</tab>
+</tabs>
+</ribbon>
+</customUI>

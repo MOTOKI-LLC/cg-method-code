@@ -1,0 +1,9 @@
+# Ubuntu/Debian
+apt-get install liblcms2-2
+
+# macOS
+brew install little-cms2
+
+# Pillowを再インストール
+pip uninstall Pillow
+pip install Pillow

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>画像一覧</title>
+
+    <!-- CSS & プラグイン読込  -->
+    <?!= include('plugin') ?>
+    <?!= include('css') ?>
+  </head>
+  <body>
+  <!-- ===== フィルター・操作エリア ===== -->
+  <header id="header" class="d-flex flex-wrap gap-2 mb-3">
+    <select id="filter"        class="selectpicker" multiple title="フィルター"
+            data-actions-box="true" data-selected-text-format="count > 3" size="4"></select>
+
+    <select id="select_chara"  class="selectpicker" multiple title="アイテム名"
+            data-actions-box="true" data-selected-text-format="count > 3"></select>
+
+    <select id="select_tag"    class="selectpicker" multiple title="タグ"
+            data-live-search="true" data-actions-box="true"
+            data-live-search-placeholder="Search" data-selected-text-format="count > 3"></select>
+
+    <button id="btn-search" class="btn btn-success">検索</button>
+    <button class="btn btn-info" onclick="window.open('https://docs.google.com/spreadsheets/d/xxxxxxxxx/edit?gid=0#gid=0')">シート</button>
+  </header>
+  <!-- ================= ページャ ================= -->
+  <nav id="pager">
+    <ul id="pagenation"></ul>
+  </nav>
+    <!-- ================= 画像グリッド ================= -->
+   <main>
+    <ul>
+      <div id="grid"></div>
+    </ul>
+  </main>
+  
+    <!-- ================= 画像モーダル ================= -->
+    <div class="iziModal"></div>
+
+    <!-- ================= JavaScript ================= -->
+    <?!= include('js') ?>
+</body>
+</html>

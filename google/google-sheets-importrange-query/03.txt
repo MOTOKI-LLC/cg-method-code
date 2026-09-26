@@ -1,0 +1,5 @@
+=QUERY(
+  IMPORTRANGE("URL", "シート1!A:E"),
+  "select * where Col2 = '" & B1 & "'",
+  1
+)

@@ -1,0 +1,56 @@
+var Chatwork_TOKEN ='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';//Chatwork APIトークン
+var SLACK_TOKEN = 'xoxp-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';//Slack APIトークン
+var MY_ID = 'xxxxxxx'; //自分のチャットワークID
+var ROOM_ID = ["xxxxxxxx","xxxxxxxx","xxxxxxxx"];//取得したいチャットワークのルームID
+
+
+function getChatwork(){
+  var params = {
+    headers : {"X-ChatworkToken" : Chatwork_TOKEN},
+    method : "get"
+  };
+  for (var i = 0; i < ROOM_ID.length; i ++) {    
+    var url = "https://api.Chatwork.com/v2/rooms/" + ROOM_ID[i] + "/messages?force=0";
+    var strRespons = UrlFetchApp.fetch(url, params);
+    if (strRespons != "") {      
+      var json = JSON.parse(strRespons.getContentText());
+      if(json == "") return;
+    
+      json.forEach(function(obj) {
+        if(obj.body.indexOf(MY_ID) != -1){
+          var message = '';
+          for(var i in json){
+            message = message + json[i].account.name + "\n```" + json[i].body + "```\n";
+            postMessage(message);
+          }
+        }
+      }); 
+    }
+  } 
+}
+
+function postMessage(message) {
+  var url        = 'https://slack.com/api/chat.postMessage';
+  var token      = SLACK_TOKEN;
+  var channel    = "#general";
+  var username   = "Chatwork"; 
+  var parse      = 'full';
+  var icon_emoji = ':robot_face:';
+  var method     = 'post';
+ 
+  var payload = {
+      'token'      : token,
+      'channel'    : channel,
+      'text'       : message,
+      'username'   : username,
+      'parse'      : parse,
+      'icon_emoji' : icon_emoji
+  };
+ 
+  var params = {
+      'method' : method,
+      'payload' : payload
+  };
+ 
+  var response = UrlFetchApp.fetch(url, params);
+}

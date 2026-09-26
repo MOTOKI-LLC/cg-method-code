@@ -1,0 +1,13 @@
+Usage: clasp create-script|create [options]
+
+Create a script
+
+Options:
+  --type <type>        Creates a new Apps Script project attached to a new
+                       Document, Spreadsheet, Presentation, Form, or as a
+                       standalone script, web app, or API. (default:
+                       "standalone")
+  --title <title>      The project title.
+  --parentId <id>      A project parent Id.
+  --rootDir <rootDir>  Local root directory in which clasp will store your
+                       project files.

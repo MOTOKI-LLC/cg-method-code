@@ -1,0 +1,5 @@
+# PSD全体をエクスポート
+psd-tools export example.psd output.png
+
+# 特定のレイヤーをエクスポート（インデックス指定）
+psd-tools export example.psd[0] layer0.png

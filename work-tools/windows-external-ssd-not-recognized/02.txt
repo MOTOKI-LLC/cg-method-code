@@ -1,0 +1,5 @@
+Number FriendlyName             OperationalStatus PartitionStyle  GB
+------ ------------             ----------------- --------------  --
+     0 WPBSN4M8-1TGP            Online            GPT            954
+     1 Generic MassStorageClass No Media          RAW              0
+     2 Generic MassStorageClass No Media          RAW              0

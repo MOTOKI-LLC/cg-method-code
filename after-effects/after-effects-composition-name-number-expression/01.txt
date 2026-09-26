@@ -1,0 +1,6 @@
+var str = thisComp.name.split("_")[1];
+var text1 = "おはよう";
+var text2 = "こんにちは";
+var text3 = "おやすみ";
+var result = eval("text" + str);
+text.sourceText = result;

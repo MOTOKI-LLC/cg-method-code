@@ -1,0 +1,7 @@
+// 変更前
+"$/AE/EGG/LStr/2410=Adobe After Effects 自動保存"
+"$/AE/EGG/LStr/2411=自動保存"
+
+// 変更後
+"$/AE/EGG/LStr/2410=Adobe After Effects AutoSave"
+"$/AE/EGG/LStr/2411=AutoSave"

@@ -1,0 +1,57 @@
+<スクリプトイベントマネージャー>
+	<events>
+		<0>
+			<name>アプリケーションを起動</name>
+			<value>Ntfy</value>
+			<valueClass></valueClass>
+		</0>
+		<1>
+			<name>新規ドキュメント</name>
+			<value>Mk  </value>
+			<valueClass>Dcmn</valueClass>
+		</1>
+		<2>
+			<name>ドキュメントを開く</name>
+			<value>Opn </value>
+			<valueClass></valueClass>
+		</2>
+		<3>
+			<name>ドキュメントを保存を開始</name>
+			<value>save</value>
+			<valueClass>saveBegin</valueClass>
+		</3>
+		<4>
+			<name>ドキュメントを保存</name>
+			<value>save</value>
+			<valueClass>saveSucceeded</valueClass>
+		</4>
+		<5>
+			<name>ドキュメントを閉じる</name>
+			<value>Cls </value>
+			<valueClass></valueClass>
+		</5>
+		<6>
+			<name>日本標準用紙</name>
+			<value>Prnt</value>
+			<valueClass></valueClass>
+		</6>
+		<7>
+			<name>ドキュメントの書き出し</name>
+			<value>Expr</value>
+			<valueClass></valueClass>
+		</7>
+		<8>
+			<name>すべてのイベント</name>
+			<value>All </value>
+			<valueClass></valueClass>
+		</8>
+		<9>
+			<name>test</name>
+			<value>aaa</value>
+			<valueClass></valueClass>
+		</9>
+	</events>
+	<extrafiles>
+		<0>~/Desktop/test.jsx</0>
+	</extrafiles>
+</スクリプトイベントマネージャー>

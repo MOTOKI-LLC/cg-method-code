@@ -1,0 +1,8 @@
+# Windows
+winget install BurntSushi.ripgrep.MSVC
+
+# Mac
+brew install ripgrep
+
+# Ubuntu・Debian
+sudo apt install ripgrep

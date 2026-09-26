@@ -1,0 +1,6 @@
+table{background:#F5F5F5}.
+{background:#666666}. |_. %{color:white}親フォルダ%|_. %{color:white}子フォルダ%|_. %{color:white}備考% |_. %{color:white}発注%|_. %{color:white}制作%|
+|/4=. TEST |=.A |. -|/2=. - |/2=. -|
+|=.B |. - |
+|=.C |. - |=. - |=. -|
+|=.D |. - |=. - |=. -|

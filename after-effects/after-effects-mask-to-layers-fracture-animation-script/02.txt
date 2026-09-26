@@ -1,0 +1,5 @@
+temp=thisComp.layer("TRANSFORM").effect("Spread")("スライダー");
+if(temp<0){
+value+[temp,-temp,0];}
+else{
+value+[temp,0,0];}

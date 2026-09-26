@@ -1,0 +1,5 @@
+Remote Control
+Remote Control requires a claude.ai subscription. Run claude auth login to sign in.
+- Not signed in to claude.ai
+- claude.ai subscription auth not active
+- Sign-in is missing the user:profile scope

@@ -1,0 +1,8 @@
+{
+  "name": "ファイル内の全コンポーネント情報を出力",
+  "id": "prefix-scanner",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"]
+}

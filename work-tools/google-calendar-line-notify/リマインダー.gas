@@ -1,0 +1,66 @@
+var lineToken = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; //LINEトークン
+var googleAccount = "xxxxxxxxx@gmail.com";　//Googleアカウント
+var notifytime = 15　;//何分前通知
+
+var calenderSpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+var calenderSheet = calenderSpreadSheet.getActiveSheet();
+
+function dailyCalenderCheck() {　
+  var myCal = CalendarApp.getCalendarById(googleAccount);　
+  var myEvents = myCal.getEventsForDay(new Date());
+  var addCellList = [];
+  for (var i = 0; i < myEvents.length; i++) {
+    var title = myEvents[i].getTitle();
+    var startTime = Utilities.formatDate(myEvents[i].getStartTime(), 'JST', 'HH:mm')
+    if (startTime != "00:00") {
+      addCellList.push([startTime, title]);
+    }
+  }　
+  addCellList.sort(function (a, b) {
+    var aTime = a[0].split(":");
+    var bTime = b[0].split(":");
+    if (parseInt(aTime[0]) == parseInt(bTime[0])) {
+      return parseInt(aTime[1]) - parseInt(bTime[1]);
+    } else {
+      return parseInt(aTime[0]) - parseInt(bTime[0]);
+    }
+  });
+  var addRange = calenderSheet.getRange("A1:B" + addCellList.length);
+  addRange.setValues(addCellList);
+}
+
+function sendRemind() {
+  var range = calenderSheet.getRange("A1:B1");
+  var schedule = range.getValues();
+  var time = schedule[0][0];
+  var title = schedule[0][1];
+  var tmpDate = new Date();
+  tmpDate.setMinutes(tmpDate.getMinutes() + notifytime);
+  var hour = tmpDate.getHours();
+  if (hour < 10) {
+    hour = "0" + hour;
+  }
+  var minute = tmpDate.getMinutes();
+  if (minute < 10) {
+    minute = "0" + minute;
+  }
+  var triggeredTime = hour + ":" + minute;
+  if (time == "" || time != triggeredTime) {
+    return;
+  }
+  var sendText = time + "に" + title + "の予定が始まります。";
+  sendLineMessage(sendText);
+  range.deleteCells(SpreadsheetApp.Dimension.ROWS);
+}
+
+function sendLineMessage(sendText) {
+  var token = lineToken;
+  var opt = {
+    "method": "POST",
+    "payload": "message=" + sendText,
+    "headers": {
+      "Authorization": "Bearer " + token
+    }
+  };
+  UrlFetchApp.fetch("https://notify-api.line.me/api/notify", opt);
+}

@@ -1,0 +1,10 @@
+var proj = app.project;
+var comp = proj.activeItem;
+if(comp){
+  var selectedLayers = comp.selectedLayers;
+  if(selectedLayers.length > 0){
+    for(var l = 0 ; l < selectedLayers.length ; l++){
+      selectedLayers[l].source.selected = true;
+    }
+  }
+}

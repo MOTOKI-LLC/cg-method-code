@@ -1,0 +1,5 @@
+プロジェクト概要は@README.mdを、利用可能なnpmコマンドは@package.jsonを参照。
+
+# 追加指示
+- Gitワークフロー：@docs/git-instructions.md
+- 個人オーバーライド：@~/.claude/my-project-instructions.md

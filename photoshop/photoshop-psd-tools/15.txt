@@ -1,0 +1,9 @@
+# レイヤーをグループに追加
+group = psd[0]
+group.append(layer)
+
+# レイヤーを削除
+layer.remove()
+
+# グループをクリア
+group.clear()

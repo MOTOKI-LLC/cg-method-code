@@ -1,0 +1,5 @@
+macroScript Bipedsel
+tooltip:"Bipedsel"
+buttonText:"Bipedsel"
+Category:"# Scripts"
+--  Icon:#("Bipedsel",1)

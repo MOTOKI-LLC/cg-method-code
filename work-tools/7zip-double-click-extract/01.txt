@@ -1,0 +1,246 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\7-Zip.001\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.001\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.001\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.7z\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.7z\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.7z\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.arj\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.arj\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.arj\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.bz2\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.bz2\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.bz2\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.bzip2\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.bzip2\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.bzip2\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.cab\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.cab\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.cab\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.cpio\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.cpio\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.cpio\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.deb\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.deb\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.deb\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.dmg\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.dmg\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.dmg\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.fat\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.fat\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.fat\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.gz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.gz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.gz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.gzip\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.gzip\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.gzip\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.hfs\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.hfs\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.hfs\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.iso\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.iso\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.iso\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.lha\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.lha\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.lha\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.lzh\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.lzh\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.lzh\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.lzma\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.lzma\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.lzma\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.ntfs\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.ntfs\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.ntfs\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.rar\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.rar\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.rar\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.rpm\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.rpm\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.rpm\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.squashfs\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.squashfs\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.squashfs\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.swm\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.swm\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.swm\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.tar\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.tar\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.tar\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.taz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.taz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.taz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.tbz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.tbz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.tbz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.tbz2\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.tbz2\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.tbz2\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.tgz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.tgz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.tgz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.tpz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.tpz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.tpz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.txz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.txz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.txz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.vhd\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.vhd\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.vhd\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.wim\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.wim\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.wim\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.xar\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.xar\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.xar\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.xz\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.xz\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.xz\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.z\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.z\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.z\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
+
+[HKEY_CLASSES_ROOT\7-Zip.zip\shell]
+@="extract"
+[HKEY_CLASSES_ROOT\7-Zip.zip\shell\extract]
+@="Extract to Folder"
+[HKEY_CLASSES_ROOT\7-Zip.zip\shell\extract\command]
+@="\"C:\\Program Files\\7-Zip\\7zG.exe\" x \"%1\" -o*"
