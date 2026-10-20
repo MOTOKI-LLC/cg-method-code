@@ -3,6 +3,7 @@ var docRef = app.activeDocument
 var pixelLoc = [UnitValue("10 pixels") , UnitValue("10 pixels")];
 var colorSamplerRef = docRef.colorSamplers.add(pixelLoc);
 app.foregroundColor = colorSamplerRef.color
+colorSamplerRef.remove(); //置いたカラーサンプラーを消す
 
 //カラーのRGB値を取得
 var Colour = app.foregroundColor;  

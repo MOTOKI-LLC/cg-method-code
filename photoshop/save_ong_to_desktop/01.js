@@ -9,7 +9,7 @@ function CGM_SavePngToDesktop() {
   else {
     var basename = docName;
   }
-  if (folder == null) {
+  if (!folder.exists) {
     return;
   }
   exportPng(doc, folder, basename+ '.png');
@@ -20,6 +20,7 @@ function exportPng(doc, folder, name) {
     options.format = SaveDocumentType.PNG;
     options.optimized = true;
     options.interlaced = false;
+    options.PNG8 = false;
     doc.exportDocument(file, ExportType.SAVEFORWEB, options);
 }
 CGM_SavePngToDesktop();
