@@ -1,7 +1,8 @@
-preferences.rulerUnits = Units.PIXELS;
 var doc = activeDocument;
+var oldUnits = preferences.rulerUnits;
+preferences.rulerUnits = Units.PIXELS;
 var layer = doc.activeLayer;
-var name = layer.name;
+var layerName = layer.name;
 var w = doc.width;
 var h = doc.height;
 
@@ -11,10 +12,15 @@ var y1 = parseInt(b[1], 10);
 var x2 = parseInt(b[2], 10);
 var y2 = parseInt(b[3], 10);
 
-var newDoc = documents.add(w, h, 72, name, NewDocumentMode.RGB, DocumentFill.TRANSPARENT);
-activeDocument = doc;
-layer.duplicate(newDoc);
-activeDocument = newDoc;
-newDoc.crop([x1, y1, x2, y2]);
+if (x2 <= x1 || y2 <= y1) {
+    alert("選んだレイヤーに描画された部分がありません。");
+} else {
+    var newDoc = documents.add(w, h, doc.resolution, layerName, NewDocumentMode.RGB, DocumentFill.TRANSPARENT);
+    activeDocument = doc;
+    layer.duplicate(newDoc);
+    activeDocument = newDoc;
+    newDoc.crop([x1, y1, x2, y2]);
 
-newDoc.layers.getByName('レイヤー 1').remove();
+    newDoc.layers.getByName('レイヤー 1').remove();
+}
+preferences.rulerUnits = oldUnits;

@@ -1,11 +1,7 @@
 (function(){
     app.bringToFront();  
     var doc= activeDocument;
-    var bg = doc.layers.length;
     var comp = "tmp";
-
-    //背景がある場合は解除
-    doc.layers[bg-1].isBackgroundLayer = false;
 
     doc.suspendHistory("選択したレイヤーだけを表示・非表示する", "main()");
 
@@ -36,27 +32,56 @@
     }
 
     //選択しているレイヤーのみ表示
-    function showSelectLayer(){       
-        var idShw = charIDToTypeID( "Shw " );
-        var desc75 = new ActionDescriptor();
-        var idnull = charIDToTypeID( "null" );
-        var list42 = new ActionList();
-        var ref68 = new ActionReference();
-        var tgtLayerkind = activeDocument.activeLayer;
-            if(tgtLayerkind.isBackgroundLayer){
-                var idLyr = charIDToTypeID( "Lyr " );
-                var idBckg = charIDToTypeID( "Bckg" );
-                ref68.putProperty( idLyr, idBckg );
-            } else {
-                ref68.putIndex( charIDToTypeID("Lyr "), tgtLayerkind.itemIndex );
-            }
-        list42.putReference( ref68 );
-        desc75.putList( idnull, list42 );
-        var idTglO = charIDToTypeID( "TglO" );
-        desc75.putBoolean( idTglO, true );
-        executeAction( idShw, desc75, DialogModes.NO );
+    function showSelectLayer(){
+        var ids = getSelectedLayerIDs();
+        if (ids.length == 0) ids.push(doc.activeLayer.id);
+        setVisible(doc.layers, ids);
     }
-        
+
+    //選択しているレイヤーのIDを取得
+    function getSelectedLayerIDs(){
+        var ids = [];
+        var ref = new ActionReference();
+        ref.putProperty( charIDToTypeID( "Prpr" ), stringIDToTypeID( "targetLayersIDs" ) );
+        ref.putEnumerated( charIDToTypeID( "Dcmn" ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Trgt" ) );
+        var desc = executeActionGet( ref );
+        if (desc.hasKey( stringIDToTypeID( "targetLayersIDs" ) )) {
+            var list = desc.getList( stringIDToTypeID( "targetLayersIDs" ) );
+            for (var i = 0; i < list.count; i++) ids.push( list.getReference( i ).getIdentifier() );
+        }
+        return ids;
+    }
+
+    //選択しているレイヤーと、それを入れているグループを表示し、ほかを非表示にする
+    function setVisible(layers, ids){
+        for (var i = 0; i < layers.length; i++) {
+            var layer = layers[i];
+            if (isSelected(layer, ids)) {
+                layer.visible = true;
+            } else if (hasSelected(layer, ids)) {
+                layer.visible = true;
+                setVisible(layer.layers, ids);
+            } else {
+                layer.visible = false;
+            }
+        }
+    }
+
+    function hasSelected(layer, ids){
+        if (layer.typename != "LayerSet") return false;
+        for (var i = 0; i < layer.layers.length; i++) {
+            if (isSelected(layer.layers[i], ids) || hasSelected(layer.layers[i], ids)) return true;
+        }
+        return false;
+    }
+
+    function isSelected(layer, ids){
+        for (var i = 0; i < ids.length; i++) {
+            if (layer.id == ids[i]) return true;
+        }
+        return false;
+    }
+
      //もとの表示状態に戻す   
     function restoreSelectLayer(){    
         var idapplyComp = stringIDToTypeID( "applyComp" );
