@@ -62,3 +62,4 @@ function clippingArea() {
     xy = null;
     v_array = null;
 }
+clippingArea();
