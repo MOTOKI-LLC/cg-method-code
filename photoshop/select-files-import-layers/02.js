@@ -13,7 +13,7 @@ function main() {
     var len = docs.length;
     for (var i = 0; i < len; i++) {
         var doc = docs[i];
-        fileArray.push(doc);
+        if (doc instanceof File && /\.(psd|psb|png|jpe?g|gif|bmp|tiff?|webp)$/i.test(doc.name)) fileArray.push(doc);
     }
 
     for (var i = 0; i < fileArray.length; i++) {

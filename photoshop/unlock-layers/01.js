@@ -1,26 +1,28 @@
 function unlockLayers(){
-    var topLayer = app.activeDocument.layers[0];
-    app.activeDocument.activeLayer = topLayer;
-    do {
-      unlockLayer();
-      selectLayerBelow();
-    } while(topLayer != app.activeDocument.activeLayer);
+    unlockAll(app.activeDocument.layers);
 
-    function unlockLayer() {
-      if(app.activeDocument.activeLayer.isBackgroundLayer ) app.activeDocument.activeLayer.name = '背景';
-      if(app.activeDocument.activeLayer.allLocked) app.activeDocument.activeLayer.allLocked = false;
-      if(app.activeDocument.activeLayer.pixelsLocked && app.activeDocument.activeLayer.kind != LayerKind.TEXT) app.activeDocument.activeLayer.pixelsLocked = false;
-      if(app.activeDocument.activeLayer.positionLocked) app.activeDocument.activeLayer.positionLocked = false;
-      if(app.activeDocument.activeLayer.transparentPixelsLocked && app.activeDocument.activeLayer.kind != LayerKind.TEXT) app.activeDocument.activeLayer.transparentPixelsLocked = false;
+    function unlockAll(layers) {
+      for (var i = 0; i < layers.length; i++) {
+        unlockLayer(layers, i);
+        if (layers[i].typename == 'LayerSet') unlockAll(layers[i].layers);
+      }
     }
 
-    function selectLayerBelow() {
-      var desc = new ActionDescriptor();
+    function unlockLayer(layers, i) {
+      var hidden = !isVisible(layers[i]);
+      if(layers[i].isBackgroundLayer ) layers[i].name = '背景';
+      var layer = layers[i];
+      if(layer.allLocked) layer.allLocked = false;
+      if(layer.pixelsLocked && layer.kind != LayerKind.TEXT) layer.pixelsLocked = false;
+      if(layer.positionLocked) layer.positionLocked = false;
+      if(layer.transparentPixelsLocked && layer.kind != LayerKind.TEXT) layer.transparentPixelsLocked = false;
+      if(hidden) layer.visible = false;
+    }
+
+    function isVisible(layer) {
       var ref = new ActionReference();
-      ref.putEnumerated( charIDToTypeID( "Lyr " ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Bckw" ) );
-      desc.putReference( charIDToTypeID( "null" ), ref );
-      desc.putBoolean( charIDToTypeID( "MkVs" ), false );
-      executeAction( charIDToTypeID( "slct" ), desc, DialogModes.NO );
+      ref.putIdentifier( charIDToTypeID( "Lyr " ), layer.id );
+      return executeActionGet( ref ).getBoolean( charIDToTypeID( "Vsbl" ) );
     }
  }
 unlockLayers()

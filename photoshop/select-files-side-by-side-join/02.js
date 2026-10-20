@@ -15,7 +15,7 @@ function main() {
         var fileObj = new File();
         var fileArray = fileObj.openDlg('ファイルを選択してください:', '*', true);
         
-        saveName = fileArray[1].name;
+        saveName = fileArray[0].name;
         savePath = fileArray[0].path;
        
         for (var i = 0; i < fileArray.length; i++) {
@@ -69,19 +69,11 @@ function main() {
             if (len >= 2) {
                 //一番下のレイヤー
                 if (i == len - 1) {}
-                //下から2番めのレイヤー
-                if (i == len - 2) {
-                    try {
-                        var A = getSize(lay[1]).height;
-                        lay[i].translate(0, A);
-                    } catch (e) {}
+                //それ以外は、1つ下のレイヤーの下端に上端を合わせる
+                if (i <= len - 2) {
+                    var A = getPosition(lay[i + 1]).top + getSize(lay[i + 1]).height;
+                    lay[i].translate(0, A - getPosition(lay[i]).top);
                 }
-                //それ以外
-                try {
-                    var A = getPosition(lay[i + 1]).top;
-                    var B = getSize(lay[i + 2]).height;
-                    lay[i].translate(0, A + B);
-                } catch (e) {}
             }
         }
 
