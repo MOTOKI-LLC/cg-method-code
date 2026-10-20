@@ -1,21 +1,7 @@
-var doc = app.activeDocument;
-doc.activeLayer = doc.layers.getByName("リネーム");
-
-var fileName = doc.name;
-var fileName = baseName(fileName);
-
-//レイヤーリネーム
-doc.activeLayer.name = fileName + ".png" + "," + "32x32 fileName" + ".png";
-
-//保存して閉じる
-doc.save();
-doc.close();
-
-
-//拡張子を抜く
-function baseName(str) {
-    var base = new String(str).substring(str.lastIndexOf('/') + 1);
-    if (base.lastIndexOf(".") != -1)
-        base = base.substring(0, base.lastIndexOf("."));
-    return base;
+// 前面のドキュメントで画像アセットをオンにする
+// ［ファイル］→［生成］→［画像アセット］と同じ命令を、Photoshop付属のgenerate.jsxで送る
+if (app.documents.length > 0) {
+    $.evalFile(new File(app.path.fsName + "\\Presets\\Scripts\\generate.jsx"));
+} else {
+    alert("PSDを開いてから実行してください。");
 }
