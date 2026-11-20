@@ -1,7 +1,11 @@
-# コードスタイル
-- CommonJS（require）ではなくESモジュール（import/export）構文を使用
-- 可能な場合はインポートを分割代入（例：import { foo } from 'bar'）
+# コマンド
+- 依存の追加: pnpm install
+- 1ファイルだけテスト: pnpm vitest run path/to/file.test.ts
+- 型チェック: pnpm tsc --noEmit
 
-# ワークフロー
-- 一連のコード変更が終わったら必ず型チェックを実行
-- パフォーマンスのため、テストスイート全体ではなく単一テストの実行を優先
+# 決まり
+- エラーは src/lib/errors.ts の関数で出す
+- src/legacy/ は動いているが、新しいコードでまねしない
+
+# 注意
+- 結合テストには DATABASE_URL が要る（.env.example を参照）

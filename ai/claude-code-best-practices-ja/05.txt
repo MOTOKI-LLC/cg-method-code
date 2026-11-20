@@ -1,9 +1,6 @@
----
-name: api-conventions
-description: サービス用のREST API設計規約
----
-# API規約
-- URLパスにはkebab-caseを使用
-- JSONプロパティにはcamelCaseを使用
-- リストエンドポイントには常にページネーションを含める
-- URLパスでAPIをバージョン管理（/v1/、/v2/）
+for file in $(cat files.txt); do
+  claude --bare -p "$file を新しいログのAPIに移してコミットして。最後に OK か FAIL だけ返して" \
+    --allowedTools "Read,Edit,Bash(git add *),Bash(git commit *)" \
+    --permission-mode dontAsk \
+    --max-turns 20
+done

@@ -1,5 +1,6 @@
-プロジェクト概要は@README.mdを、利用可能なnpmコマンドは@package.jsonを参照。
-
-# 追加指示
-- Gitワークフロー：@docs/git-instructions.md
-- 個人オーバーライド：@~/.claude/my-project-instructions.md
+---
+paths:
+  - "src/api/**/*.ts"
+---
+- リクエストの検証は src/api/schemas/ の zod スキーマを使う
+- 新しいエンドポイントは openapi.yaml にも書く

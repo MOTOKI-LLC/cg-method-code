@@ -1,4 +1,4 @@
-# Claude│ベストプラクティス│日本語訳
+# Claude Codeのベストプラクティス｜公式の要点まとめと実践のポイント
 
 解説記事: https://cg-method.com/ai/claude-code-best-practices-ja/
 
@@ -9,5 +9,3 @@
 - `03.txt`
 - `04.txt`
 - `05.txt`
-- `06.txt`
-- `07.txt`

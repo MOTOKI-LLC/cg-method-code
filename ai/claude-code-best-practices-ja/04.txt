@@ -1,13 +1,7 @@
----
-name: security-reviewer
-description: セキュリティの脆弱性についてコードをレビュー
-tools: Read, Grep, Glob, Bash
-model: opus
----
-あなたはシニアセキュリティエンジニアです。以下についてコードをレビューしてください：
-- インジェクション脆弱性（SQL、XSS、コマンドインジェクション）
-- 認証と認可の欠陥
-- コード内のシークレットまたは資格情報
-- 安全でないデータ処理
-
-具体的な行参照と提案される修正を提供してください。
+{
+  "permissions": {
+    "allow": ["Bash(pnpm tsc --noEmit)"],
+    "ask": ["Bash(git push *)"],
+    "deny": ["Read(./.env)", "Read(./.env.local)", "Read(./secrets/**)"]
+  }
+}
