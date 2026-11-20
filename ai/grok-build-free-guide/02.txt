@@ -1,0 +1,5 @@
+[model.qwen3-local]
+model = "qwen3:4b"
+base_url = "http://localhost:11434/v1"
+name = "Qwen3 4B (Ollama)"
+context_window = 32768

@@ -1,0 +1,17 @@
+<style>
+* {box-sizing:border-box;}
+body {margin:0; font-family:system-ui,sans-serif; color:#20303b; background:#f7f9fa;}
+main {max-width:1200px; margin:auto; padding:20px;}
+h1 {font-size:1.4rem; margin:0 0 12px;}
+p {line-height:1.7; overflow-wrap:anywhere;}
+.controls {display:flex; flex-wrap:wrap; gap:12px; align-items:end;}
+label {display:flex; flex-direction:column; gap:6px; min-width:0; max-width:100%;}
+select,button {font:inherit; min-height:42px; max-width:100%; padding:6px; border:1px solid #8797a2; border-radius:4px; background:white;}
+select {width:100%;}
+label:first-child {flex:1 1 360px;}
+#status {background:#e6edf2; padding:10px;}
+.legend {font-size:0.85rem;}
+#cy {height:60vh; min-height:320px; width:100%; border:1px solid #9eacb5; background:white;}
+#details {font-size:0.9rem; min-height:48px;}
+@media(max-width:600px) {main {padding:12px;} .controls label {width:100%;} #cy {height:55vh;}}
+</style>

@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│全てのロックを解除する方法
+# Photoshopスクリプト（jsx）│レイヤーとグループのロックを一括解除する方法
 
 解説記事: https://cg-method.com/photoshop/unlock-layers/
 

@@ -1,8 +1,6 @@
-seedRandom(thisComp.layer("TRANSFORM").effect("seedRandom")("スライダー")+index);
-temp=wiggle(thisComp.layer("TRANSFORM").effect("RotationFreq")("スライダー"),thisComp.layer("TRANSFORM").effect("Rotation")("スライダー"));
-trans=thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
-spd=thisComp.layer("TRANSFORM").effect("speed")("スライダー");
-end=100-(index*spd/100);
-if(thisComp.layer("TRANSFORM").effect("ease")("チェックボックス")==0){
-linear(trans,0,end,temp,0);}
-else{ease(trans,0,end,temp,0);}
+var control = thisComp.layer("TRANSFORM");
+var progress = clamp(control.effect("復元")(1).value, 0, 100);
+var match = /^MASK_(\d+)$/.exec(thisLayer.name);
+var part = match ? parseInt(match[1], 10) : 0;
+seedRandom(control.effect("シード")(1).value + part, true);
+value + random(-30, 30) * (1 - progress / 100);

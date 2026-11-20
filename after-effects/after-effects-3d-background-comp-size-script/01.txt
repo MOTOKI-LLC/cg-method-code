@@ -1,0 +1,26 @@
+var cam = thisComp.activeCamera;
+if (!cam) { throw new Error("Create an active camera."); }
+if (hasParent || orientation[0] != 0 || orientation[1] != 0 || orientation[2] != 0 ||
+    rotationX != 0 || rotationY != 0 || rotationZ != 0) {
+    throw new Error("Use an unparented, unrotated background plane.");
+}
+var cp = cam.toWorld([0, 0, 0]);
+var axis = normalize(cam.toWorldVec([0, 0, 1]));
+var right = normalize(cam.toWorldVec([1, 0, 0]));
+var eps = 0.001;
+if (Math.abs(axis[0]) > eps || Math.abs(axis[1]) > eps || axis[2] < 0.999 ||
+    right[0] < 0.999 || Math.abs(right[1]) > eps || Math.abs(right[2]) > eps ||
+    Math.abs(cp[0] - thisComp.width / 2) > eps || Math.abs(cp[1] - thisComp.height / 2) > eps ||
+    Math.abs(position[0] - cp[0]) > eps || Math.abs(position[1] - cp[1]) > eps ||
+    Math.abs(anchorPoint[0] - width / 2) > eps || Math.abs(anchorPoint[1] - height / 2) > eps ||
+    Math.abs(anchorPoint[2]) > eps || thisComp.pixelAspect != 1 || thisLayer.source.pixelAspect != 1) {
+    throw new Error("Use centered layers, square pixels and a front-facing camera.");
+}
+var depth = position[2] - cp[2];
+var zoom = cam.zoom;
+if (!isFinite(depth) || !isFinite(zoom) || depth <= 0 || zoom <= 0 || width <= 0 || height <= 0) {
+    throw new Error("Check depth, zoom and source dimensions.");
+}
+var fit = Math.max(thisComp.width / width, thisComp.height / height);
+var percent = fit * depth / zoom * 100;
+[percent, percent, 100];

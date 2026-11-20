@@ -1,0 +1,5 @@
+Set objApp = CreateObject("Photoshop.Application")
+filename = "C:\MyFile"
+DIM docRef
+SET docRef = objApp.Open(filename)
+objApp.DoJavaScriptFile "C:\emboss.jsx", Array(75, 2, 89)

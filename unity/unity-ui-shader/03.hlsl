@@ -59,7 +59,7 @@ SubShader
         fixed4 fragmentProgram(vertexToFragment input) : COLOR
         {
             float distance = _Distance;
-            fixed4 computedColor = tex2D(_MainTex, input.textureCoordinate) * input.color;
+            float4 computedColor = tex2D(_MainTex, input.textureCoordinate) * input.color;
             computedColor += tex2D(_MainTex, half2(input.textureCoordinate.x + distance, input.textureCoordinate.y + distance)) * input.color;
             computedColor += tex2D(_MainTex, half2(input.textureCoordinate.x + distance, input.textureCoordinate.y)) * input.color;
             computedColor += tex2D(_MainTex, half2(input.textureCoordinate.x, input.textureCoordinate.y + distance)) * input.color;

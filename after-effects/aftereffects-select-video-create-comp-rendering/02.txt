@@ -1,0 +1,23 @@
+(function () {
+    if (!app.project) { alert("Open a saved practice project first."); return; }
+    var queue = app.project.renderQueue;
+    if (queue.rendering) { alert("Stop rendering before adding items."); return; }
+    var selected = app.project.selection.slice(0), comps = [];
+    for (var i = 0; i < selected.length; i++) {
+        if (selected[i] instanceof CompItem) { comps.push(selected[i]); }
+    }
+    if (!comps.length) { alert("Select compositions in the Project panel."); return; }
+    var added = 0;
+    try {
+        for (var j = 0; j < comps.length; j++) {
+            var item = queue.items.add(comps[j]);
+            item.render = false;
+            added++;
+        }
+        alert("Added, not enabled for rendering: " + added +
+            "\nSet unique outputs and formats, then enable only the intended items.");
+    } catch (e) {
+        alert("Stopped after " + added + " items: " + e.toString() +
+            "\nInspect the practice queue; no render was started.");
+    }
+}());

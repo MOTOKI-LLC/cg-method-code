@@ -1,0 +1,7 @@
+var result = value;
+if (value.length === 3) {
+    seedRandom(index, true);
+    var amount = Math.max(0, thisComp.layer("CTRL").effect("Spread")(1).value);
+    result = [value[0], value[1], value[2] + random(0, amount)];
+}
+result;

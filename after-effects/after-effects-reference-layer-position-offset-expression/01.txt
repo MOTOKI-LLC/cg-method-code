@@ -1,0 +1,8 @@
+var result = value;
+if (value.length === 3 && index < thisComp.numLayers) {
+    var next = thisComp.layer(index + 1).transform.position.value;
+    if (next.length === 3) {
+        result = [next[0], next[1], next[2] + 3000];
+    }
+}
+result;

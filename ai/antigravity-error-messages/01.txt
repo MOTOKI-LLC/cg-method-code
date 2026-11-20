@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "command(git)",
+      "command(regex:npm run (build|lint|test))"
+    ]
+  }
+}

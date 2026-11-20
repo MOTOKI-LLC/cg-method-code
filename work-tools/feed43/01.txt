@@ -1,0 +1,32 @@
+import argparse
+from pathlib import Path
+import xml.etree.ElementTree as ET
+from card_extract import extract_cards
+
+
+def make_rss(source, base_url, output):
+    rows = extract_cards(source, base_url)
+    if not rows:
+        raise ValueError("No cards found; RSS was not written.")
+    root = ET.Element("rss", version="2.0")
+    channel = ET.SubElement(root, "channel")
+    for name, value in (("title", "CGM practice"), ("link", base_url),
+                        ("description", "Static fictional HTML practice; no scheduled fetch.")):
+        ET.SubElement(channel, name).text = value
+    for title, target in rows:
+        item = ET.SubElement(channel, "item")
+        ET.SubElement(item, "title").text = title
+        ET.SubElement(item, "link").text = target
+        ET.SubElement(item, "guid", isPermaLink="true").text = target
+    with Path(output).open("xb") as stream:
+        stream.write(ET.tostring(root, encoding="utf-8", xml_declaration=True))
+    return len(rows)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", default="cards-practice.html")
+    parser.add_argument("--base", default="https://example.invalid/list/")
+    parser.add_argument("--output", default="practice.xml")
+    args = parser.parse_args()
+    print(f"RSS items: {make_rss(Path(args.input).read_text('utf-8'), args.base, args.output)}")

@@ -1,6 +1,9 @@
-var str = thisComp.name.split("_")[1];
-var text1 = "おはよう";
-var text2 = "こんにちは";
-var text3 = "おやすみ";
-var result = eval("text" + str);
-text.sourceText = result;
+var match = thisComp.name.match(/_([1-9][0-9]*)$/);
+var number = match ? Number(match[1]) : 0;
+var step = thisLayer.source.frameDuration;
+var frames = Math.floor(thisLayer.source.duration / step + 0.000001);
+var result = value;
+if (number >= 1 && isFinite(step) && step > 0 && frames >= 1) {
+    result = (Math.min(number, frames) - 1) * step;
+}
+result;

@@ -1,9 +1,8 @@
 /*
 <javascriptresource>
-<name>アラート</name>
-<menu></menu>
-<category>Layers</category>
+<name>CGM Menu Demo</name>
+<menu>automate</menu>
 <enableinfo>true</enableinfo>
 </javascriptresource>
 */
-alert("アラート！");
+alert("CGM Menu Demo");

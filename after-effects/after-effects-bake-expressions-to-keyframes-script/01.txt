@@ -1,52 +1,63 @@
-function convertToKeyframes(theProperty){
-    if (theProperty.canSetExpression && theProperty.expressionEnabled){
-        theProperty.selected = true;
-        app.executeCommand(2639);
-        theProperty.selected = false;
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open a composition."); return; }
+    var targets = [], plans = [], times = [], frame = comp.frameDuration, i, j;
+    function dimensions(type) {
+        if (type === PropertyValueType.OneD) { return 1; }
+        if (type === PropertyValueType.TwoD || type === PropertyValueType.TwoD_SPATIAL) { return 2; }
+        if (type === PropertyValueType.ThreeD || type === PropertyValueType.ThreeD_SPATIAL) { return 3; }
+        if (type === PropertyValueType.COLOR) { return 4; }
+        return 0;
     }
-}
-    var myComp = app.project.activeItem;
-    if (myComp && myComp instanceof CompItem){
-        var myLayer;
-        var myProperty;
-        app.beginUndoGroup("convert expressions");
-        for (var i = 1; i <= myComp.numLayers; i++){
-              myLayer = myComp.layer(i);
-          try{
-              myProperty = myLayer.property("position");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("anchorPoint");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("rotation");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("scale");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("opacity");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("timeRemap");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
-          try{
-              myProperty = myLayer.property("sourceText");
-              convertToKeyframes(myProperty);
-          }catch(err){
-          }
+    function collect(group, locked) {
+        for (var k = 1; k <= group.numProperties; k++) {
+            var prop = group.property(k);
+            if (prop.propertyType !== PropertyType.PROPERTY) { collect(prop, locked); continue; }
+            if (!prop.canSetExpression || !prop.expressionEnabled) { continue; }
+            if (locked || prop.numKeys !== 0 || prop.expressionError || !dimensions(prop.propertyValueType)) {
+                throw new Error("Only unlocked numeric expressions without existing keys are supported.");
+            }
+            targets.push(prop);
         }
-        app.endUndoGroup();
-}
+    }
+    try {
+        if (!isFinite(frame) || frame <= 0 || !isFinite(comp.duration) || comp.duration <= 0) { throw new Error("Invalid duration."); }
+        var count = Math.ceil(comp.duration / frame - 0.000001);
+        if (count < 1 || count > 3000) { throw new Error("Use 1 to 3000 frames."); }
+        for (i = 1; i <= comp.numLayers; i++) { collect(comp.layer(i), comp.layer(i).locked); }
+        if (!targets.length || targets.length > 20 || targets.length * count > 20000) { throw new Error("Too many properties or samples, or no target."); }
+        for (i = 0; i < count; i++) { times.push(i * frame); }
+        // Sample every target before writing keys, including dependent expressions.
+        for (i = 0; i < targets.length; i++) {
+            var prop = targets[i], values = [], size = dimensions(prop.propertyValueType);
+            for (j = 0; j < times.length; j++) {
+                var value = prop.valueAtTime(times[j], false), copy;
+                if (prop.expressionError) { throw new Error(prop.expressionError); }
+                if (size === 1) {
+                    if (typeof value !== "number" || !isFinite(value)) { throw new Error("Invalid scalar sample."); }
+                    copy = value;
+                } else {
+                    if (!value || value.length !== size) { throw new Error("Invalid vector sample."); }
+                    copy = [];
+                    for (var n = 0; n < size; n++) {
+                        if (typeof value[n] !== "number" || !isFinite(value[n])) { throw new Error("Invalid vector sample."); }
+                        copy.push(value[n]);
+                    }
+                }
+                values.push(copy);
+            }
+            plans.push({prop:prop, values:values});
+        }
+    } catch (error) { alert("Nothing changed: " + error.toString()); return; }
+    app.beginUndoGroup("Bake numeric expressions at comp frames");
+    try {
+        for (i = 0; i < plans.length; i++) {
+            var plan = plans[i]; plan.prop.setValuesAtTimes(times, plan.values);
+            for (j = 1; j <= plan.prop.numKeys; j++) {
+                plan.prop.setInterpolationTypeAtKey(j, KeyframeInterpolationType.LINEAR, KeyframeInterpolationType.LINEAR);
+            }
+            plan.prop.expressionEnabled = false; // Keep the original expression text.
+        }
+    } catch (error) { alert("Stopped: " + error.toString() + "\nUndo or reopen your practice copy."); }
+    finally { app.endUndoGroup(); }
+})();

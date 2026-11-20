@@ -1,9 +1,14 @@
-cc=effect("targetControl")("スライダ");
-num=Math.floor(cc);
-nxtNum=num+1;
-start=effect("Target-"+num)("レイヤー").transform.yRotation;
-end=effect("Target-"+nxtNum)("レイヤー").transform.yRotation;
-if(effect("ease")("チェックボックス")==0){
-linear(cc,num,nxtNum,start,end)}
-else{
-ease(cc,num,nxtNum,start,end);}
+var cc = effect("targetControl")(1).value;
+var result = value;
+if (isFinite(cc)) {
+    cc = Math.max(0, Math.min(3, cc));
+    var n = Math.min(2, Math.floor(cc));
+    var a = effect("Target-" + n)(1);
+    var b = effect("Target-" + (n + 1))(1);
+    var start = a.toWorld(a.anchorPoint);
+    var end = b.toWorld(b.anchorPoint);
+    var world = effect("ease")(1).value == 1 ?
+        ease(cc, n, n + 1, start, end) : linear(cc, n, n + 1, start, end);
+    result = hasParent ? parent.fromWorld(world) : world;
+}
+result;

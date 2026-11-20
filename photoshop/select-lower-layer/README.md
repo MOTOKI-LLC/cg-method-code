@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│1つ下の表示レイヤーを選択する方法
+# Photoshop JSXで1つ下へ相対選択する｜Bckw・非表示・エラーの確認
 
 解説記事: https://cg-method.com/photoshop/select-lower-layer/
 

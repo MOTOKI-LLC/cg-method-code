@@ -1,0 +1,49 @@
+using Spine.Unity;
+using UnityEngine;
+
+// spine-unity 4.3 専用。4.2 以前の Setup Pose API とは混ぜない。
+public class CombineSkins : MonoBehaviour
+{
+    public SkeletonAnimation skeletonAnimation;
+    public string baseSkinName = "skin-base";
+    public string extraSkinName = "hair/pink";
+
+    void Start() { TryCombine(); }
+
+    public bool TryCombine()
+    {
+        if (skeletonAnimation == null || skeletonAnimation.Renderer == null ||
+            skeletonAnimation.SkeletonDataAsset == null)
+        {
+            Debug.LogError("SkeletonAnimation・描画コンポーネント・Skeleton Data Assetを確認してください。", this);
+            return false;
+        }
+        if (string.IsNullOrEmpty(baseSkinName) || string.IsNullOrEmpty(extraSkinName))
+        {
+            Debug.LogError("データに存在する2つのスキン名を指定してください。", this);
+            return false;
+        }
+        skeletonAnimation.Initialize(false);
+        var skeleton = skeletonAnimation.Skeleton;
+        var state = skeletonAnimation.AnimationState;
+        if (skeleton == null || state == null)
+        {
+            Debug.LogError("スケルトンを初期化できません。Consoleを確認してください。", this);
+            return false;
+        }
+        var baseSkin = skeleton.Data.FindSkin(baseSkinName);
+        var extraSkin = skeleton.Data.FindSkin(extraSkinName);
+        if (baseSkin == null || extraSkin == null)
+        {
+            Debug.LogError("指定したスキンがデータにありません。Export設定と名前を確認してください。", this);
+            return false;
+        }
+        var combined = new Spine.Skin("practice-combined");
+        combined.AddSkin(baseSkin);
+        combined.AddSkin(extraSkin);
+        skeleton.SetSkin(combined);
+        skeleton.SetupPoseSlots();
+        state.Apply(skeleton);
+        return true;
+    }
+}

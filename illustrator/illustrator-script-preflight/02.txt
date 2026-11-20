@@ -1,0 +1,5 @@
+// 変更前（グレースケールの黒を白として数えていた）
+if (c.typename === "GrayColor") return c.gray === 100;
+
+// 変更後
+if (c.typename === "GrayColor") return c.gray === 0;

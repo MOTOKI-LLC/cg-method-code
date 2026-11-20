@@ -1,0 +1,11 @@
+/* レイアウト */
+width: 48px;
+
+/* タイポグラフィ */
+color: #FFF;
+font-feature-settings: 'vrt2' on;
+font-family: "Noto Sans JP";
+font-size: 48px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;

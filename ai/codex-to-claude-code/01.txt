@@ -1,0 +1,7 @@
+if claude -p "README.md を要約して。変更はしないで" --tools "Read" --allowedTools "Read" --output-format json > claude-result.json; then
+  if jq -e '.is_error != true' claude-result.json >/dev/null; then
+    if task_session_id=$(jq -er '.session_id | select(type == "string" and length > 0)' claude-result.json); then
+      claude -p "その要約の根拠となる箇所を示して" --tools "Read" --allowedTools "Read" --resume "$task_session_id"
+    fi
+  fi
+fi

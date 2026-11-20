@@ -1,0 +1,5 @@
+@echo off
+chcp 65001 >nul
+pushd "%~dp0"
+for /f "usebackq delims=" %%a in ("list.txt") do md "%%a"
+popd

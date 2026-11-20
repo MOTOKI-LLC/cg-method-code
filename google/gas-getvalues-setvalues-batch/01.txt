@@ -1,0 +1,5 @@
+var sheet = SpreadsheetApp.getActiveSheet();
+for (var i = 1; i <= 100; i++) {
+  var v = sheet.getRange(i, 1).getValue();
+  sheet.getRange(i, 2).setValue(v * 2);
+}

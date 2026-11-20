@@ -1,270 +1,61 @@
-/************************************************
- * Jira タスク発行スクリプト
- * （エピック紐付け + 担当者 + ステータス + 優先度
- *
- * シート構成（シート1）
- *   A: 発行状態   （空 / 済）
- *   B: 親         （エピックキー: 例 MFLP-2）
- *   C: タスク番号（Jira Issueキー）
- *   D: 報告者     （未使用）
- *   E: タスク名   （summary）
- *   F: 担当者     （Jiraの表示名: 例 suimin）
- *   G: ステータス （To Do / 進行中 / レビュー中 / 完了）
- *   H: 優先度     （Highest / High / Medium / Low / Lowest）
- *   I: 説明       （テキスト）
- ************************************************/
-
-
-/* ========================
-   共通
-======================== */
-
-function getJiraConfig() {
-  const props    = PropertiesService.getScriptProperties();
-  const baseUrl  = props.getProperty('JIRA_BASE_URL');
-  const email    = props.getProperty('JIRA_EMAIL');
-  const apiToken = props.getProperty('JIRA_API_TOKEN');
-
-  if (!baseUrl || !email || !apiToken) {
-    throw new Error('Jira接続情報が設定されていません。');
-  }
-  return { baseUrl, email, apiToken };
+const JIRA_DRY_RUN = true;
+const JIRA_SHEET_NAME = 'Jira練習';
+function jiraConfig_() {
+  const p = PropertiesService.getScriptProperties();
+  const read = k => {const v=p.getProperty(k);if(!v)throw new Error(k+'が未設定です');return v;};
+  const api = read('JIRA_API_BASE').replace(/\/$/,'');
+  if (!/^https:\/\/[a-z0-9][a-z0-9-]*\.atlassian\.net$/.test(api) &&
+      !/^https:\/\/api\.atlassian\.com\/ex\/jira\/[a-f0-9-]{36}$/i.test(api)) throw new Error('API接続先を確認してください');
+  const project = read('JIRA_PROJECT_ID'), type = read('JIRA_ISSUE_TYPE_ID');
+  if (!/^\d+$/.test(project) || !/^\d+$/.test(type)) throw new Error('プロジェクトと課題タイプはIDを設定してください');
+  return {api,project,type,sheetId:read('SPREADSHEET_ID'),email:read('JIRA_EMAIL'),token:read('JIRA_API_TOKEN')};
 }
-
-/**
- * キーをHYPERLINKに変換してセルへセット
- */
-function setJiraLinkToCell_(sheet, row, col, issueKey) {
-  if (!issueKey) return;
-  const config = getJiraConfig();
-  const url = config.baseUrl.replace(/\/$/, '') + '/browse/' + issueKey;
-  sheet.getRange(row, col).setFormula(
-    `=HYPERLINK("${url}","${issueKey}")`
-  );
-}
-
-
-/* ========================
-   ユーザー検索（担当者）
-======================== */
-
-function findAccountIdByExactDisplayName_(displayName) {
-  const config = getJiraConfig();
-  const url = config.baseUrl + '/rest/api/3/user/search?query=' +
-              encodeURIComponent(displayName);
-
-  const res = UrlFetchApp.fetch(url, {
-    method: 'get',
-    headers: {
-      Authorization: 'Basic ' +
-        Utilities.base64Encode(config.email + ':' + config.apiToken)
-    },
-    muteHttpExceptions: true
-  });
-
-  if (res.getResponseCode() >= 300) {
-    Logger.log('ユーザー検索エラー: ' + res.getContentText());
-    return '';
-  }
-
-  const users = JSON.parse(res.getContentText());
-  for (const user of users) {
-    if (user.displayName === displayName) return user.accountId;
-  }
-  return '';
-}
-
-
-/* ========================
-   ステータス遷移
-======================== */
-
-/**
- * G列のステータス名（「レビュー中」「進行中」「完了」など）に遷移させる
- */
-function transitionIssueStatus(issueKey, targetStatusName) {
-  if (!targetStatusName) return;
-
-  const config = getJiraConfig();
-  const url = config.baseUrl + '/rest/api/3/issue/' +
-              encodeURIComponent(issueKey) + '/transitions';
-
-  const headers = {
-    Authorization: 'Basic ' +
-      Utilities.base64Encode(config.email + ':' + config.apiToken),
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
-
-  // 利用可能な遷移一覧を取得
-  const listRes = UrlFetchApp.fetch(url, {
-    method: 'get',
-    headers: headers,
-    muteHttpExceptions: true
-  });
-
-  const listCode = listRes.getResponseCode();
-  const listBody = listRes.getContentText();
-
-  if (listCode < 200 || listCode >= 300) {
-    Logger.log('ステータス取得失敗 issue=' + issueKey +
-               ' code=' + listCode + ' body=' + listBody);
-    return;
-  }
-
-  const listJson = JSON.parse(listBody);
-  const transitions = listJson.transitions || [];
-
-  // UI上のステータス名（t.to.name）で一致を探す
-  const trans = transitions.find(t =>
-    t.to && t.to.name === targetStatusName
-  ) || transitions.find(t =>
-    t.name === targetStatusName
-  );
-
-  if (!trans) {
-    Logger.log('ステータス "' + targetStatusName +
-               '" への遷移が見つかりません（issue=' + issueKey + '）');
-    return;
-  }
-
-  const payload = {
-    transition: { id: trans.id }
-  };
-
-  const doRes = UrlFetchApp.fetch(url, {
-    method: 'post',
-    headers: headers,
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  });
-
-  const doCode = doRes.getResponseCode();
-  const doBody = doRes.getContentText();
-  if (doCode >= 200 && doCode < 300) {
-    Logger.log('ステータス変更成功 issue=' + issueKey +
-               ' -> ' + targetStatusName);
-  } else {
-    Logger.log('ステータス変更失敗 issue=' + issueKey +
-               ' code=' + doCode + ' body=' + doBody);
-  }
-}
-
-
-/* ========================
-   Jira Issue作成
-======================== */
-
-function createJiraIssue(summary, descriptionText, epicKey,
-                         assigneeRaw, priorityName, statusName) {
-  const config = getJiraConfig();
-  const projectKey = epicKey ? String(epicKey).split('-')[0] : 'MFLP';
-
-  const fields = {
-    project:   { key: projectKey },
-    summary:   summary,
-    issuetype: { name: 'Task' },
-    description: {
-      type: 'doc',
-      version: 1,
-      content: [{
-        type: 'paragraph',
-        content: descriptionText
-          ? [{ type: 'text', text: String(descriptionText) }]
-          : []
-      }]
-    }
-  };
-
-  // 親エピック
-  if (epicKey) fields.parent = { key: epicKey };
-
-  // 担当者
-  if (assigneeRaw) {
-    const id = findAccountIdByExactDisplayName_(assigneeRaw);
-    if (id) {
-      fields.assignee = { accountId: id };
-    } else {
-      Logger.log('WARN: 担当者 "%s" の accountId が見つからず未割当', assigneeRaw);
-    }
-  }
-
-  // 優先度
-  if (priorityName) {
-    fields.priority = { name: priorityName };
-  }
-
-  // Issue作成
-  const createRes = UrlFetchApp.fetch(config.baseUrl + '/rest/api/3/issue', {
-    method: 'post',
-    headers: {
-      Authorization: 'Basic ' +
-        Utilities.base64Encode(config.email + ':' + config.apiToken),
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    payload: JSON.stringify({ fields }),
-    muteHttpExceptions: true
-  });
-
-  const createCode = createRes.getResponseCode();
-  const createBody = createRes.getContentText();
-
-  if (createCode < 200 || createCode >= 300) {
-    Logger.log('Jira Issue作成エラー code=' + createCode + ' body=' + createBody);
-    throw new Error('Issue作成失敗');
-  }
-
-  const issueKey = JSON.parse(createBody).key;
-  Logger.log('Issue作成成功: ' + issueKey);
-
-  // ステータスが指定されていれば遷移
-  if (statusName) {
-    transitionIssueStatus(issueKey, statusName);
-  }
-
-  return issueKey;
-}
-
-
-/* ========================
-   実行本体
-======================== */
-
 function publishJiraTasksFromSheet() {
-  const sheet   = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('シート1');
-  const lastRow = sheet.getLastRow();
-
-  for (let r = 2; r <= lastRow; r++) {
-    const 発行状態 = sheet.getRange(r, 1).getValue();
-    if (発行状態 === '済') continue;
-
-    const 親         = sheet.getRange(r, 2).getValue(); // B: 親エピック
-    const タスク名   = sheet.getRange(r, 5).getValue(); // E: タスク名
-    if (!タスク名) continue;
-
-    const 担当者     = sheet.getRange(r, 6).getValue(); // F
-    const ステータス = sheet.getRange(r, 7).getValue(); // G
-    const 優先度     = sheet.getRange(r, 8).getValue(); // H
-    const 説明       = sheet.getRange(r, 9).getValue(); // I: 説明
-
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(1000))throw new Error('別の実行が進行中です');
+  try {
+    const c=jiraConfig_();
+    const sheet=SpreadsheetApp.openById(c.sheetId).getSheetByName(JIRA_SHEET_NAME);
+    if(!sheet)throw new Error('Jira練習シートがありません');
+    const last=sheet.getLastRow();
+    if(last<2 || last>11)throw new Error('見出しを除き1〜10行にしてください');
+    const range=sheet.getRange(1,1,last,5), rows=range.getDisplayValues();
+    if(range.getFormulas().some(r=>r.some(Boolean)))throw new Error('A:E列には数式を使わないでください');
+    const heads=['発行状態','タスク番号','タスク名','説明','照合ID'];
+    if(heads.some((v,i)=>rows[0][i]!==v))throw new Error('A1:E1の見出しを確認してください');
+    if(rows.slice(1).some(r=>r[0] && !['準備','済'].includes(r[0])))throw new Error('送信中・結果不明の行を先にJiraと照合してください');
+    const targets=rows.slice(1).map((r,i)=>({r,row:i+2})).filter(x=>x.r[0]==='準備');
+    if(targets.length!==1)throw new Error('準備にする行は1件だけにしてください');
+    const {r,row}=targets[0];
+    if(r[1] || r[4])throw new Error('タスク番号・照合IDがある行は再送しません');
+    if(!r[2].trim() || r[2].length>200 || r[3].length>4000)throw new Error('タスク名1〜200文字、説明4000文字以内にしてください');
+    if(JIRA_DRY_RUN){console.log('未送信：対象行='+row+'、projectId='+c.project+'、typeId='+c.type);return;}
+    const id='sheet-'+Utilities.getUuid();
+    const text=r[3]+'\n照合ID: '+id;
+    const fields={project:{id:c.project},issuetype:{id:c.type},summary:r[2],description:{type:'doc',version:1,content:text.split(/\r?\n/).map(t=>({type:'paragraph',content:t?[{type:'text',text:t}]:[]}))}};
+    // 書き込み前にも入力を比較。共同編集や並べ替えは止めて実行する。
+    if(JSON.stringify(sheet.getRange(row,1,1,5).getDisplayValues()[0])!==JSON.stringify(r))throw new Error('入力が変更されました');
+    sheet.getRange(row,5).setValue(id);
+    sheet.getRange(row,1).setValue('送信中');
+    SpreadsheetApp.flush();
+    let key='';
     try {
-      const issueKey = createJiraIssue(
-        タスク名, 説明, 親,
-        担当者, 優先度, ステータス
-      );
-
-      // A列: 発行済に
-      sheet.getRange(r, 1).setValue('済');
-
-      // B列: 親エピックをリンク化（元の値がキー前提）
-      if (親) setJiraLinkToCell_(sheet, r, 2, 親);
-
-      // C列: タスクキーをリンク化
-      setJiraLinkToCell_(sheet, r, 3, issueKey);
-
-    } catch (e) {
-      Logger.log('行 ' + r + ' エラー: ' + e.message);
+      const res=UrlFetchApp.fetch(c.api+'/rest/api/3/issue',{
+        method:'post',contentType:'application/json',
+        headers:{Authorization:'Basic '+Utilities.base64Encode(c.email+':'+c.token),Accept:'application/json'},
+        payload:JSON.stringify({fields}),muteHttpExceptions:true,followRedirects:false
+      });
+      if(res.getResponseCode()!==201)throw new Error('HTTP '+res.getResponseCode());
+      key=JSON.parse(res.getContentText()).key;
+      if(typeof key!=='string' || !/^[A-Z][A-Z0-9_]*-\d+$/.test(key))throw new Error('課題キーを確認できません');
+      console.log('作成応答：'+key+'、照合ID='+id);
+      sheet.getRange(row,2).setValue(key);
+      SpreadsheetApp.flush();
+      sheet.getRange(row,1).setValue('済');
+      SpreadsheetApp.flush();
+    } catch(error) {
+      try {sheet.getRange(row,1).setValue('結果不明');SpreadsheetApp.flush();}catch(ignored){}
+      throw new Error('再送しないでください。行='+row+'、照合ID='+id+'。Jiraとシートを照合してください。');
     }
-  }
+  } finally {lock.releaseLock();}
 }

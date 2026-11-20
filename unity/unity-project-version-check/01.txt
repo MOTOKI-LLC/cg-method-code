@@ -1,0 +1,13 @@
+param([Parameter(Mandatory=$true)][string]$Project)
+$ErrorActionPreference = 'Stop'
+$file = Join-Path $Project 'ProjectSettings\ProjectVersion.txt'
+$text = Get-Content -LiteralPath $file -Raw -Encoding UTF8
+$versions = [regex]::Matches($text, '(?m)^m_EditorVersion:\s*([^\r\n]+)\s*$')
+if ($versions.Count -ne 1) { throw 'Expected exactly one m_EditorVersion line' }
+$version = $versions[0].Groups[1].Value.Trim()
+if ($version -notmatch '^\d+\.\d+\.\d+[abfp]\d+$') { throw 'Unrecognized version format' }
+$revision = [regex]::Match($text, '(?m)^m_EditorVersionWithRevision:\s*([^\r\n]+)\s*$')
+if ($revision.Success -and $revision.Groups[1].Value.Trim().Split(' ')[0] -ne $version) {
+    throw 'Version lines disagree; check the original file'
+}
+Write-Output $version

@@ -1,0 +1,28 @@
+(function () {
+    var rows = [["青森", "リンゴ"], ["沖縄", "バナナ"], ["栃木", "イチゴ"]];
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open or select the template composition."); return; }
+    if (rows.length === 0 || rows.length > 20) { alert("Use 1 to 20 practice rows."); return; }
+    var names = [], i, j;
+    for (i = 0; i < rows.length; i++) {
+        if (rows[i].length !== 2 || !rows[i][0] || !rows[i][1] ||
+            /_/.test(rows[i][0]) || /_/.test(rows[i][1])) {
+            alert("Each row needs two nonempty fields without underscores. Nothing changed."); return;
+        }
+        var name = "Practice_" + rows[i][0] + "_" + rows[i][1];
+        for (j = 0; j < names.length; j++) {
+            if (names[j] === name) { alert("Repeated output name. Nothing changed."); return; }
+        }
+        for (j = 1; j <= app.project.numItems; j++) {
+            if (app.project.item(j).name === name) { alert("Output name already exists. Nothing changed."); return; }
+        }
+        names.push(name);
+    }
+    app.beginUndoGroup("Duplicate practice text compositions");
+    try {
+        for (i = 0; i < names.length; i++) {
+            var copy = comp.duplicate();
+            copy.name = names[i];
+        }
+    } finally { app.endUndoGroup(); }
+})();

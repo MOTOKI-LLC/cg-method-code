@@ -1,0 +1,86 @@
+(function () {
+    var target = app.project.activeItem;
+    function reject(text) { alert(text); return false; }
+    function near(a, b) { return Math.abs(a - b) < 0.00001; }
+    function hasExpression(group) {
+        if (!group) { return false; }
+        if (group.canSetExpression && group.expressionEnabled) { return true; }
+        for (var k = 1; k <= group.numProperties; k++) {
+            if (hasExpression(group.property(k))) { return true; }
+        }
+        return false;
+    }
+    if (!(target instanceof CompItem) || target.selectedLayers.length !== 1) {
+        reject("開いたコンポでプリコンポレイヤーを1枚選択してください。"); return;
+    }
+    var original = target.selectedLayers[0];
+    if (typeof original.id !== "number") {
+        reject("この改訂コードにはレイヤーIDを取得できるAEが必要です。"); return;
+    }
+    var source = original.source; // レイヤー名やプロジェクト内の同名検索を使わない
+    if (!(source instanceof CompItem) || source === target || source.numLayers < 1) {
+        reject("中身のあるプリコンポを選択してください。"); return;
+    }
+    if (source.width !== target.width || source.height !== target.height ||
+        source.pixelAspect !== target.pixelAspect || !near(source.frameDuration, target.frameDuration)) {
+        reject("素材コンポと展開先のサイズ・ピクセル比・fpsを揃えてください。"); return;
+    }
+    var tr = original.property("ADBE Transform Group");
+    var position = tr.property("ADBE Position");
+    var anchor = tr.property("ADBE Anchor Point");
+    var scale = tr.property("ADBE Scale");
+    var rotation = tr.property("ADBE Rotate Z");
+    var opacity = tr.property("ADBE Opacity");
+    if (original.locked || !original.enabled || original.parent || original.threeDLayer ||
+        original.collapseTransformation || original.timeRemapEnabled || original.stretch !== 100 ||
+        !near(original.startTime, 0) || !near(original.inPoint, 0) || !near(original.outPoint, source.duration) ||
+        original.adjustmentLayer || original.guideLayer || original.solo || original.hasTrackMatte ||
+        original.isTrackMatte || original.blendingMode !== BlendingMode.NORMAL ||
+        original.property("ADBE Mask Parade").numProperties || original.property("ADBE Effect Parade").numProperties ||
+        position.dimensionsSeparated || position.numKeys || anchor.numKeys || scale.numKeys ||
+        rotation.numKeys || opacity.numKeys || hasExpression(original) || hasExpression(tr) ||
+        !near(position.value[0], target.width / 2) || !near(position.value[1], target.height / 2) ||
+        !near(anchor.value[0], source.width / 2) || !near(anchor.value[1], source.height / 2) ||
+        !near(scale.value[0], 100) || !near(scale.value[1], 100) || !near(rotation.value, 0) || !near(opacity.value, 100)) {
+        reject("対象外の変形・時間変更・親子・合成・エフェクトがあります。元のプリコンポを維持してください。"); return;
+    }
+    var i;
+    for (i = 1; i <= source.numLayers; i++) {
+        var layer = source.layer(i);
+        if (!(layer instanceof AVLayer) || layer.hasAudio || layer.parent || layer.threeDLayer || layer.adjustmentLayer ||
+            layer.guideLayer || layer.solo || layer.hasTrackMatte || layer.isTrackMatte ||
+            layer.timeRemapEnabled || layer.blendingMode !== BlendingMode.NORMAL ||
+            layer.property("ADBE Effect Parade").numProperties || hasExpression(layer) ||
+            hasExpression(layer.property("ADBE Transform Group")) || hasExpression(layer.property("ADBE Text Properties"))) {
+            reject("中のレイヤーにも2D・親なし・通常合成・式/エフェクト/マットなしの制約があります。"); return;
+        }
+    }
+    var copies = [];
+    app.beginUndoGroup("単純2Dプリコンポの中身を展開");
+    try {
+        // 1枚コピーするたびに元プリコンポの直前へ移す。
+        // 内部の上から順に処理すると、配置後も同じ順になる。
+        for (i = 1; i <= source.numLayers; i++) {
+            var previousIds = {};
+            var j;
+            for (j = 1; j <= target.numLayers; j++) {
+                previousIds["id" + target.layer(j).id] = true;
+            }
+            source.layer(i).copyToComp(target);
+            var copied = null;
+            for (j = 1; j <= target.numLayers; j++) {
+                if (!previousIds["id" + target.layer(j).id]) {
+                    if (copied !== null) { throw new Error("追加レイヤーを特定できません。"); }
+                    copied = target.layer(j);
+                }
+            }
+            if (copied === null) { throw new Error("追加レイヤーが見つかりません。"); }
+            copied.moveBefore(original);
+            copies.push(copied);
+        }
+        original.enabled = false; // 元プリコンポは削除せず映像だけOFF
+        alert("展開したレイヤー：" + copies.length + "枚。元プリコンポは映像OFFで残しました。");
+    } catch (error) {
+        alert(error.toString() + "\n途中のコピーを残しています。編集→取り消しで今回分を戻してください。");
+    } finally { app.endUndoGroup(); }
+}());

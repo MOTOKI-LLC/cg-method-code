@@ -1,0 +1,7 @@
+var rate = 20; // 1秒あたりの文字数
+var delay = 0; // レイヤーのIN点から待つ秒数
+var total = String(text.sourceText.value).length;
+var elapsed = Math.max(0, time - inPoint - delay);
+var count = (isFinite(rate) && rate > 0 && isFinite(delay) && delay >= 0)
+    ? Math.floor(elapsed * rate + 0.000001) : 0;
+Math.min(total, count);

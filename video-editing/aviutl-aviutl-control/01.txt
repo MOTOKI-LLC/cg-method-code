@@ -17,7 +17,7 @@ Const OUTPUT_PLUGIN = 0
 Const OUTPUT_EXT = ".mp4"
 
 ' AviUtlのフルパス
-Const AVIUTL_PATH = ur'C:/Program File (x86)/AviUtl/aviutl100/aviutl.exe'
+Const AVIUTL_PATH = "C:\AviUtl\aviutl.exe"
 
 ' AviUtl Controlのフルパス(最後の文字は"\")
-Const AUC_FOLDER = "C:/Program File (x86)/AviUtl/aviutl100/auc/"
+Const AUC_FOLDER = "C:\AviUtl\auc\"

@@ -1,0 +1,28 @@
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class StartMenu : MonoBehaviour
+{
+    Button _startButton;
+
+    void OnEnable()
+    {
+        // UXMLはUI Documentが読み込み済みなので、その一番上の要素から探す
+        var root = GetComponent<UIDocument>().rootVisualElement;
+        _startButton = root.Q<Button>("start-button");
+        _startButton.clicked += OnStartClicked;
+    }
+
+    void OnDisable()
+    {
+        if (_startButton != null)
+        {
+            _startButton.clicked -= OnStartClicked;
+        }
+    }
+
+    void OnStartClicked()
+    {
+        Debug.Log("Start が押されました");
+    }
+}

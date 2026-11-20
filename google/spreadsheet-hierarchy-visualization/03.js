@@ -1,176 +1,34 @@
-<script type="module">
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
-/* ===== 設定値 ===== */
-const sheetUrl =
-  "https://docs.google.com/spreadsheets/d/★ここにスプレッドシートのID/gviz/tq?tqx=out:json";
-const rectSize = { width: 100, height: 30 };
-const space    = { width: 140, height: 60, padding: 30 };
-const gap      = { x: 40, y: 60 };
-
-/* ===== スプレッドシート → 階層データ ===== */
-const buildTree = (rows) => {
-  const map = new Map(), childrenMap = new Map();
-
-  rows.forEach((r) => {
-    const nodeId = r.c[1]?.v;
-    const parentId = r.c[2]?.v || null;
-    const name = r.c[3]?.v;
-    const comps = r.c[4]?.v || "";
-
-    if (!nodeId || !name) return;
-
-    map.set(nodeId, {
-      name,
-      comps,
-      children: []
-    });
-
-    if (parentId) {
-      if (!childrenMap.has(parentId)) childrenMap.set(parentId, []);
-      childrenMap.get(parentId).push(nodeId);
-    }
-  });
-
-  childrenMap.forEach((childIds, pid) => {
-    if (!map.has(pid)) return;
-    childIds.forEach((cid) => map.get(pid).children.push(map.get(cid)));
-  });
-
-  return [...map.keys()].filter(
-    id => !rows.some(r => r.c[1]?.v === id && r.c[2]?.v)
-  ).map(id => map.get(id));
-};
-
-/* ===== 座標計算（Y位置） ===== */
-const seekParent = (cur, name) => {
-  const hrcy = cur.parent.children;
-  const tgt = hrcy.find((c) => c.data.name === name);
-  return tgt ? { name, hierarchy: hrcy } : seekParent(cur.parent, name);
-};
-const calcLeaves = (names, cur) => {
-  const hs = names.map((n) => seekParent(cur, n));
-  const idxs = hs.map((h) => h.hierarchy.findIndex((d) => d.data.name === h.name));
-  const sliced = hs.map((h, i) => h.hierarchy.slice(0, idxs[i]));
-  return sliced.flat().map((d) => d.value);
-};
-const defineY = (d, sp) => {
-  const leaves = calcLeaves(d.ancestors().map((a) => a.data.name).slice(0, -1), d);
-  return leaves.reduce((s, v) => s + v, 0) * sp.height + sp.padding;
-};
-const definePos = (root, sp) => {
-  root.each((d) => {
-    d.x = d.depth * sp.width + sp.padding;
-    d.y = defineY(d, sp);
-  });
-};
-
-/* ===== テキスト自動縮小 ===== */
-function fitText(textSel, maxWidth, minFont = 6){
-  textSel.each(function(){
-    const text = d3.select(this);
-    let fontSize = parseInt(text.style("font-size")) || 12;
-    while (this.getComputedTextLength() > maxWidth && fontSize > minFont){
-      fontSize -= 1;
-      text.style("font-size", `${fontSize}px`);
-    }
-  });
+<script>
+const status = document.getElementById('status');
+function showFailure(error) {
+  status.textContent = '表示できません：' + (error.message || String(error));
 }
-
-/* ===== メイン処理 ===== */
-fetch(sheetUrl)
-  .then((res) => res.text())
-  .then((txt) => JSON.parse(txt.match(/google\.visualization\.Query\.setResponse\((.*)\)/s)[1]))
-  .then((json) => {
-    const rows = json.table.rows.slice(1);
-    const trees = buildTree(rows);
-
-    const svg = d3.select("svg");
-    const svgWidth = +svg.attr("width") || window.innerWidth;
-
-    let xOffset = 0, yOffset = 0, rowMaxHeight = 0;
-
-    trees.forEach((data) => {
-      const root = d3.hierarchy(data);
-      d3.tree()(root);
-      root.count();
-      definePos(root, space);
-
-      const treeWidth =
-        (root.height + 1) * space.width + space.padding * 2;
-      const treeHeight =
-        root.value * rectSize.height +
-        (root.value - 1) * (space.height - rectSize.height) +
-        space.padding * 2;
-
-      // 折り返し処理
-      if (xOffset + treeWidth > svgWidth) {
-        xOffset = 0;
-        yOffset += rowMaxHeight + gap.y;
-        rowMaxHeight = 0;
-      }
-
-      const g = svg.append("g")
-        .attr("transform", `translate(${xOffset},${yOffset})`);
-      xOffset += treeWidth + gap.x;
-      rowMaxHeight = Math.max(rowMaxHeight, treeHeight);
-
-      // エッジ描画
-      g.selectAll(".link")
-        .data(root.descendants().slice(1))
-        .enter()
-        .append("path")
-        .attr("fill", "none")
-        .attr("stroke", "#000")
-        .attr("d", (d) => {
-          const yC = d.y + rectSize.height / 2;
-          const yP = d.parent.y + rectSize.height / 2;
-          const xM = d.parent.x + rectSize.width + (space.width - rectSize.width) / 2;
-          return `M${d.x},${yC} L${xM},${yC} L${xM},${yP} L${d.parent.x + rectSize.width},${yP}`;
-        });
-
-      // ノード描画
-      const node = g.selectAll(".node")
-        .data(root.descendants())
-        .enter()
-        .append("g")
-        .attr("class", "node")
-        .attr("transform", (d) => `translate(${d.x},${d.y})`);
-
-      const tooltip = d3.select("#tooltip");
-
-      node
-        .on("mouseenter", (event, d) => {
-          tooltip
-            .style("display", "block")
-            .text(d.data.comps || "（コンポーネントなし）");
-        })
-        .on("mousemove", (event) => {
-          tooltip
-            .style("left", `${event.pageX + 10}px`)
-            .style("top", `${event.pageY + 10}px`);
-        })
-        .on("mouseleave", () => {
-          tooltip.style("display", "none");
-        });
-
-      node.append("rect")
-        .attr("width", rectSize.width)
-        .attr("height", rectSize.height)
-        .attr("fill", "#fff")
-        .attr("stroke", "#333");
-
-      const txt = node.append("text")
-        .text(d => d.data.name)
-        .attr("x", 6)
-        .attr("y", 20);
-
-      // ツールチップ追加（SVG標準）
-      txt.append("title").text(d => d.data.comps || "（コンポーネントなし）");
-
-      fitText(txt, rectSize.width - 8);
-    });
-
-    svg.attr("height", yOffset + rowMaxHeight + space.padding);
-  });
+function drawTree(nodes) {
+  try {
+    const root = d3.stratify().id(d => d.id).parentId(d => d.parent || null)(nodes);
+    d3.tree().nodeSize([64, 240])(root);
+    const all = root.descendants();
+    const min = Math.min(...all.map(d => d.x));
+    const max = Math.max(...all.map(d => d.x));
+    const svg = d3.select('svg').attr('width', (root.height + 1) * 240 + 40).attr('height', max - min + 90);
+    svg.selectAll('*').remove();
+    const g = svg.append('g').attr('transform', `translate(20,${35-min})`);
+    g.selectAll('path').data(root.links()).join('path')
+      .attr('fill','none').attr('stroke','#777')
+      .attr('d',d => `M${d.source.y+190},${d.source.x}H${d.source.y+215}V${d.target.x}H${d.target.y}`);
+    const n = g.selectAll('.node').data(all).join('g').attr('class','node')
+      .attr('transform',d => `translate(${d.y},${d.x})`).attr('tabindex',0).attr('role','button')
+      .attr('aria-label',d => d.data.name + '：' + d.data.comps);
+    const show = (event,d) => { document.getElementById('detail').textContent = d.data.name + '：' + (d.data.comps || '補足情報なし'); };
+    n.on('mouseenter',show).on('focus',show).on('click',show)
+      .on('keydown',(event,d) => {if (event.key==='Enter' || event.key===' ') {event.preventDefault();show(event,d);}});
+    n.append('rect').attr('y',-18).attr('width',190).attr('height',36).attr('fill','#fff').attr('stroke','#333');
+    n.append('text').attr('x',8).attr('y',5).attr('font-size',13)
+      .text(d => {const a=Array.from(d.data.name);return a.length>12?a.slice(0,12).join('')+'…':d.data.name;});
+    n.append('title').text(d => d.data.name + '：' + d.data.comps);
+    status.textContent = nodes.length + '件を表示。シート変更後はページを再読み込みしてください。';
+  } catch (error) {showFailure(error);}
+}
+if (typeof d3 === 'undefined') showFailure(new Error('D3.jsを読み込めませんでした'));
+else google.script.run.withSuccessHandler(drawTree).withFailureHandler(showFailure).getPrefabTreeData();
 </script>

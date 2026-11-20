@@ -1,0 +1,11 @@
+var result = value;
+if (value.length === 3) {
+    var base = thisComp.layer("BASE");
+    if (base.index !== index) {
+        var position = base.transform.position.value;
+        if (position.length === 3) {
+            result = [position[0], position[1], position[2] + 3000];
+        }
+    }
+}
+result;

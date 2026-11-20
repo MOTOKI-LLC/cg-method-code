@@ -1,18 +1,20 @@
 function exportPdf() {
-  var folder = "フォルダのID"; // 保存先フォルダのID
-
-  // 変換するファイルの数
-  var last = 2;
-
-  // 変換したいスライドのファイルIDを配列で指定
-  var fileId = [
-    "ファイルのスライドID①",
-    "ファイルのスライドID②",
-  ];
-
-  for (let i = 0; i < last; i++) {
-    var slideFile = DriveApp.getFileById(fileId[i]);
-    var pdfFile = slideFile.getAs(MimeType.PDF); // PDFに変換
-    DriveApp.getFolderById(folder).createFile(pdfFile); // フォルダに保存
+  const folderId = '保存先フォルダID';
+  const fileIds = ['GoogleスライドのファイルID1', 'GoogleスライドのファイルID2', 'GoogleスライドのファイルID3'];
+  const folder = DriveApp.getFolderById(folderId);
+  const results = [];
+  for (const id of fileIds) {
+    try {
+      const source = DriveApp.getFileById(id);
+      if (source.getMimeType() !== MimeType.GOOGLE_SLIDES) {
+        throw new Error('Googleスライド以外のファイルです');
+      }
+      const blob = source.getAs(MimeType.PDF).setName(source.getName() + '.pdf');
+      const output = folder.createFile(blob);
+      results.push({sourceId: id, outputId: output.getId(), ok: true});
+    } catch (error) {
+      results.push({sourceId: id, ok: false, error: String(error.message)});
+    }
   }
+  console.log(JSON.stringify(results));
 }

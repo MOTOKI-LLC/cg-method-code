@@ -1,4 +1,4 @@
-# Photoshop│自作スクリプトをメニューに表示させる方法
+# Photoshopのスクリプトをメニューに登録する方法｜配置先・表示名・自動処理
 
 解説記事: https://cg-method.com/photoshop/script-menu/
 
@@ -9,3 +9,4 @@
 - `03.js`
 - `04.js`
 - `05.js`
+- `06.js`

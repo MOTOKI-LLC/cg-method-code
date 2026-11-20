@@ -1,0 +1,81 @@
+// テキストの検索と置換（開いているコンポジションと、その中のプリコンポジション）
+// 「ファイル」＞「スクリプト」＞「スクリプトファイルを実行...」で実行する
+(function () {
+    var FIND = "2025";             // 探す文字
+    var REPLACE = "2026";          // 置き換える文字
+    var INCLUDE_PRECOMPS = true;   // プリコンポジションの中も置き換えるなら true
+
+    var comp = app.project.activeItem;
+    if (!(comp instanceof CompItem)) {
+        alert("コンポジションを開いてから実行してください。");
+        return;
+    }
+    if (FIND === "") {
+        alert("FIND に探す文字を入れてください。");
+        return;
+    }
+
+    var done = {};      // 同じコンポジションを2回処理しない
+    var changedLayers = 0;
+    var changedKeys = 0;
+    var skipped = [];   // エクスプレッションが付いていて飛ばしたレイヤー
+
+    app.beginUndoGroup("テキストの検索と置換");
+    processComp(comp);
+    app.endUndoGroup();
+
+    var msg = "置き換えたレイヤー：" + changedLayers + "\nうちキーフレームの数：" + changedKeys;
+    if (skipped.length > 0) {
+        msg += "\nエクスプレッションがあるため飛ばしたレイヤー：\n" + skipped.join("\n");
+    }
+    alert(msg);
+
+    function processComp(c) {
+        if (done[c.id]) {
+            return;
+        }
+        done[c.id] = true;
+        for (var i = 1; i <= c.numLayers; i++) {
+            var layer = c.layer(i);
+            if (INCLUDE_PRECOMPS && layer.source instanceof CompItem) {
+                processComp(layer.source);
+            }
+            if (!(layer instanceof TextLayer)) {
+                continue;
+            }
+            var prop = layer.property("ADBE Text Properties").property("ADBE Text Document");
+            if (prop.expressionEnabled) {
+                skipped.push(c.name + " / " + layer.name);
+                continue;
+            }
+            if (replaceInProperty(prop)) {
+                changedLayers++;
+            }
+        }
+    }
+
+    function replaceInProperty(prop) {
+        var changed = false;
+        if (prop.numKeys === 0) {
+            var doc = prop.value;
+            var next = doc.text.split(FIND).join(REPLACE);
+            if (next !== doc.text) {
+                doc.text = next;
+                prop.setValue(doc);
+                changed = true;
+            }
+            return changed;
+        }
+        for (var k = 1; k <= prop.numKeys; k++) {
+            var keyDoc = prop.keyValue(k);
+            var keyNext = keyDoc.text.split(FIND).join(REPLACE);
+            if (keyNext !== keyDoc.text) {
+                keyDoc.text = keyNext;
+                prop.setValueAtKey(k, keyDoc);
+                changed = true;
+                changedKeys++;
+            }
+        }
+        return changed;
+    }
+})();

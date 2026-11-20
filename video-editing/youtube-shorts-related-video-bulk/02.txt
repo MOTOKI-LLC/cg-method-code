@@ -1,0 +1,12 @@
+import subprocess
+
+CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+PORT = 9333
+
+subprocess.Popen([
+    CHROME,
+    f"--remote-debugging-port={PORT}",
+    "--user-data-dir=studio-profile",  # 専用のプロフィール（フォルダー）
+    "--no-first-run",
+    "https://studio.youtube.com/",
+])

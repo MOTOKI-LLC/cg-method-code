@@ -1,0 +1,12 @@
+# コマンド
+- 依存関係のインストール：npm install
+- テスト：npm test
+- コミットの前に npm run lint を通す
+
+# 決まり
+- 字下げはスペース2つ
+- APIの処理は src/api/handlers/ に置く
+- src/legacy/ は今も動いているが、新しいコードではまねしない
+
+# 落とし穴
+- 結合テストには環境変数 DATABASE_URL が要る（.env.example を見る）

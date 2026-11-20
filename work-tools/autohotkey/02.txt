@@ -1,0 +1,43 @@
+#Requires AutoHotkey v2.0
+
+NormalizeBindings(values) {
+    if values.Length != 3
+        throw ValueError("Exactly three shortcuts are required")
+    result := []
+    seen := Map()
+    for value in values {
+        value := Trim(value)
+        if !RegExMatch(value, "^(?:\^!|!\^)([1-9])$", &match)
+            throw ValueError("Use Ctrl+Alt+1 through Ctrl+Alt+9")
+        key := "^!" match[1]
+        if seen.Has(key)
+            throw ValueError("Duplicate shortcut")
+        seen[key] := true
+        result.Push(key)
+    }
+    return result
+}
+
+ReadBindings(path) {
+    if !FileExist(path)
+        return ["^!1", "^!2", "^!3"]
+    values := []
+    Loop 3
+        values.Push(IniRead(path, "Script" A_Index, "hotkey", ""))
+    return NormalizeBindings(values)
+}
+
+SaveBindings(values, path) {
+    values := NormalizeBindings(values)
+    if FileExist(path ".backup")
+        throw Error("Backup already exists; preserve it before another save")
+    temp := path ".new-" A_TickCount
+    if FileExist(temp)
+        throw Error("Temporary output already exists")
+    if FileExist(path)
+        FileCopy(path, path ".backup", false)
+    Loop 3
+        IniWrite(values[A_Index], temp, "Script" A_Index, "hotkey")
+    FileMove(temp, path, true)
+    return values
+}

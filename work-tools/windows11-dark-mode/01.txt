@@ -1,0 +1,20 @@
+$ErrorActionPreference = 'Stop'
+$version = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+$themePath = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+$taskbarPath = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+function Read-OptionalValue([string]$Path, [string]$Name) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $null }
+    $item = Get-ItemProperty -LiteralPath $Path
+    $property = $item.PSObject.Properties[$Name]
+    if ($null -eq $property) { return $null }
+    return $property.Value
+}
+[pscustomobject]@{
+    DisplayVersion = $version.DisplayVersion
+    Build = $version.CurrentBuild
+    Revision = $version.UBR
+    AppsUseLightTheme = Read-OptionalValue $themePath 'AppsUseLightTheme'
+    SystemUsesLightTheme = Read-OptionalValue $themePath 'SystemUsesLightTheme'
+    LegacyTaskbarSi = Read-OptionalValue $taskbarPath 'TaskbarSi'
+    RegistryWritten = $false
+} | ConvertTo-Json

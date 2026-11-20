@@ -1,0 +1,13 @@
+using UnityEngine;
+
+public class ChangeTint : MonoBehaviour
+{
+    // Shader GraphのプロパティのReferenceと同じ名前にする
+    static readonly int TintId = Shader.PropertyToID("_Tint");
+
+    void Start()
+    {
+        var material = GetComponent<Renderer>().material;
+        material.SetColor(TintId, Color.red);
+    }
+}

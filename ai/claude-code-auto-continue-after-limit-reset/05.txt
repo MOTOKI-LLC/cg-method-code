@@ -1,5 +1,13 @@
-Usage Credits
-OFF
-
-制限リセット時に自動的に続行する
-ON
+Proの通常枠を使う
+↓
+上限に到達
+↓
+Claude Code停止
+↓
+リセットまで待機
+↓
+Proの通常枠が復活
+↓
+Claude Code自動続行
+↓
+再び通常枠を使う

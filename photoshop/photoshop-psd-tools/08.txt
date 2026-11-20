@@ -1,7 +1,6 @@
-if layer.kind == 'shape':
-    # ベクターマスク情報
-    print(layer.vector_mask)
-    
-    # ライブシェイププロパティ
-    for shape in layer.origination:
-        print(shape)
+# グループ内のレイヤーを反復処理
+for layer in psd:
+    if layer.is_group():
+        print(f"グループ: {layer.name}")
+        for child in layer:
+            print(f"  - {child.name}")

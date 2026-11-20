@@ -1,0 +1,8 @@
+@echo off
+chcp 65001 >nul
+pushd "%~dp0"
+md "営業部"
+md "経理部"
+md "山田 太郎"
+md "2026年\01月"
+popd

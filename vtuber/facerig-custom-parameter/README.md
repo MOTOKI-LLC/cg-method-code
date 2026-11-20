@@ -1,4 +1,4 @@
-# 【FaceRig】カスタムパラメーター＆Live2Dのアニメーション（モーション）の設定方法まとめ
+# FaceRig＋Live2Dのカスタムパラメーター・モーション設定の旧記録
 
 解説記事: https://cg-method.com/vtuber/facerig-custom-parameter/
 

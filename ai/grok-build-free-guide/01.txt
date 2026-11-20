@@ -1,0 +1,5 @@
+[model.muse-glimmer]
+model = "muse-glimmer"
+base_url = "http://localhost:11434/v1"
+name = "Muse Glimmer (Ollama)"
+context_window = 128000

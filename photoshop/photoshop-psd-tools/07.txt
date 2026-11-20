@@ -1,7 +1,12 @@
-if layer.kind == 'type':
-    # テキスト内容を取得
-    print(f"テキスト: {layer.text}")
+# ピクセルレイヤーの確認
+if layer.kind == 'pixel':
+    # レイヤーを画像として出力
+    layer_image = layer.composite()
+    layer_image.save(f'{layer.name}.png')
     
-    # スタイル情報（読み取り専用）
-    print(f"エンジン辞書: {layer.engine_dict}")
-    print(f"リソース辞書: {layer.resource_dict}")
+    # NumPy配列として取得
+    pixels = layer.numpy()
+    print(pixels.shape)  # (height, width, channels)
+    
+    # PIL Imageとして取得
+    pil_image = layer.topil()

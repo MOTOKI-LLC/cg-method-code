@@ -1,0 +1,7 @@
+systemctl edit ollama.service
+
+[Service]
+Environment="OLLAMA_MODELS=<新しい保存先のパス>"
+
+systemctl daemon-reload
+systemctl restart ollama

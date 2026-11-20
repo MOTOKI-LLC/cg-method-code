@@ -1,8 +1,31 @@
-var myComp;
-for (var i = 1; i <= app.project.numItems; i ++) {
-    if ((app.project.item(i) instanceof CompItem) && (app.project.item(i).name === 'コンポ 1')) {
-        myComp = app.project.item(i);
-        myComp.layer("ヌル 1").effect("チェックボックス制御")("チェックボックス").setValue(true);
-        break;
+(function () {
+    var COMP_NAME = "PracticeSwitch", LAYER_NAME = "Ctrl", EFFECT_NAME = "Toggle";
+    var TARGET = 1; // 1 = ON, 0 = OFF
+    if (!app.project || (TARGET !== 0 && TARGET !== 1)) { alert("Use TARGET 0 or 1."); return; }
+    var comp = null, layer = null, effect = null, i, matches = 0;
+    for (i = 1; i <= app.project.numItems; i++) {
+        var item = app.project.item(i);
+        if (item instanceof CompItem && item.name === COMP_NAME) { comp = item; matches++; }
     }
-}
+    if (matches !== 1) { alert("Use exactly one named composition."); return; }
+    matches = 0;
+    for (i = 1; i <= comp.numLayers; i++) {
+        if (comp.layer(i).name === LAYER_NAME) { layer = comp.layer(i); matches++; }
+    }
+    if (matches !== 1 || layer.locked) { alert("Use one unlocked named control layer."); return; }
+    var effects = layer.property("ADBE Effect Parade"); matches = 0;
+    if (effects) {
+        for (i = 1; i <= effects.numProperties; i++) {
+            if (effects.property(i).name === EFFECT_NAME) { effect = effects.property(i); matches++; }
+        }
+    }
+    if (matches !== 1 || effect.matchName !== "ADBE Checkbox Control") { alert("Use one named Checkbox Control."); return; }
+    var checkbox = effect.property("ADBE Checkbox Control-0001");
+    if (!checkbox || checkbox.numKeys !== 0 || checkbox.expression !== "") {
+        alert("Use a checkbox with no keys or expression."); return;
+    }
+    app.beginUndoGroup("Set named checkbox");
+    try { checkbox.setValue(TARGET); }
+    catch (error) { alert("Stopped: " + error.toString() + "\nUndo or reopen your practice copy."); }
+    finally { app.endUndoGroup(); }
+})();

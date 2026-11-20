@@ -1,4 +1,4 @@
-# Unity│UI制作に役に立つシェーダー6選│uGUI
+# UnityのUIシェーダー6例｜画像効果・ぼかしとMaskの確認
 
 解説記事: https://cg-method.com/unity/unity-ui-shader/
 

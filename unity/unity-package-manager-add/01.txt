@@ -1,0 +1,12 @@
+{
+  "scopedRegistries": [
+    {
+      "name": "Example",
+      "url": "https://registry.example.com",
+      "scopes": ["com.example"]
+    }
+  ],
+  "dependencies": {
+    "com.example.tool": "1.0.0"
+  }
+}

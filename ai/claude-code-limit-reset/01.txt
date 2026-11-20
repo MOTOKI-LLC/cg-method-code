@@ -1,0 +1,40 @@
+import json
+import math
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+JST = timezone(timedelta(hours=9))
+
+def extract(lines):
+    rows = set()
+    for line in lines:
+        try:
+            rec = json.loads(line)
+            q = rec.get("quotaLimits")
+            if not isinstance(q, dict):
+                continue
+            kind, due = q.get("rateLimitType"), q.get("resetsAt")
+            if kind not in ("five_hour", "seven_day"):
+                continue
+            if type(due) not in (int, float) or not math.isfinite(due):
+                continue
+            hit = datetime.fromisoformat(rec["timestamp"].replace("Z", "+00:00"))
+            if hit.tzinfo is None:
+                continue
+            datetime.fromtimestamp(due, JST)  # Validate timestamp range.
+            rows.add((hit.timestamp(), kind, due))
+        except (ValueError, TypeError, KeyError, AttributeError, OverflowError, OSError):
+            continue
+    return sorted(rows)
+
+def fmt(s):
+    return datetime.fromtimestamp(s, JST).strftime("%Y-%m-%d %H:%M")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        raise SystemExit("Usage: python check_quota.py SESSION.jsonl")
+    with Path(sys.argv[1]).open(encoding="utf-8", errors="replace") as f:
+        rows = extract(f)
+    for hit, kind, reset in rows:
+        print(fmt(hit), kind, "→ 次のリセット", fmt(reset))

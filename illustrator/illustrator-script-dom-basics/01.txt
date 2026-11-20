@@ -1,0 +1,12 @@
+app                         Illustrator
+├─ documents               開いているファイルの一覧
+└─ activeDocument          いま前にあるファイル
+      ├─ layers            レイヤー
+      │  └─ pageItems      そのレイヤーのオブジェクト
+      ├─ pageItems         ファイルの全オブジェクト
+      ├─ pathItems         パスだけ
+      ├─ textFrames        テキストだけ
+      ├─ placedItems       配置した画像だけ
+      ├─ groupItems        グループだけ
+      ├─ artboards         アートボード
+      └─ selection         選んでいるもの

@@ -1,4 +1,4 @@
-# Figma│コンポーネントの情報を出力するFigmaライブラリ
+# Figmaの情報をGoogleスプレッドシートに出力する方法｜GAS・REST API・セクション指定
 
 解説記事: https://cg-method.com/figma/figma-sheet/
 
@@ -6,4 +6,3 @@
 
 - `01.js`
 - `02.js`
-- `03.js`

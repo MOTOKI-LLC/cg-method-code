@@ -1,0 +1,19 @@
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length === 0) {
+        alert("Open a composition and select one or more layers."); return;
+    }
+    var layers = comp.selectedLayers, end = 0;
+    for (var i = 0; i < layers.length; i++) {
+        if (!isFinite(layers[i].outPoint)) { alert("Invalid outPoint."); return; }
+        end = Math.max(end, layers[i].outPoint);
+    }
+    var frame = comp.frameDuration;
+    if (!(frame > 0) || !isFinite(frame) || end <= 0) {
+        alert("A positive end time and frame duration are required."); return;
+    }
+    var duration = Math.ceil(end / frame - 0.0000001) * frame;
+    if (duration < frame || duration > 10800) { alert("Duration is outside the allowed range."); return; }
+    app.beginUndoGroup("Match duration to selected layers");
+    try { comp.duration = duration; } finally { app.endUndoGroup(); }
+})();

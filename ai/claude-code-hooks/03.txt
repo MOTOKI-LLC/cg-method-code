@@ -1,0 +1,5 @@
+import json, sys, datetime
+data = json.load(sys.stdin)
+path = data.get("tool_input", {}).get("file_path", "")
+with open("hooks.log", "a", encoding="utf-8") as f:
+    f.write(f"{datetime.datetime.now():%H:%M:%S} {data['tool_name']} {path}\n")

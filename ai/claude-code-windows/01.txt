@@ -1,0 +1,7 @@
+Bashツールの出力:
+/usr/bin/bash
+MINGW64_NT-10.0-26200
+C:/demo
+
+PowerShellツールの出力:
+5.1.26100.9444

@@ -1,0 +1,5 @@
+// 動かない
+this(5)(2).value;
+
+// 動く
+thisLayer(5)(2).value;

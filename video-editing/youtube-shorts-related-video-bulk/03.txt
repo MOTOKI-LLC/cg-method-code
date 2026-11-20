@@ -1,0 +1,6 @@
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.connect_over_cdp("http://127.0.0.1:9333", timeout=30000)
+    pages = [x for x in browser.contexts[0].pages if "studio.youtube.com" in x.url]
+    page = pages[-1] if pages else browser.contexts[0].new_page()

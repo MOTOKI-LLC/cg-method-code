@@ -1,0 +1,26 @@
+(function () {
+    var comp = app.project.activeItem;
+    if (!(comp instanceof CompItem)) {
+        alert("Open a composition first.");
+        return;
+    }
+    var layers = comp.selectedLayers;
+    if (layers.length === 0) {
+        alert("Select at least one layer.");
+        return;
+    }
+    app.beginUndoGroup("Move selected layers");
+    var moved = 0;
+    for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if (layer.locked || !layer.hasVideo) continue;
+        var pos = layer.transform.position;
+        if (pos.numKeys > 0 || pos.dimensionsSeparated) continue;
+        var v = pos.value;
+        v[0] = v[0] + 100;
+        pos.setValue(v);
+        moved++;
+    }
+    app.endUndoGroup();
+    alert("Moved: " + moved + " / " + layers.length);
+})();

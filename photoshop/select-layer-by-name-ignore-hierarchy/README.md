@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│階層関係なくレイヤー名でレイヤー選択する方法
+# Photoshop JSXでグループ内も名前で選択する｜再帰検索・同名・階層指定
 
 解説記事: https://cg-method.com/photoshop/select-layer-by-name-ignore-hierarchy/
 

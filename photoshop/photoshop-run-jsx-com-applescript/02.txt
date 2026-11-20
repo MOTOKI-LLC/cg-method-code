@@ -1,0 +1,6 @@
+tell application "Adobe Photoshop"
+      set theFile to alias "Application:Documents:MyFile"
+      open theFile
+      do javascript (file <path to Emboss.jsx>) ¬
+            with arguments { 75,2,89 }
+end tell

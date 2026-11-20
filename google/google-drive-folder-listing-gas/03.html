@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><style>
+body {font-family:sans-serif;} input {box-sizing:border-box;width:100%;padding:8px;} button {margin-top:12px;} #status {white-space:pre-wrap;}
+</style></head><body>
+<label for="folderUrl">Google DriveのフォルダURL</label>
+<input type="url" id="folderUrl" placeholder="https://drive.google.com/drive/folders/xxxxx">
+<button id="run" onclick="submitFolder()">実行</button><p id="status" role="status"></p>
+<script>
+let running = false;
+function submitFolder() {
+  if (running) return;
+  running = true;
+  const button = document.getElementById('run');
+  const status = document.getElementById('status');
+  button.disabled = true; status.textContent = '処理中です。画面を閉じずにお待ちください。';
+  google.script.run.withSuccessHandler(result => {
+    status.textContent = result.name + 'へ' + result.files + '件を出力しました。画面を閉じて結果を確認してください。';
+    // 同じダイアログからの重複出力を防ぐため、ボタンは無効のままです。
+  }).withFailureHandler(error => {
+    status.textContent = '処理に失敗しました。実行ログと作成済みシートを確認してください。' + error.message;
+    running = false; button.disabled = false;
+  }).processFolderUrl(document.getElementById('folderUrl').value);
+}
+</script></body></html>

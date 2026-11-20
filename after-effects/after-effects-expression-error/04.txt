@@ -1,0 +1,5 @@
+// 動く
+function timesTen(val) {
+  return val * 10
+}
+timesTen(value);

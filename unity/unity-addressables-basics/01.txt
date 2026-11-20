@@ -1,0 +1,5 @@
+// 移行前：Resources内の相対パス。拡張子を付けない
+Resources.LoadAsync<GameObject>("desert/tank");
+
+// 移行後：Groupsで確認したアドレスを指定する
+var handle = Addressables.LoadAssetAsync<GameObject>("desert/tank.prefab");

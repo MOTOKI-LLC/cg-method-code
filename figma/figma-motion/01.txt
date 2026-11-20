@@ -1,0 +1,22 @@
+@property --rotate-transform { syntax: '<angle>'; initial-value: 0rad; inherits: false; }
+
+transform: rotate(var(--rotate-transform, 0rad));
+
+animation:
+  kf_1_3_opacity_0 2s linear,
+  kf_1_3_rotate_0 2s linear,
+  kf_1_3_translate_0 2s linear;
+animation-iteration-count: infinite;
+
+@keyframes kf_1_3_opacity_0 {
+  0% { animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); opacity: 0; }
+  50% { opacity: 1; }
+}
+@keyframes kf_1_3_rotate_0 {
+  0% { animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1); --rotate-transform: 0rad; }
+  50% { --rotate-transform: -1.571rad; }
+}
+@keyframes kf_1_3_translate_0 {
+  0% { translate: 0px 0px; }
+  50% { translate: 453px 0px; }
+}

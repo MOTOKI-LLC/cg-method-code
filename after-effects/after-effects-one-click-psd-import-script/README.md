@@ -1,4 +1,4 @@
-# After Effects│PSDを1クリックでインポートするスクリプト
+# After EffectsでPSDをコンポジションとして読み込むスクリプト｜既存素材を守る修正版
 
 解説記事: https://cg-method.com/after-effects/after-effects-one-click-psd-import-script/
 

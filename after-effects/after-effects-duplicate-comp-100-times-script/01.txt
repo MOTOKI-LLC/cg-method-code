@@ -1,0 +1,26 @@
+(function () {
+    var selected = app.project.selection;
+    var totalPerComp = 100; // 元コンポを含む合計数
+    if (!selected.length) { alert("プロジェクトパネルでコンポを選択してください。"); return; }
+    var targets = [], i, j;
+    for (i = 0; i < selected.length; i++) {
+        if (!(selected[i] instanceof CompItem)) {
+            alert("コンポだけを選択してください。フッテージとフォルダーは対象外です。"); return;
+        }
+        targets.push(selected[i]);
+    }
+    if (totalPerComp < 1 || totalPerComp !== Math.floor(totalPerComp) ||
+        targets.length * (totalPerComp - 1) > 500) {
+        alert("合計数は1以上の整数、今回追加するコンポは500個以内にしてください。"); return;
+    }
+    var made = 0;
+    app.beginUndoGroup("選択コンポを複製");
+    try {
+        for (i = 0; i < targets.length; i++) {
+            for (j = 1; j < totalPerComp; j++) { targets[i].duplicate(); made++; }
+        }
+        alert("追加したコンポ：" + made + "個");
+    } catch (error) {
+        alert("途中停止（追加" + made + "個）：" + error.toString() + "\n編集→取り消しで今回分を戻してください。");
+    } finally { app.endUndoGroup(); }
+}());

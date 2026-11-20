@@ -1,4 +1,4 @@
-# Photoshop│AutoHotkeyからスクリプトを実行する方法
+# PhotoshopでAutoHotkey v2からJSXを実行する方法｜キー割り当て・GUI・エラー対処
 
 解説記事: https://cg-method.com/photoshop/autohotkey-script-launcher/
 

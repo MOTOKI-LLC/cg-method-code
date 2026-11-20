@@ -1,4 +1,4 @@
-# Claude Codeを日本語で使う｜返答の日本語化はできる、画面表示はできない
+# Claude Codeを日本語で使う｜language設定・CLAUDE.md・改行方法
 
 解説記事: https://cg-method.com/ai/claude-code-japanese/
 

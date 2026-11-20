@@ -1,8 +1,7 @@
-// 遅い：1行ごとにシートへ書きに行く
-for (let i = 0; i < rows.length; i++) {
-  sheet.getRange(i + 1, 1).setValue(rows[i]);
+function debugMissingSheet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('存在しない練習シート');
+  return sheet.getRange('A1').getValue();
 }
-
-// 速い：配列を作ってから1回で書く
-const values = rows.map(r => [r]);
-sheet.getRange(1, 1, values.length, 1).setValues(values);
+function debugMissingVariable() {
+  return missingPracticeValue;
+}

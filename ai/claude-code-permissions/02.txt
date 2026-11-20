@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run test:*)",
-      "Bash(git commit *)",
-      "Read"
+      "Bash(npm run test)",
+      "Bash(git status)",
+      "Bash(git diff)"
     ],
     "deny": [
       "Bash(git push *)",

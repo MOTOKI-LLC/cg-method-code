@@ -1,0 +1,9 @@
+var startTime = 0;
+var endTime = 2;
+var startNum = 0;
+var endNum = 1000;
+var n = startNum;
+if (endTime > startTime) {
+  n = linear(time, startTime, endTime, startNum, endNum);
+}
+String(Math.round(n));

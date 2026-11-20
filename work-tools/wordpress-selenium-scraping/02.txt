@@ -1,0 +1,31 @@
+import argparse
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from card_extract import extract_cards, write_csv
+
+
+def collect(url, output):
+    driver = webdriver.Chrome()
+    try:
+        driver.set_page_load_timeout(30)
+        driver.get(url)
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "#main_content .p-postList__item")
+            )
+        )
+        rows = extract_cards(driver.page_source, driver.current_url)
+        write_csv(rows, output)
+        print(f"Saved {len(rows)} unique visible-page links: {output}")
+    finally:
+        driver.quit()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--url", default="https://cg-method.com/work-tools/")
+    parser.add_argument("--output", default="cards.csv")
+    args = parser.parse_args()
+    collect(args.url, args.output)

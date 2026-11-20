@@ -1,0 +1,5 @@
+# demo.cfg
+[config]
+sessionSizeLimit = 15MB
+sessionCountLimit = 5
+serverTitle = demo server

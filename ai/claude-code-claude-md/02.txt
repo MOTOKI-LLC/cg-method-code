@@ -1,0 +1,8 @@
+claude-memo/
+├── CLAUDE.md        … 返事の最後に「(root)」と書く
+├── CLAUDE.local.md  … 返事の最後に「(local)」と書く
+└── app/
+    ├── CLAUDE.md    … 返事の最後に「(app)」と書く
+    └── src/
+        ├── CLAUDE.md … 返事の最後に「(src)」と書く
+        └── main.py

@@ -1,0 +1,7 @@
+You have 2 models, taking up 2.10 GB of disk space.
+
+LLM                      PARAMS    ARCH     SIZE       DEVICE
+llama-3.2-3b-instruct    3B        Llama    2.02 GB    Local
+
+EMBEDDING                               PARAMS    ARCH          SIZE        DEVICE
+text-embedding-nomic-embed-text-v1.5              Nomic BERT    84.11 MB    Local

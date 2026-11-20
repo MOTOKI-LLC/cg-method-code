@@ -1,0 +1,8 @@
+@echo off
+setlocal DisableDelayedExpansion
+chcp 65001 >nul
+pushd "%~dp0" || exit /b 1
+md "山田 太郎" || exit /b 1
+md "資料 ! & [2026]" || exit /b 1
+md "進捗 100%%" || exit /b 1
+popd

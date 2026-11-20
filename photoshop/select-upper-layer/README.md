@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│1つ上の表示レイヤーを選択する方法
+# Photoshop JSXで1つ上へ相対選択する｜Frwr・非表示・エラーの確認
 
 解説記事: https://cg-method.com/photoshop/select-upper-layer/
 

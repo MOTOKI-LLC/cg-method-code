@@ -1,4 +1,4 @@
-# Claude Code│「制限リセット時に自動的に続行する」が便利。追加課金を避けながら長期タスクを回す
+# Claude Codeの自動再開｜利用上限のリセット後に作業を続ける設定と止まる条件
 
 解説記事: https://cg-method.com/ai/claude-code-auto-continue-after-limit-reset/
 
@@ -11,6 +11,3 @@
 - `05.txt`
 - `06.txt`
 - `07.txt`
-- `08.txt`
-- `09.txt`
-- `10.txt`

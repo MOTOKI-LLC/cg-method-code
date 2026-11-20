@@ -1,0 +1,11 @@
+@charset "utf-8";
+	.st0
+{
+	background : #EFEFEF;
+	background : rgba(239, 239, 239, 1);
+	width : 240px;
+	height : 100px;
+	border-radius : 12px;
+	-moz-border-radius : 12px;
+	-webkit-border-radius : 12px;
+}

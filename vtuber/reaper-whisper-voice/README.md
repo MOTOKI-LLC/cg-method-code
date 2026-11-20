@@ -1,4 +1,4 @@
-# 【Reaper】ささやき声を加工して変換！疑似バイノーラルをする方法［ASMR］
+# 【REAPER・Audacity】ささやき声の音量・音色・左右を加工する方法
 
 解説記事: https://cg-method.com/vtuber/reaper-whisper-voice/
 

@@ -1,0 +1,12 @@
+$ErrorActionPreference = 'Stop'
+$version = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+$adapters = @(Get-NetAdapter -Physical | Where-Object { $_.PhysicalMediaType -eq 'Native 802.11' })
+[pscustomobject]@{
+    DisplayVersion = $version.DisplayVersion
+    Build = $version.CurrentBuild
+    WirelessPhysicalAdapterCount = $adapters.Count
+    WirelessDisplayAppPackageCount = @(Get-AppxPackage -Name 'Microsoft.PPIProjection').Count
+    MiracastSupportProven = $false
+    TwoPCConnectionTested = $false
+    OptionalFeatureInstalledByScript = $false
+} | ConvertTo-Json

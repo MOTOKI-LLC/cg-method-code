@@ -1,0 +1,25 @@
+& {
+    $InputPath = Join-Path (Get-Location).Path 'practice-4x3.png'
+    $ErrorActionPreference = 'Stop'
+    function Get-CgmImageHash([string]$Path) {
+        $cgmHasher = [System.Security.Cryptography.SHA256]::Create()
+        try { [BitConverter]::ToString($cgmHasher.ComputeHash([System.IO.File]::ReadAllBytes($Path))) }
+        finally { $cgmHasher.Dispose() }
+    }
+    $cgmCandidates = @(
+        (Join-Path $env:LOCALAPPDATA 'PowerToys\WinUI3Apps\PowerToys.ImageResizerCLI.exe'),
+        (Join-Path $env:ProgramFiles 'PowerToys\WinUI3Apps\PowerToys.ImageResizerCLI.exe')
+    )
+    $cgmCli = $cgmCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+    if (-not $cgmCli) { throw 'Image Resizer CLI was not found. Check your installed PowerToys version and path.' }
+    if (-not (Test-Path -LiteralPath $InputPath -PathType Leaf)) { throw 'Input image was not found.' }
+    $cgmInput = (Resolve-Path -LiteralPath $InputPath).Path
+    $cgmDestination = Join-Path (Split-Path -Parent $cgmInput) 'half-output'
+    if (Test-Path -LiteralPath $cgmDestination) { throw 'half-output already exists. Use a new practice folder.' }
+    $cgmHashBefore = Get-CgmImageHash $cgmInput
+    New-Item -ItemType Directory -Path $cgmDestination | Out-Null
+    & $cgmCli -w 50 -h 50 -u Percent -d $cgmDestination -n '%1_half' $cgmInput
+    if ($LASTEXITCODE -ne 0) { throw 'Image Resizer failed. Inspect the new output folder; keep the original image.' }
+    if ((Get-CgmImageHash $cgmInput) -ne $cgmHashBefore) { throw 'The input changed. Stop and inspect the original image.' }
+    Get-ChildItem -LiteralPath $cgmDestination -File | Select-Object Name,Length
+}

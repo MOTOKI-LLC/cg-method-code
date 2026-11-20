@@ -1,131 +1,79 @@
-// ローカルスタイルIDをキャッシュ（Paint / Effect / Text / Grid）
-const localStyleIds = new Set(
-  [
-    ...figma.getLocalPaintStyles(),
-    ...figma.getLocalEffectStyles(),
-    ...figma.getLocalTextStyles(),
-    ...figma.getLocalGridStyles(),
-  ].map((s) => s.id)
-);
+figma.showUI(__html__, { width: 360, height: 210 });
+let busy = false;
 
-function isExternalStyle(style) {
-  return !!style && style.remote === true && !localStyleIds.has(style.id);
+function csvCell(value) {
+  let text = String(value == null ? '' : value);
+  if (/^[=+@\-\t\r\n]/.test(text)) text = "'" + text;
+  return '"' + text.replace(/"/g, '""') + '"';
 }
 
-function checkExternalStyleUsage(node) {
-  const result = [];
-
-  function add(styleId, type) {
-    if (!styleId || typeof styleId !== "string") return; // figma.mixed は弾く
-    const style = figma.getStyleById(styleId);
-    if (isExternalStyle(style)) {
-      result.push({
-        name: node.name,
-        id: "'" + node.id, // Excel誤変換防止
-        type,
-        styleName: style.name,
-        styleId: style.id,
-        libraryName: (style && style.libraryName) || "不明",
-      });
+async function audit(scope) {
+  if (scope === 'all') await figma.loadAllPagesAsync();
+  const cache = new Map();
+  const rows = [];
+  async function resolve(id) {
+    if (!cache.has(id)) {
+      cache.set(id, figma.getStyleByIdAsync(id).then(style => {
+        if (!style) return { status: 'unresolved', name: '', key: '' };
+        return { status: style.remote ? 'external' : 'local',
+          name: style.name, key: style.key };
+      }).catch(() => ({ status: 'unresolved', name: '', key: '' })));
     }
+    return cache.get(id);
   }
-
-  try {
-    add(node.fillStyleId, "Fill Style");
-  } catch (e) {}
-  try {
-    add(node.strokeStyleId, "Stroke Style");
-  } catch (e) {}
-  try {
-    add(node.effectStyleId, "Effect Style");
-  } catch (e) {}
-  if ("textStyleId" in node) {
-    try {
-      add(node.textStyleId, "Text Style");
-    } catch (e) {}
-  }
-
-  return result;
-}
-
-function walk(node, acc) {
-  // SceneNodeのみチェック
-  if (node && node.type && typeof node.type === "string") {
-    try {
-      acc.push(...checkExternalStyleUsage(node));
-    } catch (e) {}
-  }
-  if ("children" in node && Array.isArray(node.children)) {
-    for (const child of node.children) {
-      walk(child, acc);
+  async function inspect(node, pageName) {
+    const refs = new Map();
+    function add(id, type) {
+      if (typeof id === 'string' && id) refs.set(type + ':' + id, { id, type });
     }
-  }
-}
-
-function getTimestamp() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const hh = String(now.getHours()).padStart(2, "0");
-  const min = String(now.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}_${hh}${min}`;
-}
-
-function toCSV(rows) {
-  const headers = [
-    "Layer Name",
-    "Layer ID",
-    "Style Type",
-    "Style Name",
-    "Style ID",
-    "Library Name",
-  ];
-  const records = rows.map((r) => [
-    r.name,
-    r.id,
-    r.type,
-    r.styleName,
-    r.styleId,
-    r.libraryName,
-  ]);
-  return [headers, ...records]
-    .map((row) =>
-      row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")
-    )
-    .join("\n");
-}
-
-// ---- UIを表示（小さめのモーダル） ----
-figma.showUI(__html__, { width: 320, height: 160 });
-
-figma.ui.onmessage = (msg) => {
-  if (!msg || typeof msg !== "object") return;
-
-  if (msg.type === "export") {
-    const allResults = [];
-
-    // ファイル全体：全ページを起点に再帰走査
-    for (const page of figma.root.children) {
-      if (page.type === "PAGE") {
-        walk(page, allResults);
+    for (const [property, type] of [
+      ['fillStyleId', 'Fill'], ['strokeStyleId', 'Stroke'],
+      ['effectStyleId', 'Effect'], ['gridStyleId', 'Grid'],
+      ['textStyleId', 'Text']
+    ]) {
+      if (property in node) add(node[property], type);
+    }
+    if (node.type === 'TEXT' && node.characters.length > 0) {
+      for (const segment of node.getStyledTextSegments(['textStyleId', 'fillStyleId'])) {
+        add(segment.textStyleId, 'Text');
+        add(segment.fillStyleId, 'Fill');
       }
     }
-
-    if (allResults.length === 0) {
-      figma.notify(
-        "外部スタイルを参照しているレイヤーは見つかりませんでした。"
-      );
-      figma.ui.postMessage({ type: "error", message: "外部スタイルなし。" });
-      return;
+    for (const ref of refs.values()) {
+      const style = await resolve(ref.id);
+      if (style.status !== 'local') {
+        rows.push([pageName, node.name, node.id, ref.type,
+          ref.id, style.name, style.key, style.status]);
+      }
     }
-
-    const csv = toCSV(allResults);
-    const filename = `external_styles_${getTimestamp()}.csv`;
-    figma.ui.postMessage({ type: "download", csv, filename });
   }
+  async function walk(node, pageName) {
+    await inspect(node, pageName);
+    if ('children' in node) {
+      for (const child of node.children) await walk(child, pageName);
+    }
+  }
+  const pages = scope === 'all' ? figma.root.children : [figma.currentPage];
+  for (const page of pages) await walk(page, page.name);
+  const headers = ['Page', 'Layer', 'Node ID', 'Type', 'Style ID',
+    'Style Name', 'Style Key', 'Status'];
+  const csv = [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n');
+  return { csv, count: rows.length,
+    unresolved: rows.filter(row => row[7] === 'unresolved').length };
+}
 
-  if (msg.type === "close") {
-    figma.closePlugin();
+figma.ui.onmessage = async msg => {
+  if (!msg || msg.type !== 'export' || busy) return;
+  if (msg.scope !== 'current' && msg.scope !== 'all') return;
+  busy = true;
+  try {
+    const result = await audit(msg.scope);
+    figma.ui.postMessage({ type: 'result', ...result });
+  } catch (error) {
+    figma.ui.postMessage({ type: 'error',
+      message: '走査に失敗しました。完了した監査として扱わず、コンソールを確認してください。' });
+    console.error(error);
+  } finally {
+    busy = false;
   }
 };

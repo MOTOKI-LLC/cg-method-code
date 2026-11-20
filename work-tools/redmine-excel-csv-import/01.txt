@@ -1,0 +1,28 @@
+"""Local CSV structure/date check only. No network or Redmine calls."""
+import csv,io,json,sys
+from datetime import date
+from pathlib import Path
+FIELDS=['subject','description','start_date','due_date','parent_issue_id']
+def validate(text):
+    reader=csv.DictReader(io.StringIO(text.lstrip('\ufeff')),strict=True)
+    if reader.fieldnames != FIELDS:
+        raise ValueError('Header must be: '+','.join(FIELDS))
+    rows=list(reader)
+    if not rows:raise ValueError('No data rows')
+    for i,r in enumerate(rows,1):
+        if None in r or any(v is None for v in r.values()):raise ValueError(f'Row {i}: column count mismatch')
+        if not r['subject'].strip():raise ValueError(f'Row {i}: empty subject')
+        dates=[]
+        for field in ['start_date','due_date']:
+            value=r[field]
+            if value and (len(value)!=10 or date.fromisoformat(value).isoformat()!=value):raise ValueError(f'Row {i}: use YYYY-MM-DD')
+            dates.append(date.fromisoformat(value) if value else None)
+        if all(dates) and dates[1]<dates[0]:raise ValueError(f'Row {i}: due date before start date')
+        parent=r['parent_issue_id']
+        if parent:
+            # This exercise intentionally allows only an earlier imported row.
+            if not parent.isdecimal() or not 1<=int(parent)<i:raise ValueError(f'Row {i}: parent must be an earlier import position')
+    return {'rows':len(rows),'column_count':len(FIELDS),'redmine_import_verified':False}
+if __name__=='__main__':
+    try:print(json.dumps(validate(Path(sys.argv[1]).read_text('utf-8-sig')),ensure_ascii=False))
+    except (ValueError,csv.Error) as exc:sys.exit(str(exc))

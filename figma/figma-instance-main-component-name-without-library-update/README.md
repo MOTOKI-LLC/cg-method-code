@@ -1,4 +1,4 @@
-# Figmaプラグイン│インスタンス名と参照元の名前を比較・変更する方法
+# Figmaインスタンス名を参照元と比較するプラグイン｜差分確認と一括変更
 
 解説記事: https://cg-method.com/figma/figma-instance-main-component-name-without-library-update/
 

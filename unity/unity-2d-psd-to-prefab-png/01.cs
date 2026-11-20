@@ -2,20 +2,20 @@
 using UnityEditor;
 using UnityEditor.U2D.PSD;
 using System;
+using System.IO;
 
-public class PsdOverridePostprocessor : AssetPostprocessor
+public static class PsdOverridePostprocessor
 {
-    // PSD を Texture として読み込む前に呼ばれる
-    void OnPreprocessTexture()
+    [MenuItem("Assets/BG/PSD Importerに切り替え")]
+    private static void SwitchSelected()
     {
-        // assetPath は「Assets/.../サンプル.psd」のような文字列
-        if (assetPath.EndsWith(".psd", StringComparison.OrdinalIgnoreCase))
+        foreach (var asset in Selection.objects)
         {
-            // 既に PSDImporter なら何もしない
-            if (AssetImporter.GetAtPath(assetPath) is PSDImporter) return;
-
-            // .psd を PSDImporter に差し替え
-            AssetDatabase.SetImporterOverride<PSDImporter>(assetPath);
+            string path = AssetDatabase.GetAssetPath(asset);
+            if (!string.Equals(Path.GetExtension(path), ".psd",
+                               StringComparison.OrdinalIgnoreCase)) continue;
+            if (AssetImporter.GetAtPath(path) is PSDImporter) continue;
+            AssetDatabase.SetImporterOverride<PSDImporter>(path);
         }
     }
 }

@@ -1,4 +1,4 @@
-# Unity│知っておくと便利！エディタ拡張まとめ 9選
+# Unityのエディタ拡張｜一括リネーム・Undo・グループ化と共有方法
 
 解説記事: https://cg-method.com/unity/unity-editor-extensions/
 
@@ -8,4 +8,6 @@
 - `02.cs`
 - `03.cs`
 - `04.cs`
-- `05.txt`
+- `05.cs`
+- `06.json`
+- `07.json`

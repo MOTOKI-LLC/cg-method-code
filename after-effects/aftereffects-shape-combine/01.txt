@@ -1,0 +1,7 @@
+// G_02以降の「パスのトリミング 1」→「終了点」へ貼付。
+var match = thisProperty.propertyGroup(3).name.match(/^G_(\d+)$/);
+var id = match ? Math.max(1, Number(match[1])) : 1;
+var delay = Math.max(0, effect("遅延（秒）")(1));
+var master = thisLayer.content("線群").content("G_01")
+    .content("パスのトリミング 1").end;
+master.valueAtTime(time - delay * (id - 1));

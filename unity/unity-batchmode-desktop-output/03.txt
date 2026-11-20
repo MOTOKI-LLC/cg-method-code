@@ -1,0 +1,43 @@
+@echo off
+setlocal DisableDelayedExpansion
+if "%~1"=="" goto usage
+if "%~2"=="" goto usage
+if "%~3"=="" goto usage
+if not "%~4"=="" goto usage
+set "UNITY=%~1"
+set "PROJECT=%~2"
+set "RUN=%~3"
+if not exist "%UNITY%" goto bad_input
+if not exist "%PROJECT%\ProjectSettings\ProjectVersion.txt" goto bad_input
+if not "%RUN:~1,2%"==":\" goto bad_input
+if exist "%RUN%" goto existing_run
+mkdir "%RUN%"
+if errorlevel 1 exit /b 2
+"%UNITY%" -batchmode -quit -nographics ^
+ -projectPath "%PROJECT%" ^
+ -executeMethod BatchHelloWriter.Run ^
+ -helloOutput "%RUN%\hello.txt" ^
+ -logFile "%RUN%\write.log"
+set "RESULT=%ERRORLEVEL%"
+if not "%RESULT%"=="0" goto failed
+"%UNITY%" -batchmode -quit -nographics ^
+ -projectPath "%PROJECT%" ^
+ -executeMethod BatchHelloWriter.VerifyOutput ^
+ -helloOutput "%RUN%\hello.txt" ^
+ -logFile "%RUN%\verify.log"
+set "RESULT=%ERRORLEVEL%"
+if not "%RESULT%"=="0" goto failed
+echo Unity process returned 0. Check log and output: "%RUN%"
+exit /b 0
+:failed
+echo Unity process returned %RESULT%. Inspect logs in "%RUN%".
+exit /b %RESULT%
+:existing_run
+echo Run path already exists. Choose a new absolute run directory.
+exit /b 2
+:bad_input
+echo Check Unity.exe, ProjectVersion.txt and the absolute run directory.
+exit /b 2
+:usage
+echo Usage: %~nx0 "Unity.exe" "Project root" "New absolute run directory"
+exit /b 2

@@ -1,0 +1,43 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
+public class UIClickProbe : MonoBehaviour
+{
+    readonly List<RaycastResult> results = new List<RaycastResult>();
+
+    void Update()
+    {
+        if (EventSystem.current == null)
+        {
+            Debug.LogWarning("シーンにEventSystemがありません");
+            enabled = false;
+            return;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current == null || !Mouse.current.leftButton.wasPressedThisFrame) return;
+        Vector2 position = Mouse.current.position.ReadValue();
+#else
+        if (!Input.GetMouseButtonDown(0)) return;
+        Vector2 position = Input.mousePosition;
+#endif
+
+        var data = new PointerEventData(EventSystem.current) { position = position };
+        results.Clear();
+        EventSystem.current.RaycastAll(data, results);
+
+        if (results.Count == 0)
+        {
+            Debug.Log("この位置にクリックを受け取る部品はありません");
+            return;
+        }
+        foreach (var r in results)
+        {
+            Debug.Log(r.gameObject.name, r.gameObject);
+        }
+    }
+}

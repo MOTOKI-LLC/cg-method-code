@@ -1,0 +1,8 @@
+git lfs install --local
+git lfs track "*.png" "*.fbx"
+git add -- .gitattributes "Assets/Textures/body.png" "Assets/Textures/body.png.meta" "Assets/Models/chara.fbx" "Assets/Models/chara.fbx.meta"
+git diff --cached --stat
+git commit -m "Track practice binary assets with LFS"
+git lfs ls-files
+git check-attr filter -- "Assets/Textures/body.png" "Assets/Textures/body.png.meta" "Assets/Scenes/Test.unity"
+git show HEAD:Assets/Textures/body.png

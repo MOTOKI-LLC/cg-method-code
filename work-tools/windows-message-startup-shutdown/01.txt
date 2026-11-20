@@ -1,0 +1,17 @@
+param(
+    [ValidateSet('SignIn','BeforeExit')]
+    [string]$Mode = 'SignIn',
+    [switch]$Preview
+)
+$messages = @{
+    SignIn = '今日の予定を確認してください。'
+    BeforeExit = '作業を保存し、保存先を確認してからWindowsの電源メニューで終了してください。'
+}
+$message = $messages[$Mode]
+if ($Preview) {
+    [PSCustomObject]@{ Mode = $Mode; Message = $message; ShutdownExecuted = $false }
+    return
+}
+Add-Type -AssemblyName PresentationFramework
+[void][System.Windows.MessageBox]::Show($message, '作業メモ')
+# メッセージ表示だけ。シャットダウン・再起動は実行しない。

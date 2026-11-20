@@ -1,8 +1,10 @@
-from psd_tools.constants import BlendMode
+import io
+from PIL import Image
 
-# ブレンドモードの確認
-print(layer.blend_mode)
-
-# ブレンドモードの変更
-if layer.blend_mode == BlendMode.NORMAL:
-    layer.blend_mode = BlendMode.SCREEN
+if layer.kind == 'smartobject':
+    # スマートオブジェクトデータにアクセス
+    smart_obj = layer.smart_object
+    
+    if smart_obj.filetype in ('jpg', 'png'):
+        image = Image.open(io.BytesIO(smart_obj.data))
+        image.save(f'{layer.name}_embedded.{smart_obj.filetype}')

@@ -1,0 +1,7 @@
+// G_02以降の「線 1」→「線幅」へ貼付。
+var match = thisProperty.propertyGroup(3).name.match(/^G_(\d+)$/);
+var id = match ? Math.max(1, Number(match[1])) : 1;
+var step = Math.max(0, effect("線幅差")(1));
+var master = thisLayer.content("線群").content("G_01")
+    .content("線 1").strokeWidth;
+Math.max(0, master.value - step * (id - 1));

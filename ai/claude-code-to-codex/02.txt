@@ -1,0 +1,8 @@
+---
+name: codex
+description: 実装を Codex に任せて、結果を確認する
+disable-model-invocation: true
+---
+1. 担当ファイル・実行場所・完了条件を spec.md に書き、親と同じファイルを同時編集しない
+2. cat spec.md | codex exec --sandbox workspace-write - を実行する
+3. 終了コード・出力・git diff・テスト結果を確認し、未完事項を報告する

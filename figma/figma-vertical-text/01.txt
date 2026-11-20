@@ -1,0 +1,15 @@
+/* ラーメン、縦書き。「括弧」 */
+
+position: absolute;
+width: 48px;
+height: 936px;
+
+font-family: 'Noto Sans JP';
+font-style: normal;
+font-weight: 400;
+font-size: 48px;
+line-height: 150%;
+/* または72px */
+font-feature-settings: 'vrt2' on;
+
+color: #FFFFFF;

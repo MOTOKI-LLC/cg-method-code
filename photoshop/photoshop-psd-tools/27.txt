@@ -1,35 +1,8 @@
-import json
-from psd_tools import PSDImage
+from psd_tools.constants import Tag
 
-def extract_layer_info(psd_path):
-    """レイヤー情報を辞書形式で抽出"""
-    psd = PSDImage.open(psd_path)
-    
-    def layer_to_dict(layer):
-        info = {
-            'name': layer.name,
-            'kind': layer.kind,
-            'visible': layer.visible,
-            'opacity': layer.opacity,
-            'blend_mode': str(layer.blend_mode),
-            'bbox': layer.bbox,
-            'has_mask': layer.has_mask(),
-        }
-        
-        if layer.is_group():
-            info['children'] = [layer_to_dict(child) for child in layer]
-        
-        return info
-    
-    result = {
-        'mode': psd.mode,
-        'size': (psd.width, psd.height),
-        'depth': psd.depth,
-        'layers': [layer_to_dict(layer) for layer in psd]
-    }
-    
-    return result
+# タグ付きブロックにアクセス
+tagged_blocks = layer.tagged_blocks
 
-# 使用例
-info = extract_layer_info('example.psd')
-print(json.dumps(info, indent=2, ensure_ascii=False))
+# 特定のタグの情報を取得
+if Tag.LAYER_ID in tagged_blocks:
+    layer_id = tagged_blocks[Tag.LAYER_ID]

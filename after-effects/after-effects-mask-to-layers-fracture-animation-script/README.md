@@ -1,4 +1,4 @@
-# After Effects│マスクごとにレイヤーを分けるスクリプトで破壊アニメーションを作る方法
+# After Effectsでマスクをレイヤーに分離｜2D破壊・復元アニメーションのコード
 
 解説記事: https://cg-method.com/after-effects/after-effects-mask-to-layers-fracture-animation-script/
 

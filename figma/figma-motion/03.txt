@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "playbackStyle": "loop",
+  "nodes": [
+    {
+      "node": "1:3",
+      "timelineDurationMs": 2000,
+      "fields": [
+        {
+          "field": "motionTranslationX@-1:-1",
+          "keyframes": [
+            { "timeMs": 0, "value": 59 },
+            { "timeMs": 1000, "value": 512, "easingToNext": { "hold": true } },
+            { "timeMs": 2000, "value": 512 }
+          ]
+        },
+        ...（motionRotation・motionTranslationY・opacity も同じ形で続く）
+      ]
+    }
+  ]
+}

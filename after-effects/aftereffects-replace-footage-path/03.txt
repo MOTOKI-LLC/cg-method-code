@@ -1,0 +1,5 @@
+' 変更前（名前空間付きの.aepxでは0件になる）
+Set nodes = doc.selectNodes("//fileReference[@fullpath]")
+
+' 変更後
+Set nodes = doc.selectNodes("//*[local-name()='fileReference' and @fullpath]")

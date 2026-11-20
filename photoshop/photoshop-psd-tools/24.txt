@@ -1,10 +1,14 @@
-# ベクターマスク情報
-if layer.has_vector_mask():
-    vector_mask = layer.vector_mask
-    print(vector_mask)
+import numpy as np
 
-# ライブシェイププロパティ
-if layer.has_origination():
-    for shape in layer.origination:
-        # Rectangle, RoundedRectangle, Ellipse, Line など
-        print(type(shape).__name__)
+# PSD全体をNumPy配列として取得
+array = psd.numpy()
+print(array.shape)  # (height, width, channels)
+
+# レイヤーをNumPy配列として取得
+layer_array = layer.numpy()
+
+# 特定のチャンネルのみ取得
+color_only = layer.numpy(channel='color')
+alpha_only = layer.numpy(channel='alpha')
+mask_only = layer.numpy(channel='mask')
+shape_only = layer.numpy(channel='shape')

@@ -1,0 +1,7 @@
+function createOnOpenTrigger() {
+  var ss = SpreadsheetApp.getActive();
+  ScriptApp.newTrigger('myFunction')
+    .forSpreadsheet(ss)
+    .onOpen()
+    .create();
+}

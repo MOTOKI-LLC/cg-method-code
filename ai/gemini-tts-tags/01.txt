@@ -1,0 +1,24 @@
+import base64
+from google import genai
+
+client = genai.Client()
+
+interaction = client.interactions.create(
+    model="gemini-3.8-flash-tts",
+    input=[{
+        "type": "user_input",
+        "content": [{
+            "type": "text",
+            "text": "今日の作業はここまでです。<long pause>明日は資料の見直しから始めます。",
+            "annotations": [{
+                "type": "speech_metadata",
+                "style": "speaking slowly",
+            }],
+        }],
+    }],
+    response_format={"type": "audio"},
+    generation_config={"speech_config": [{"voice": "Kore"}]},
+)
+
+with open("out.wav", "wb") as f:
+    f.write(base64.b64decode(interaction.output_audio.data))

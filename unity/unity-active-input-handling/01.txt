@@ -1,0 +1,6 @@
+// 旧方式：Updateメソッド内
+if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Space)) { Jump(); }
+
+// 新方式：上の旧方式と置き換えてUpdateメソッド内へ
+var keyboard = UnityEngine.InputSystem.Keyboard.current;
+if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame) { Jump(); }

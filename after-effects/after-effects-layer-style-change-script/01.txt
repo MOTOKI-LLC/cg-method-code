@@ -1,0 +1,55 @@
+/* 追加済み・有効なレイヤースタイル「境界線」の静的なサイズだけを変更します。 */
+(function () {
+    var WIDTH = 8;
+    var comp = app.project ? app.project.activeItem : null;
+    if (!(comp instanceof CompItem)) {
+        alert("対象のコンポジションを開いてから実行してください。"); return;
+    }
+    if (typeof WIDTH !== "number" || !isFinite(WIDTH) || WIDTH < 0) {
+        alert("WIDTHには0以上の有限な数値を指定してください。"); return;
+    }
+    var layers = comp.selectedLayers;
+    if (!layers.length) {
+        alert("境界線を変更するレイヤーを選択してください。"); return;
+    }
+    var targets = [], skipped = [], unchanged = 0;
+    for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i], reason = "", size = null;
+        if (!(layer instanceof AVLayer) && !(layer instanceof TextLayer) &&
+            !(layer instanceof ShapeLayer)) reason = "対象のレイヤー形式ではない";
+        else if (layer.locked) reason = "ロック中";
+        else {
+            try {
+                var styles = layer.property("ADBE Layer Styles");
+                var stroke = styles ? styles.property("frameFX/enabled") : null;
+                if (!stroke || !stroke.canSetEnabled) reason = "境界線が未追加";
+                else if (!stroke.enabled) reason = "境界線が無効";
+                else {
+                    size = stroke.property("frameFX/size");
+                    if (!size) reason = "サイズが見つからない";
+                    else if (size.numKeys > 0) reason = "サイズにキーフレームがある";
+                    else if (size.expressionEnabled) reason = "サイズに式がある";
+                    else if ((size.hasMin && WIDTH < size.minValue) ||
+                             (size.hasMax && WIDTH > size.maxValue)) reason = "サイズの許容範囲外";
+                }
+            } catch (error) { reason = "プロパティを参照できない"; }
+        }
+        if (reason) skipped.push(layer.name + "：" + reason);
+        else if (size.value === WIDTH) unchanged++;
+        else targets.push({name:layer.name, size:size});
+    }
+    if (!targets.length) {
+        alert("変更対象は0件です。既に指定値：" + unchanged + "件\n" + skipped.join("\n")); return;
+    }
+    var changed = 0, failure = "";
+    app.beginUndoGroup("レイヤースタイルの境界線サイズを変更");
+    try {
+        for (var n = 0; n < targets.length; n++) {
+            targets[n].size.setValue(WIDTH); changed++;
+        }
+    } catch (error) {
+        failure = "\n途中で停止しました。編集メニューから取り消して確認してください。\n" + error.toString();
+    } finally { app.endUndoGroup(); }
+    alert("サイズを" + WIDTH + "に変更：" + changed + "件\n既に指定値：" + unchanged +
+          "件\nスキップ：" + skipped.length + "件\n" + skipped.join("\n") + failure);
+}());

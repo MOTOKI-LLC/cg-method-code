@@ -1,0 +1,31 @@
+import sys
+from psd_tools import PSDImage
+# psd-tools 1.21.0 が合成できる調整レイヤー（README の7種類＋色相・彩度）
+OK_ADJ = {"brightnesscontrast", "levels", "curves", "exposure", "invert", "posterize", "threshold", "huesaturation"}
+ADJ = {"brightnesscontrast","levels","curves","exposure","invert","posterize","threshold","huesaturation","colorbalance",
+       "blackandwhite","photofilter","channelmixer","colorlookup","gradientmap","selectivecolor","vibrance"}
+FILL_FX = {"ColorOverlay", "GradientOverlay", "PatternOverlay"}
+
+def inspect(path):
+    psd = PSDImage.open(path)
+    print(f"■ {path}  {psd.width}x{psd.height}  プレビュー画像: {'あり' if psd.has_preview() else 'なし'}")
+    for layer in psd.descendants():
+        notes = []
+        if layer.kind in ADJ and layer.kind not in OK_ADJ:
+            notes.append(f"調整レイヤー {layer.kind}（合成は未対応）")
+        if layer.kind == "type":
+            notes.append("文字レイヤー（フォントの描画は未対応）")
+        if layer.kind == "smartobject":
+            notes.append("スマートオブジェクト（中身の編集は未対応）")
+        if layer.kind == "shape":
+            notes.append("シェイプ（描くには composite の追加パッケージが要る）")
+        if layer.has_effects():
+            fx = [e.__class__.__name__ for e in layer.effects if e.enabled]
+            other = [f for f in fx if f not in FILL_FX]
+            if other:
+                notes.append("レイヤー効果 " + ",".join(other) + "（多くは合成が未対応）")
+        if notes:
+            print(f"  - {layer.name!r}: " + " / ".join(notes))
+
+for p in sys.argv[1:]:
+    inspect(p)

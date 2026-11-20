@@ -1,0 +1,9 @@
+selected = sorted(
+    (obj for obj in context.selected_objects if obj.type == 'MESH'),
+    key=lambda obj: obj.name,
+)
+if not selected:
+    self.report({'WARNING'}, "メッシュを選択してください")
+    return {'CANCELLED'}
+
+targets = [f"{self.prefix}_{self.start + i:03d}" for i in range(len(selected))]

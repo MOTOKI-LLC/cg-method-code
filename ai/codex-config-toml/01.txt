@@ -1,0 +1,10 @@
+OpenAI Codex v0.158.0
+--------
+workdir: C:\demo\codex-demo
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+--------

@@ -1,0 +1,14 @@
+& {
+    $ErrorActionPreference = 'Stop'
+    $cgmCommand = Get-Command 'PowerToys.ImageResizer.CLI.exe' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    $cgmHelpCli = if ($cgmCommand) { $cgmCommand.Source } else { $null }
+    if (-not $cgmHelpCli) {
+        $cgmHelpCli = @(
+            (Join-Path $env:LOCALAPPDATA 'PowerToys\WinUI3Apps\PowerToys.ImageResizerCLI.exe'),
+            (Join-Path $env:ProgramFiles 'PowerToys\WinUI3Apps\PowerToys.ImageResizerCLI.exe')
+        ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+    }
+    if (-not $cgmHelpCli) { throw 'Image Resizer CLI was not found. Check the installed version and location.' }
+    & $cgmHelpCli --help
+    & $cgmHelpCli --show-config
+}

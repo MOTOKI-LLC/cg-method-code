@@ -40,10 +40,11 @@
     document.getElementById('btnCapSource').onclick = function(){ post('capture-source'); };
     document.getElementById('btnCapTarget').onclick = function(){ post('capture-target'); };
     document.getElementById('btnClearTargets').onclick = function(){ post('clear-targets'); };
-    $btnSwap.onclick = function(){ post('swap-now'); };
+    $btnSwap.onclick = function(){ if (confirm('登録したインスタンスを差し替えますか？')) post('swap-now'); };
 
     onmessage = function(e){
-      var m = e.data.pluginMessage;
+      if (e.source !== parent) return;
+      var m = e.data && e.data.pluginMessage;
       if (!m || m.type !== 'state') return;
       $sourceVal.textContent = m.payload.sourceName || "source 未登録";
       $btnSwap.disabled = !(m.payload.hasSource && m.payload.hasTarget);

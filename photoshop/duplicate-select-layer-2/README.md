@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│ドキュメントを複製して別名で保存する方法
+# Photoshopで文書を複製して別名PSD保存するJSX｜原本・上書き・失敗時の扱い
 
 解説記事: https://cg-method.com/photoshop/duplicate-select-layer-2/
 

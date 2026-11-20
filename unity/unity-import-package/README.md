@@ -1,4 +1,4 @@
-# Unity│パッケージのインポートで更新されるもの
+# Unityのunitypackageで何が更新される？旧検証と移動・改名の確認
 
 解説記事: https://cg-method.com/unity/unity-import-package/
 

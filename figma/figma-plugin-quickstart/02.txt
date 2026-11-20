@@ -1,0 +1,26 @@
+figma.showUI(__html__, { width: 280, height: 160 });
+
+figma.ui.onmessage = (message: unknown) => {
+  if (!message || typeof message !== 'object') return;
+  const msg = message as { type?: unknown; count?: unknown };
+  if (msg.type !== 'create-rects') return;
+  const count = msg.count;
+  if (typeof count !== 'number' || !Number.isInteger(count) ||
+      count < 1 || count > 100) {
+    figma.ui.postMessage({ type: 'error', message: '1〜100の整数を入力してください' });
+    return;
+  }
+  const nodes: SceneNode[] = [];
+  for (let i = 0; i < count; i++) {
+    const rect = figma.createRectangle();
+    rect.name = 'Rect ' + (i + 1);
+    rect.resize(100, 100);
+    rect.x = i * 150;
+    rect.y = 0;
+    rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
+    nodes.push(rect);
+  }
+  figma.currentPage.selection = nodes;
+  figma.viewport.scrollAndZoomIntoView(nodes);
+  figma.ui.postMessage({ type: 'done', count: nodes.length });
+};

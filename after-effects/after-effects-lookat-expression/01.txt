@@ -1,0 +1,10 @@
+var target = thisComp.layer("対象");
+var result = value;
+if (!hasParent && target.index != index) {
+  var fromPoint = position;
+  var atPoint = target.toWorld(target.anchorPoint);
+  if (length(fromPoint, atPoint) > 0.0001) {
+    result = lookAt(fromPoint, atPoint);
+  }
+}
+result;

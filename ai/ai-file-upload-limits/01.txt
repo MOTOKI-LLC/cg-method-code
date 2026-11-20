@@ -1,0 +1,8 @@
+# ファイルの大きさ（MB）
+(Get-Item .\photo.jpg).Length / 1MB
+
+# 画像の幅と高さ（ピクセル）
+Add-Type -AssemblyName System.Drawing
+$img = [System.Drawing.Image]::FromFile((Resolve-Path .\photo.jpg))
+"$($img.Width) x $($img.Height)"
+$img.Dispose()

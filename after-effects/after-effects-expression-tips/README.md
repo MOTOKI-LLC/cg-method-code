@@ -1,4 +1,4 @@
-# After Effects│エクスプレッション作成の為のTIPSまとめ
+# After Effectsのエクスプレッション作成TIPS｜値の確認・JSON外部参照と旧エンジンの違い
 
 解説記事: https://cg-method.com/after-effects/after-effects-expression-tips/
 

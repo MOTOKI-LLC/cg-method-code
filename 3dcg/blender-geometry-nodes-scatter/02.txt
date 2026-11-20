@@ -1,0 +1,15 @@
+import bpy
+
+ob = bpy.context.object
+if ob is None or ob.type != "MESH":
+    raise RuntimeError("練習用メッシュを選んでください。")
+mod = ob.modifiers.get("Scatter")
+if mod is None or mod.type != "NODES" or mod.node_group is None:
+    raise RuntimeError("上の例で作成した Scatter モディファイアーが必要です。")
+socket = next((item for item in mod.node_group.interface.items_tree
+               if item.item_type == "SOCKET" and item.in_out == "INPUT"
+               and item.name == "Density"), None)
+if socket is None:
+    raise RuntimeError("Density 入力がありません。")
+getattr(mod.properties.inputs, socket.identifier).value = 150.0
+ob.update_tag()

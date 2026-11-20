@@ -1,0 +1,16 @@
+param([Parameter(Mandatory=$true)][string]$Folder)
+$ErrorActionPreference = 'Stop'
+if (-not (Test-Path -LiteralPath $Folder -PathType Container)) {
+    throw 'Folder does not exist; nothing was changed.'
+}
+Get-ChildItem -LiteralPath $Folder -Force | ForEach-Object {
+    [pscustomobject]@{
+        Name = $_.Name
+        NameLength = $_.Name.Length
+        NameCharacters = (($_.Name.ToCharArray() | ForEach-Object {
+            'U+{0:X4}' -f [int]$_
+        }) -join ' ')
+        IsDirectory = $_.PSIsContainer
+        Attributes = [string]$_.Attributes
+    }
+}

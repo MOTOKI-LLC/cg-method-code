@@ -1,0 +1,53 @@
+import json
+import math
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+JST = timezone(timedelta(hours=9))
+
+def extract(lines):
+    rows = set()
+    for line in lines:
+        try:
+            rec = json.loads(line)
+            rl = rec.get("payload", {}).get("rate_limits")
+            if not isinstance(rl, dict) or rl.get("limit_id") != "codex":
+                continue
+            t = datetime.fromisoformat(rec["timestamp"].replace("Z", "+00:00"))
+            if t.tzinfo is None:
+                continue
+            for w in (rl.get("primary"), rl.get("secondary")):
+                if not isinstance(w, dict) or w.get("window_minutes") != 10080:
+                    continue
+                used, due = w.get("used_percent"), w.get("resets_at")
+                if any(type(v) not in (int, float) or not math.isfinite(v)
+                       for v in (used, due)):
+                    continue
+                if not 0 <= used <= 100:
+                    continue
+                datetime.fromtimestamp(due, JST)  # Validate timestamp range.
+                rows.add((t.timestamp(), used, due))
+        except (ValueError, TypeError, KeyError, AttributeError, OverflowError, OSError):
+            continue
+    return sorted(rows)
+
+def candidates(rows):
+    for prev, curr in zip(rows, rows[1:]):
+        t0, used0, due0 = prev
+        t1, used1, due1 = curr
+        if t1 > t0 and used1 < used0 - 1.5:
+            yield prev, curr
+
+def fmt(s):
+    return datetime.fromtimestamp(s, JST).strftime("%Y-%m-%d %H:%M")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        raise SystemExit("Usage: python check_resets.py SESSION.jsonl")
+    with Path(sys.argv[1]).open(encoding="utf-8", errors="replace") as f:
+        rows = extract(f)
+    for (t0, used0, due0), (t1, used1, due1) in candidates(rows):
+        timing = "旧予定以後に観測" if t1 >= due0 else "旧予定より前に観測"
+        print(f"{fmt(t1)} {used0:.1f}%→{used1:.1f}% {timing}（候補）"
+              f" 旧予定 {fmt(due0)} / 次の予定 {fmt(due1)}")

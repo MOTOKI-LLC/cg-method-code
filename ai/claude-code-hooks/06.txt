@@ -1,0 +1,7 @@
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "grep ではなく rg を使ってください"
+  }
+}

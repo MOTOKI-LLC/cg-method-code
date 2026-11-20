@@ -1,58 +1,53 @@
-//シートIDとシート名を記載
-var mySheet = SpreadsheetApp.openById("スプレッドシートID").getSheetByName(
-  "シート名"
-);
-
-//Natural Language APIキー
-var apiKey = "APIキー";
-
-//8個までしか処理できないので、開始行と終了行を記載する
-function main() {
-  getSentiment(2, 9);
-  getSentiment(10, 15);
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('感情分析').addItem('A2:A11を分析', 'main').addToUi();
 }
 
-function getSentiment(start, end) {
-  for (i = start; i <= end; i++) {
-    var tweet = mySheet.getRange(i, 1).getValue();
-    var response = retrieveSentiment(tweet);
-    var json = JSON.parse(response);
-    var score = json["documentSentiment"]["score"];
-    var magnitude = json["documentSentiment"]["magnitude"];
-
-    mySheet.getRange(i, 2).setValue(score);
-    mySheet.getRange(i, 3).setValue(magnitude);
+function main() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) throw new Error('同じスクリプトで処理中です');
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('分析');
+    if (!sheet) throw new Error('分析シートを作成してください');
+    const key = PropertiesService.getScriptProperties().getProperty('NL_API_KEY');
+    if (!key) throw new Error('スクリプトプロパティNL_API_KEYを設定してください');
+    const data = sheet.getRange('A2:C11').getValues();
+    const formulas = sheet.getRange('B2:C11').getFormulas();
+    const jobs = [];
+    for (let i = 0; i < data.length; i++) {
+      const [text, score, magnitude] = data[i];
+      if (text === '' || score !== '' || magnitude !== '' ||
+          formulas[i][0] !== '' || formulas[i][1] !== '') continue;
+      if (typeof text !== 'string' || !text.trim() || Array.from(text).length > 1000) {
+        throw new Error((i + 2) + '行目は1〜1000文字の文章にしてください');
+      }
+      jobs.push({row: i + 2, text});
+    }
+    for (const job of jobs) {
+      let response;
+      try {
+        response = UrlFetchApp.fetch('https://language.googleapis.com/v1/documents:analyzeSentiment', {
+          method: 'post', contentType: 'application/json',
+          headers: {'x-goog-api-key': key},
+          payload: JSON.stringify({document: {type: 'PLAIN_TEXT', language: 'ja', content: job.text}, encodingType: 'UTF8'}),
+          muteHttpExceptions: true
+        });
+      } catch (e) {
+        throw new Error(job.row + '行目の通信に失敗しました。課金・出力を確認してから再実行してください');
+      }
+      if (response.getResponseCode() !== 200) {
+        throw new Error(job.row + '行目: HTTP ' + response.getResponseCode() + '。API設定・課金・割り当てを確認してください');
+      }
+      let result;
+      try { result = JSON.parse(response.getContentText()).documentSentiment; }
+      catch (e) { throw new Error(job.row + '行目の応答を解析できません'); }
+      if (!result || !Number.isFinite(result.score) || result.score < -1 || result.score > 1 ||
+          !Number.isFinite(result.magnitude) || result.magnitude < 0) {
+        throw new Error(job.row + '行目の分析結果が不正です');
+      }
+      sheet.getRange(job.row, 2, 1, 2).setValues([[result.score, result.magnitude]]);
+    }
+  } finally {
+    try { SpreadsheetApp.flush(); }
+    finally { lock.releaseLock(); }
   }
 }
-function retrieveSentiment(textData) {
-  var apiEndpoint =
-    "https://language.googleapis.com/v1/documents:analyzeSentiment?key=" +
-    apiKey;
-
-  var docDetails = {
-    language: "ja-jp",
-    type: "PLAIN_TEXT",
-    content: textData,
-  };
-
-  var nlData = {
-    document: docDetails,
-    encodingType: "UTF8",
-  };
-
-  var nlOptions = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(nlData),
-  };
-
-  var response = UrlFetchApp.fetch(apiEndpoint, nlOptions);
-  Logger.log("json is :" + response);
-  return response;
-}
-
-function onOpen() {
-  var entries = [{ name: "センチメント分析", functionName: "main" }];
-  mySheet.addMenu("カスタムメニュー", entries);
-}
-onOpen();

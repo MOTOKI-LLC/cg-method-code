@@ -1,4 +1,4 @@
-# ExtendScript│スクリプト情報を取得してスプレッドシートに記録する方法
+# ExtendScriptの実行ログをスプレッドシートへ送る旧構成と修正点
 
 解説記事: https://cg-method.com/photoshop/get-script-data-post-spreadsheet/
 

@@ -11,9 +11,9 @@ function nearestInstance(node){
   return null;
 }
 
-function getComponentFromNode(node){
+async function getComponentFromNode(node){
   if (!node) return null;
-  if (isInstance(node)) return node.mainComponent;
+  if (isInstance(node)) return await node.getMainComponentAsync();
   if (isComponent(node)) return node;
   if (isComponentSet(node)) {
     if (node.defaultVariant) return node.defaultVariant;
@@ -27,8 +27,10 @@ function getComponentFromNode(node){
 
 async function resolveComponent(componentNodeId, componentKey){
   if (componentNodeId && componentNodeId !== "") {
-    var local = figma.getNodeById(componentNodeId);
-    if (local && local.type === "COMPONENT") return local;
+    try {
+      var local = await figma.getNodeByIdAsync(componentNodeId);
+      if (local && local.type === "COMPONENT") return local;
+    } catch (_) { /* キーからの解決を続ける */ }
   }
   if (componentKey && componentKey !== "") {
     try {
@@ -60,11 +62,15 @@ function postState(){
   });
 }
 
+let busy = false;
 figma.ui.onmessage = async function(msg){
+  if (!msg || busy) return;
+  busy = true;
+  try {
   if (msg.type === "capture-source") {
     var sel = figma.currentPage.selection;
     if (!sel || sel.length === 0) { figma.notify("source を選択してください"); return; }
-    var comp = getComponentFromNode(sel[0]);
+    var comp = await getComponentFromNode(sel[0]);
     if (!comp) { figma.notify("メインコンポーネントを取得できません"); return; }
     stored.sourceId = comp.id || "";
     stored.sourceKey = comp.key || "";
@@ -74,17 +80,13 @@ figma.ui.onmessage = async function(msg){
   }
 
   if (msg.type === "capture-target") {
+
     var sel = figma.currentPage.selection;
-    if (!sel || sel.length === 0) { figma.notify("target を選択してください"); return; }
-    var inst = nearestInstance(sel[0]);
-    if (!inst) { figma.notify("INSTANCE が見つかりません"); return; }
-    // 既に同じIDがあるかチェック
-    var exists = false;
-    for (var i=0; i<stored.targets.length; i++){
-      if (stored.targets[i].id === inst.id) { exists = true; break; }
-    }
-    if (!exists){
-      stored.targets.push({id: inst.id, name: inst.name || "(no name)"});
+    if (!sel.length) { figma.notify("target を選択してください"); return; }
+    for (const node of sel) {
+      const inst = nearestInstance(node);
+      if (inst && !stored.targets.some(t => t.id === inst.id))
+        stored.targets.push({ id: inst.id, name: inst.name });
     }
     postState();
     return;
@@ -104,9 +106,9 @@ figma.ui.onmessage = async function(msg){
 
     var ok = 0, fail = 0;
     for (var i=0; i<stored.targets.length; i++){
-      var t = figma.getNodeById(stored.targets[i].id);
-      if (!t || t.type !== "INSTANCE") { fail++; continue; }
       try {
+        var t = await figma.getNodeByIdAsync(stored.targets[i].id);
+        if (!t || t.type !== "INSTANCE") { fail++; continue; }
         t.swapComponent(dest);
         ok++;
       } catch(e){ fail++; }
@@ -116,6 +118,8 @@ figma.ui.onmessage = async function(msg){
   }
 
   if (msg.type === "close") figma.closePlugin();
+  } catch (_) { figma.notify("処理に失敗しました。対象を登録し直してください", {error:true}); }
+  finally { busy = false; }
 };
 
 postState();

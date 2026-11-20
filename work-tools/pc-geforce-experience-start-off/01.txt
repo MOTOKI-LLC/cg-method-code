@@ -1,0 +1,9 @@
+# 読み取り専用。Command/User/実ファイルの場所は出力しない。
+Get-CimInstance -ClassName Win32_StartupCommand |
+    Where-Object { $_.Name -match 'NVIDIA|GeForce' } |
+    Select-Object Name, Location
+
+Get-Service |
+    Where-Object { $_.DisplayName -match 'NVIDIA' } |
+    Select-Object Name, DisplayName, Status, StartType
+# スタートアップ・サービスの設定は変更しない。

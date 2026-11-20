@@ -1,0 +1,5 @@
+// 変更前（ロックも非表示もしていないレイヤーでも止まっていた）
+if (node.locked || !node.visible || !node.editable) throw new Error("作成先レイヤーが編集できません。");
+
+// 変更後
+if (node.locked || !node.visible) throw new Error("作成先レイヤーが編集できません。");

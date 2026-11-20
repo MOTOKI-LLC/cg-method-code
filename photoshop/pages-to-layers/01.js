@@ -23,7 +23,7 @@ if (myEndung !== ".pdf") {
     pdfOpenOptions.mode = myColor;
     pdfOpenOptions.bitsPerChannel = BitsPerChannelType.EIGHT;
     pdfOpenOptions.resolution = myResolution;
-    pdfOpenOptions.supressWarnings = true;
+    pdfOpenOptions.suppressWarnings = true;
     pdfOpenOptions.cropPage = CropToType.TRIMBOX;
     pdfOpenOptions.page = myCounter;
 

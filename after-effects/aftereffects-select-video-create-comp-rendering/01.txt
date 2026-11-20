@@ -1,0 +1,32 @@
+(function () {
+    if (!app.project) { alert("Open a saved practice project first."); return; }
+    var selected = app.project.selection.slice(0);
+    var valid = [], skipped = 0, made = 0;
+    for (var i = 0; i < selected.length; i++) {
+        var x = selected[i];
+        if (!(x instanceof FootageItem) || !x.hasVideo || x.mainSource.isStill ||
+            x.footageMissing || !isFinite(x.width) || Math.floor(x.width) != x.width || x.width < 4 || x.width > 30000 ||
+            !isFinite(x.height) || Math.floor(x.height) != x.height || x.height < 4 || x.height > 30000 ||
+            !isFinite(x.duration) || x.duration <= 0 || x.duration > 10800 ||
+            !isFinite(x.frameRate) || x.frameRate < 1 || x.frameRate > 99 ||
+            !isFinite(x.pixelAspect) || x.pixelAspect < 0.01 || x.pixelAspect > 100) {
+            skipped++; continue;
+        }
+        valid.push(x);
+    }
+    if (!valid.length) { alert("No supported moving-image footage selected."); return; }
+    app.beginUndoGroup("Create selected video compositions");
+    try {
+        for (var j = 0; j < valid.length; j++) {
+            var item = valid[j];
+            var comp = app.project.items.addComp(item.name, item.width, item.height,
+                item.pixelAspect, item.duration, item.frameRate);
+            comp.layers.add(item);
+            made++;
+        }
+        alert("Created: " + made + ", skipped: " + skipped);
+    } catch (e) {
+        alert("Stopped after " + made + " completed items: " + e.toString() +
+            "\nUndo this group or reopen your saved practice copy.");
+    } finally { app.endUndoGroup(); }
+}());

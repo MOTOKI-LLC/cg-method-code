@@ -1,4 +1,4 @@
-# Unity│アニメーション制作に役に立つシェーダー 5選
+# Unityのアニメーション用シェーダー：加算・Cutout・Alphaマスクの選び方
 
 解説記事: https://cg-method.com/unity/unity-animation-shader/
 

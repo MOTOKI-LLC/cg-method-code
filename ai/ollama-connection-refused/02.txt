@@ -1,0 +1,7 @@
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+127.0.0.1        11434         16956
+
+   Id ProcessName Path
+   -- ----------- ----
+16956 ollama      C:\Users\<ユーザー名>\AppData\Local\Programs\Ollama\ollama.exe

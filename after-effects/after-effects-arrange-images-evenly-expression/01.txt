@@ -1,0 +1,19 @@
+var names = ["画像_1", "画像_2", "画像_3", "画像_4", "画像_5", "画像_6"];
+var control = thisComp.layer("adjust");
+var columns = control.effect("列数")(1).value;
+var pitchX = control.effect("横間隔")(1).value;
+var pitchY = control.effect("縦間隔")(1).value;
+var result = value;
+var order = -1;
+for (var i = 0; i < names.length; i++) if (names[i] == thisLayer.name) order = i;
+if (order >= 0 && isFinite(columns) && columns >= 1 &&
+        isFinite(pitchX) && pitchX > 0 && isFinite(pitchY) && pitchY > 0) {
+    columns = Math.min(names.length, Math.floor(columns));
+    var rows = Math.ceil(names.length / columns);
+    var col = order % columns;
+    var row = Math.floor(order / columns);
+    var x = thisComp.width / 2 + (col - (columns - 1) / 2) * pitchX;
+    var y = thisComp.height / 2 + (row - (rows - 1) / 2) * pitchY;
+    result = [x, y];
+}
+result;

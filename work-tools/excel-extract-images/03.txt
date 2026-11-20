@@ -1,0 +1,17 @@
+& {
+  $ErrorActionPreference = 'Stop'
+  $dest = 'C:\Users\ユーザー名\Documents\excel-images-実際のID\images-実際のID'
+  Add-Type -AssemblyName System.Drawing
+  Get-ChildItem -LiteralPath $dest -Recurse -File | ForEach-Object {
+    $file = $_.FullName
+    $img = $null
+    try {
+      $img = [System.Drawing.Image]::FromFile($file)
+      '{0}  FormatGuid={1}  {2}x{3}' -f $file, $img.RawFormat.Guid, $img.Width, $img.Height
+    } catch {
+      '読込失敗: {0} / {1}' -f $file, $_.Exception.Message
+    } finally {
+      if ($null -ne $img) { $img.Dispose() }
+    }
+  }
+}

@@ -1,5 +1,7 @@
-# 最初のレイヤーを取得
-first_layer = psd[0]
+from psd_tools import PSDImage
 
-# ネストしたレイヤーにアクセス
-nested_layer = psd[0][0]
+# PSDファイルを開く
+psd = PSDImage.open('example.psd')
+
+# ファイル情報を表示
+print(psd)  # PSDImage(mode=RGB size=101x55 depth=8 channels=3)

@@ -1,27 +1,49 @@
-seedRandom(thisComp.layer("TRANSFORM").effect("seedRandom")("スライダー") + index);
-X = transform.anchorPoint[0] - width / 2;
-Y = transform.anchorPoint[1] - height / 2;
-Z = 0;
-if (thisComp.layer("TRANSFORM").effect("3D")("チェックボックス") == 0) {
-  temp1 = +[X, Y] + [wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"))[0], wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"))[1]];
-  temp2 = value + [X, Y];
-  trans = thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
-  spd = thisComp.layer("TRANSFORM").effect("speed")("スライダー");
-  end = 100 - (index * spd / 100);
-  if (thisComp.layer("TRANSFORM").effect("ease")("チェックボックス") == 0) {
-    linear(trans, 0, end, temp1, temp2);
-  } else {
-    ease(trans, 0, end, temp1, temp2);
-  }
-} else {
-  temp1 = +[X, Y, Z] + wiggle(thisComp.layer("TRANSFORM").effect("PositionFreq")("スライダー"), thisComp.layer("TRANSFORM").effect("Position")("スライダー"));
-  temp2 = value + [X, Y, Z];
-  trans = thisComp.layer("TRANSFORM").effect("Transform")("スライダー");
-  spd = thisComp.layer("TRANSFORM").effect("speed")("スライダー");
-  end = 100 - (index * spd / 100);
-  if (thisComp.layer("TRANSFORM").effect("ease")("チェックボックス") == 0) {
-    linear(trans, 0, end, temp1, temp2);
-  } else {
-    ease(trans, 0, end, temp1, temp2);
-  }
-}
+(function () {
+    var comp = app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length !== 1) {
+        alert("練習コンポで素材レイヤーを1枚選択してください。"); return;
+    }
+    var original = comp.selectedLayers[0];
+    var masks = original.property("ADBE Mask Parade");
+    if (!(original instanceof AVLayer) || original.hasAudio || original.threeDLayer || original.parent ||
+        !original.enabled || original.locked || original.hasTrackMatte || original.isTrackMatte ||
+        original.adjustmentLayer || original.blendingMode !== BlendingMode.NORMAL ||
+        original.property("ADBE Effect Parade").numProperties || !masks ||
+        masks.numProperties < 2 || masks.numProperties > 20) {
+        alert("親なし2D素材・通常合成・エフェクト/マットなし・マスク2〜20枚が対象です。"); return;
+    }
+    var count = masks.numProperties, i, j;
+    for (i = 1; i <= count; i++) {
+        var mask = masks.property(i);
+        var maskPath = mask.property("ADBE Mask Shape");
+        if (maskPath.numKeys || maskPath.expressionEnabled) {
+            alert("この例はキーフレームと式のない固定マスクを対象にします。"); return;
+        }
+        if (mask.maskMode !== MaskMode.ADD || mask.inverted ||
+            mask.property("ADBE Mask Opacity").value !== 100 ||
+            mask.property("ADBE Mask Feather").value[0] !== 0 ||
+            mask.property("ADBE Mask Feather").value[1] !== 0 ||
+            mask.property("ADBE Mask Offset").value !== 0) {
+            alert("各マスクを加算・反転なし・不透明度100・ぼかし0・拡張0にしてください。"); return;
+        }
+    }
+    for (i = 1; i <= comp.numLayers; i++) {
+        if (/^MASK_\d+$/.test(comp.layer(i).name)) {
+            alert("既存のMASK_番号レイヤーがあります。別の練習コンポで実行してください。"); return;
+        }
+    }
+    app.beginUndoGroup("マスクごとに素材を複製");
+    try {
+        for (i = 1; i <= count; i++) {
+            var copy = original.duplicate();
+            copy.name = "MASK_" + i;
+            copy.moveBefore(original);
+            var copyMasks = copy.property("ADBE Mask Parade");
+            // 今回作った複製の不要マスクだけを削除。元素材は変更しない。
+            for (j = count; j >= 1; j--) { if (j !== i) { copyMasks.property(j).remove(); } }
+        }
+        original.enabled = false; // 元レイヤーを残して映像だけOFF
+    } catch (error) {
+        alert(error.toString() + "\n途中の複製を残しています。編集→取り消しで今回分を戻してください。");
+    } finally { app.endUndoGroup(); }
+}());

@@ -1,13 +1,12 @@
-a=thisLayer.index;
-b=thisComp.numLayers;
-
-for(i=a+1; i <=b; i++) {
-  curLay=thisComp.layer(i);
-  if(curLay.inPoint <=time && curLay.outPoint > time) {
-    curLay.name;
-    break;
-  }
-  else {
-    ""
-  }
+var prefix = "BGM_";
+var audioOnly = true; // falseならIN/OUTだけで判定
+var result = "";
+for (var i = thisLayer.index + 1; i <= thisComp.numLayers; i++) {
+    var layer = thisComp.layer(i);
+    if (layer.name.indexOf(prefix) == 0 && layer.inPoint <= time && time < layer.outPoint &&
+            (!audioOnly || layer.audioActive)) {
+        result = layer.name;
+        break;
+    }
 }
+result;

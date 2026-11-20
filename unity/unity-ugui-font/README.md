@@ -1,4 +1,4 @@
-# Unity│フォントに関するTIPSまとめ4選│uGUI
+# Unity uGUIのフォント設定｜旧Text・TextMeshPro・アイコンの使い分け
 
 解説記事: https://cg-method.com/unity/unity-ugui-font/
 

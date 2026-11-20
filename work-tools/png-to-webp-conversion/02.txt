@@ -1,7 +1,10 @@
 from PIL import Image, ImageChops, ImageStat
 
-a = Image.open("元.png").convert("RGB")
-b = Image.open("変換後.webp").convert("RGB")
-d = ImageChops.difference(a, b)
-print("一致:", d.getbbox() is None)
-print("平均差:", [round(x, 2) for x in ImageStat.Stat(d).mean])
+with Image.open("png-source/alpha.png") as original, Image.open("webp-new/alpha.webp") as converted:
+    a, b = original.convert("RGBA"), converted.convert("RGBA")
+    if a.size != b.size:
+        raise ValueError("寸法が違います")
+    d = ImageChops.difference(a, b)
+    extrema = [band.getextrema() for band in d.split()]
+    print("RGBA全チャンネル一致:", all(high == 0 for low, high in extrema))
+    print("R/G/B/Aの平均差:", ImageStat.Stat(d).mean)

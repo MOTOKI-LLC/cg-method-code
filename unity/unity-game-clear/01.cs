@@ -1,25 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
     public GameObject GoalText;
+    private bool cleared;
 
-    void Start()
+    void Awake()
     {
+        if (GoalText == null)
+        {
+            Debug.LogWarning("Goal TextにUIを割り当ててください。", this);
+            enabled = false;
+            return;
+        }
         GoalText.SetActive(false);
     }
 
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-    }
+        if (!isActiveAndEnabled || cleared || GoalText == null) return;
+        Rigidbody body = other.attachedRigidbody;
+        bool isPlayer = other.CompareTag("Player")
+            || (body != null && body.CompareTag("Player"));
+        if (!isPlayer) return;
 
-    private void OnTriggerEnter(Collider collider)
-    {
-        if (collider.gameObject.tag == "Player")
-        {
-            GoalText.SetActive(true);
-        }
+        cleared = true;
+        GoalText.SetActive(true);
     }
 }

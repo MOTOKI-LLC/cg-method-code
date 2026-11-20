@@ -1,0 +1,11 @@
+$gpuNames = @('CUDA_VISIBLE_DEVICES', 'ROCR_VISIBLE_DEVICES',
+    'GGML_VK_VISIBLE_DEVICES', 'OLLAMA_VULKAN', 'OLLAMA_LLM_LIBRARY')
+foreach ($scope in @('Process', 'User', 'Machine')) {
+    foreach ($name in $gpuNames) {
+        [pscustomobject]@{
+            Scope = $scope
+            Name = $name
+            Value = [Environment]::GetEnvironmentVariable($name, $scope)
+        }
+    }
+}

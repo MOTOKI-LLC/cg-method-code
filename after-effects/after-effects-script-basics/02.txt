@@ -1,0 +1,5 @@
+try {
+    // ここに処理を書く
+} catch (e) {
+    alert(e.toString());
+}

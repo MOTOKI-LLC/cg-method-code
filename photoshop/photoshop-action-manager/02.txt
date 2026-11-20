@@ -1,0 +1,8 @@
+function emboss(angle, height, amount) {
+    var desc = new ActionDescriptor();
+    desc.putInteger(charIDToTypeID("Angl"), angle);
+    desc.putInteger(charIDToTypeID("Hght"), height);
+    desc.putInteger(charIDToTypeID("Amnt"), amount);
+    executeAction(charIDToTypeID("Embs"), desc, DialogModes.NO);
+}
+emboss(135, 3, 100);

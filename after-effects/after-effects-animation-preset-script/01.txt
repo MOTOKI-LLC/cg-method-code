@@ -1,7 +1,25 @@
-app.beginUndoGroup("AnimationPreset");
-var activeComp = app.project.activeItem ; 
-var activeLayer = activeComp.selectedLayers ; 
-var presetPath = ("C:\\Users\\user\\Desktop\\集中線.ffx");
-var addPreset = File(presetPath);
-activeLayer[0].applyPreset(addPreset);
-app.endUndoGroup();
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open a composition."); return; }
+    var layers = comp.selectedLayers, saved = [], i;
+    if (!layers.length) { alert("Select at least one layer."); return; }
+    for (i = 0; i < layers.length; i++) {
+        if (layers[i].locked) { alert("Unlock the selected layers first."); return; }
+        saved.push(layers[i]);
+    }
+    var preset = File.openDialog("Choose your practice .ffx preset");
+    if (!preset) { return; }
+    if (!preset.exists || !/\.ffx$/i.test(preset.name)) { alert("Choose an existing .ffx file."); return; }
+    layers = comp.selectedLayers;
+    if (app.project.activeItem !== comp || layers.length !== saved.length) { alert("Selection changed."); return; }
+    for (i = 0; i < layers.length; i++) {
+        if (layers[i] !== saved[i] || layers[i].locked) { alert("Selection changed."); return; }
+    }
+    app.beginUndoGroup("Apply one practice preset");
+    try {
+        // applyPreset acts on all selected layers in this comp. Call it once.
+        saved[0].applyPreset(preset);
+    } catch (error) {
+        alert("Stopped: " + error.toString() + "\nUndo or reopen your practice copy.");
+    } finally { app.endUndoGroup(); }
+})();

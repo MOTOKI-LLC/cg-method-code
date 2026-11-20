@@ -1,0 +1,7 @@
+codex-agents/            ← Gitのルート
+├── AGENTS.md            … 返事に「★」を含める
+└── app/
+    ├── AGENTS.md        … 返事に「▲」を含める
+    ├── AGENTS.override.md … 返事に「●」を含める
+    └── src/
+        └── AGENTS.md    … 返事に「■」を含める

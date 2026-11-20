@@ -1,0 +1,21 @@
+import argparse
+from pathlib import Path
+from bs4 import BeautifulSoup
+
+
+def selected_text(source, selector):
+    nodes = BeautifulSoup(source, "html.parser").select(selector)
+    if not nodes:
+        raise ValueError("Selector matched nothing; do not treat this as no change.")
+    return tuple(" ".join(x.get_text(" ", strip=True).split()) for x in nodes)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("before")
+    parser.add_argument("after")
+    parser.add_argument("--selector", default="#watched")
+    args = parser.parse_args()
+    old = selected_text(Path(args.before).read_text('utf-8'), args.selector)
+    new = selected_text(Path(args.after).read_text('utf-8'), args.selector)
+    print("changed" if old != new else "unchanged")

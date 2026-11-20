@@ -1,5 +1,11 @@
-//Z値
-var value = thisComp.layer(index)
-str =" "+ thisComp.layer(index).name;
-if (comp("master").layer("controll").effect("状態制御")("スライダー")== str) -1 else 0
-if (comp("master").layer("controll").effect("状態制御")("スライダー")== 6) -1
+var result = value;
+if (thisLayer.marker.numKeys >= 1) {
+    var number = Number(thisLayer.marker.key(1).comment);
+    var step = thisLayer.source.frameDuration;
+    var frames = Math.floor(thisLayer.source.duration / step + 0.000001);
+    if (isFinite(number) && number >= 1 && number % 1 == 0 &&
+            isFinite(step) && step > 0 && frames >= 1) {
+        result = (Math.min(number, frames) - 1) * step;
+    }
+}
+result;

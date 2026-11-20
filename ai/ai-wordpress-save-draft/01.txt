@@ -1,0 +1,78 @@
+# AIが書いた記事を、WordPressに「下書き」として保存する
+# 使い方: python save_draft.py 記事.html "記事の題名" [アイキャッチ画像.jpg] [画像の代替テキスト]
+import base64, json, mimetypes, os, re, sys, urllib.request
+from urllib.parse import urlsplit
+from pathlib import Path
+
+SITE = os.environ["WP_URL"].rstrip("/")      # 例 https://example.com
+parts = urlsplit(SITE)
+if (parts.scheme != "https" or not parts.hostname or parts.username is not None
+        or parts.password is not None or parts.query or parts.fragment):
+    raise ValueError("WP_URLには認証情報やクエリを含まないHTTPS URLを指定してください")
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise RuntimeError("リダイレクトを拒否しました。WP_URLの正規URLを確認してください")
+
+OPENER = urllib.request.build_opener(NoRedirect())
+USER = os.environ["WP_USER"]                 # WordPressのユーザー名
+APP_PASSWORD = os.environ["WP_APP_PASSWORD"] # アプリケーションパスワード
+AUTH = "Basic " + base64.b64encode(f"{USER}:{APP_PASSWORD}".encode()).decode()
+
+
+def api(method, path, body=None, headers=None):
+    h = {"Authorization": AUTH}
+    if isinstance(body, dict):
+        body = json.dumps(body).encode("utf-8")
+        h["Content-Type"] = "application/json"
+    h.update(headers or {})
+    req = urllib.request.Request(SITE + "/wp-json/wp/v2" + path, data=body, headers=h, method=method)
+    with OPENER.open(req, timeout=60) as r:
+        return json.load(r)
+
+
+def upload_image(path, alt):
+    # ファイル名は半角の英数字にしておく（ヘッダーに日本語は入れられない）
+    p = Path(path)
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", p.name):
+        raise ValueError("画像のファイル名は半角英数字・_・-・.にしてください")
+    ctype = mimetypes.guess_type(p.name)[0]
+    if ctype not in {"image/jpeg", "image/png", "image/webp", "image/gif"}:
+        raise ValueError("この例ではJPEG・PNG・WebP・GIFを指定してください")
+    media = api("POST", "/media", p.read_bytes(), {
+        "Content-Type": ctype,
+        "Content-Disposition": f'attachment; filename="{p.name}"',
+    })
+    print("メディア作成 id =", media["id"])
+    api("POST", f"/media/{media['id']}", {"alt_text": alt})
+    saved = api("GET", f"/media/{media['id']}?context=edit")
+    if saved["alt_text"] != alt:
+        raise RuntimeError("代替テキストが一致しません。作成済みメディアを確認してください")
+    return media["id"]
+
+
+def main():
+    if len(sys.argv) not in (3, 5):
+        raise SystemExit('使い方: python save_draft.py 記事.html "題名" [画像.jpg "代替テキスト"]')
+    html_file, title = sys.argv[1], sys.argv[2]
+    content = Path(html_file).read_text(encoding="utf-8")
+    post = {"title": title, "content": content, "status": "draft"}
+    if len(sys.argv) == 5:
+        post["featured_media"] = upload_image(sys.argv[3], sys.argv[4])
+    created = api("POST", "/posts", post)
+    print("投稿作成 id =", created["id"])
+
+    # 保存されたものを読み直して確かめる
+    back = api("GET", f"/posts/{created['id']}?context=edit")
+    if back["status"] != "draft":
+        raise RuntimeError("下書きになっていません。作成済み投稿を直ちに確認してください")
+    if back["content"]["raw"] != content or back["title"]["raw"] != title:
+        raise RuntimeError("題名または本文が一致しません。作成済み投稿を確認してください")
+    if back["featured_media"] != post.get("featured_media", 0):
+        raise RuntimeError("アイキャッチ画像が一致しません。作成済み投稿を確認してください")
+    print("下書きを保存しました id =", created["id"])
+    print("編集画面:", f"{SITE}/wp-admin/post.php?post={created['id']}&action=edit")
+
+
+if __name__ == "__main__":
+    main()

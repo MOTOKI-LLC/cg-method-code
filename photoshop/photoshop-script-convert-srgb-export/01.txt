@@ -1,0 +1,64 @@
+#target photoshop
+(function () {
+    if (app.documents.length > 0) {
+        alert("Save and close your open documents before running this script.");
+        return;
+    }
+    var src = Folder.selectDialog("Select the input folder");
+    if (!src) return;
+    var dst = Folder.selectDialog("Select a separate, empty output folder");
+    if (!dst) return;
+    if (src.fsName.toLowerCase() === dst.fsName.toLowerCase()) {
+        alert("Input and output folders must be different.");
+        return;
+    }
+    var files = src.getFiles(function (f) {
+        return f instanceof File && /\.(psd|tif|tiff|jpg|jpeg|png)$/i.test(f.name);
+    });
+    var targets = [], seen = {}, i;
+    if (!files.length) { alert("No supported input files."); return; }
+    for (i = 0; i < files.length; i++) {
+        // Keep the original extension: sample.png.jpg and sample.psd.jpg.
+        var target = new File(dst.fsName + "/" + decodeURI(files[i].name) + ".jpg");
+        var key = target.fsName.toLowerCase();
+        if (target.exists || seen[key]) {
+            alert("Output already exists or is duplicated: " + target.fsName);
+            return;
+        }
+        seen[key] = true;
+        targets.push(target);
+    }
+    var opts = new JPEGSaveOptions();
+    opts.quality = 10;
+    opts.embedColorProfile = true;
+    var saved = 0, failed = [], closeErrors = [];
+    for (i = 0; i < files.length; i++) {
+        var doc = null;
+        try {
+            if (targets[i].exists) throw new Error("Output appeared after the initial check.");
+            doc = app.open(files[i]);
+            if (doc.mode !== DocumentMode.RGB || doc.bitsPerChannel !== BitsPerChannelType.EIGHT) {
+                throw new Error("Use an 8-bit RGB input copy.");
+            }
+            if (doc.colorProfileType === ColorProfile.NONE) {
+                throw new Error("Assign the correct source profile to a copy first.");
+            }
+            doc.convertProfile("sRGB IEC61966-2.1", Intent.RELATIVECOLORIMETRIC, true, false);
+            if (targets[i].exists) throw new Error("Output appeared before saving.");
+            doc.saveAs(targets[i], opts, true, Extension.LOWERCASE);
+            saved++;
+        } catch (e) {
+            failed.push(files[i].name + ": " + e.message);
+        } finally {
+            if (doc) {
+                try { doc.close(SaveOptions.DONOTSAVECHANGES); }
+                catch (e2) { closeErrors.push(files[i].name + ": " + e2.message); }
+            }
+        }
+        // Stop if a document could not be closed; do not accumulate more open files.
+        if (closeErrors.length) break;
+    }
+    alert("Saved: " + saved + " / " + files.length +
+        "\nFailed: " + failed.length + "\n" + failed.join("\n") +
+        "\nClose errors: " + closeErrors.length + "\n" + closeErrors.join("\n"));
+}());

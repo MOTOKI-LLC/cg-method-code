@@ -1,4 +1,4 @@
-# After Effects│1クリックで自作のコンポとフォルダを作成するスクリプト
+# After Effectsの作業コンポとフォルダを作成する｜1920×1080・30fpsのスクリプト
 
 解説記事: https://cg-method.com/after-effects/after-effects-auto-create-comp-folder-script/
 

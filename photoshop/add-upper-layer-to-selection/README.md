@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│1つ上のレイヤーを追加選択する方法
+# Photoshop JSXで1つ上を追加選択する｜複数選択・同じ親・ID指定
 
 解説記事: https://cg-method.com/photoshop/add-upper-layer-to-selection/
 

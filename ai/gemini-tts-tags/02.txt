@@ -1,0 +1,14 @@
+"content": [
+    {"type": "text", "text": "資料はもう見ましたか？",
+     "annotations": [{"type": "speech_metadata", "speaker": "Joe"}]},
+    {"type": "text", "text": "<chuckle>まだ半分です。",
+     "annotations": [{"type": "speech_metadata", "speaker": "Jane"}]},
+],
+# generation_config の speech_config に書く
+"speech_config": {
+    "mode": "conversational",
+    "speakers": [
+        {"speaker": "Joe", "voice": "Puck"},
+        {"speaker": "Jane", "voice": "Kore"},
+    ],
+},

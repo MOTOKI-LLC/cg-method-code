@@ -1,0 +1,6 @@
+$i = 1
+Get-ChildItem -File -Filter *.jpg | Sort-Object LastWriteTime, Name | ForEach-Object {
+  $new = 'photo_{0:D3}{1}' -f $i, $_.Extension.ToLower()
+  Rename-Item -LiteralPath $_.FullName -NewName $new
+  $i++
+}

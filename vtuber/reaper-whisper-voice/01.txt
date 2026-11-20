@@ -1,5 +1,8 @@
-cd C:Users\ユーザー名\Desktop\wsasayaki
-
-wsasayaki 変換前データ.wav 変換後データ.wav
-
+@echo off
+cd /d "%~dp0"
+if not exist "wsasayaki.exe" exit /b 1
+if not exist "input.wav" exit /b 1
+if exist "output.wav" exit /b 1
+wsasayaki.exe "input.wav" "output.wav"
+if errorlevel 1 exit /b 1
 pause

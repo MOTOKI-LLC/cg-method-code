@@ -1,0 +1,5 @@
+// 動かない
+text.sourceText[0]
+
+// 動く
+text.sourceText.value[0]

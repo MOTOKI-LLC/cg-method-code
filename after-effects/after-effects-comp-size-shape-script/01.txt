@@ -1,23 +1,25 @@
-/*########################################################################################################################
-#   コンポサイズのシェイプを作成
-#   @author suimin 
-########################################################################################################################*/
-app.beginUndoGroup("コンポサイズのシェイプを作成");
-var activeComp = app.project.activeItem;
-if (activeComp == null) {
-    alert("コンポジションを選択してください。")
-}
-else {
+// 原記事 @author suimin の処理を、対象判定とmatchName参照で改訂。
+(function () {
     var comp = app.project.activeItem;
-    var customShape = comp.layers.addShape();
-    customShape.name = "Custom Shape"
-    customShape.label = 0  //ラベルをグレーに
-    customShape.adjustmentLayer = true
-    customShape.property("position").expression = "x=thisComp.width;\ry=thisComp.height;\r[x/2,y/2]"
-    var shapeProperty = customShape.property("ADBE Root Vectors Group");
-    var customShapePath = shapeProperty.addProperty("ADBE Vector Shape - Rect")
-    customShapePath(2).expression = "x=thisComp.width;\ry=thisComp.height;\r[x,y]"
-    var fill = shapeProperty.addProperty("ADBE Vector Graphic - Fill")
-    fill.property("ADBE Vector Fill Color").setValue([0, 0, 0, 0]); //塗りを黒に
-}
-app.endUndoGroup();
+    var makeAdjustment = false; // 黒背景=false、調整レイヤー=true
+    if (!(comp instanceof CompItem)) { alert("コンポを開いてください。"); return; }
+    app.beginUndoGroup("コンポサイズのシェイプを作成");
+    try {
+        var shape = comp.layers.addShape();
+        shape.name = makeAdjustment ? "コンポ調整" : "コンポ黒背景";
+        shape.label = 0;
+        shape.adjustmentLayer = makeAdjustment;
+        shape.property("ADBE Transform Group").property("ADBE Position").expression =
+            "[thisComp.width / 2, thisComp.height / 2]";
+        var root = shape.property("ADBE Root Vectors Group");
+        var rectangle = root.addProperty("ADBE Vector Shape - Rect");
+        rectangle.property("ADBE Vector Rect Size").expression = "[thisComp.width, thisComp.height]";
+        // addProperty後は同じグループ内の古い参照を使い回さない。
+        var fill = shape.property("ADBE Root Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+        fill.property("ADBE Vector Fill Color").setValue([0, 0, 0, 1]);
+        fill.property("ADBE Vector Fill Opacity").setValue(100);
+        if (!makeAdjustment) { shape.moveToEnd(); }
+    } catch (error) {
+        alert(error.toString() + "\n編集→取り消しで今回作成分を戻してください。");
+    } finally { app.endUndoGroup(); }
+}());

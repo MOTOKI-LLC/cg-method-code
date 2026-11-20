@@ -1,7 +1,7 @@
-# Googleカレンダー│予定が始まる直前にLineへ通知を送る方法
+# GoogleカレンダーをLINEへ通知するには｜Notify終了後の選択肢と練習コード
 
 解説記事: https://cg-method.com/work-tools/google-calendar-line-notify/
 
 このフォルダーのコードは、上の記事で説明しているものです。使い方・前提・注意点は記事を見てください。
 
-- `リマインダー.gas`
+- `01.php`

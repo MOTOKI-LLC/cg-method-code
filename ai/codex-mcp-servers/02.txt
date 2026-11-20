@@ -1,0 +1,5 @@
+Name        Command  Args                                        Env  Cwd  Status   Auth
+everything  npx      -y @modelcontextprotocol/server-everything  -    -    enabled  Unsupported
+
+Name  Url                      Bearer Token Env Var  Status   Auth
+docs  https://example.com/mcp  DOCS_TOKEN            enabled  Bearer token

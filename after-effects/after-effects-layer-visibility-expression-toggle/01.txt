@@ -1,0 +1,19 @@
+(function () {
+    var enabled = false; // false:非表示、true:表示
+    var comp = app.project ? app.project.activeItem : null;
+    if (!(comp instanceof CompItem)) { alert("対象コンポを開いてください。"); return; }
+    var layers = comp.selectedLayers;
+    if (!layers.length || layers.length > 100) { alert("1〜100レイヤーを選択してください。"); return; }
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].locked) { alert("ロックされたレイヤーがあります。変更しません。"); return; }
+    }
+    var began = false;
+    try {
+        app.beginUndoGroup("CGM selected visibility"); began = true;
+        for (var j = 0; j < layers.length; j++) layers[j].enabled = enabled;
+    } catch (e) {
+        alert("途中で停止しました。変更が一部残った場合は取り消してください。\n" + String(e));
+    } finally {
+        if (began) app.endUndoGroup();
+    }
+}());

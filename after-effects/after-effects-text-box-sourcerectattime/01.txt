@@ -1,0 +1,5 @@
+var t = thisComp.layer("テキスト");
+var r = t.sourceRectAtTime(time, false);
+var px = t.effect("余白横")("スライダー");
+var py = t.effect("余白縦")("スライダー");
+[r.width + px * 2, r.height + py * 2];

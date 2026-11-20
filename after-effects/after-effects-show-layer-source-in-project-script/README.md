@@ -1,4 +1,4 @@
-# After Effects│プロジェクト内のレイヤーソースを表示するスクリプト
+# After Effectsの選択レイヤーから素材ソースを選ぶ｜ソースなしレイヤーに対応
 
 解説記事: https://cg-method.com/after-effects/after-effects-show-layer-source-in-project-script/
 

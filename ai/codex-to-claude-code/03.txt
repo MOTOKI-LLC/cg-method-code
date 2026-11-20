@@ -1,0 +1,5 @@
+## Claude Code への依頼
+- 文章の校正とテストの追加は、Claude Code に任せる
+- 呼び出し方：claude -p "<依頼内容>" --output-format json
+- 終了コード・JSONのエラー・resultを確認し、実際の差分やテストと照合して報告する
+- 担当ファイルを限定し、親のCodexと同じファイルを同時に編集しない

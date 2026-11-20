@@ -1,0 +1,45 @@
+param([Parameter(Mandatory=$true)][string]$Source,
+      [Parameter(Mandatory=$true)][string]$Output,
+      [switch]$ImageSize)
+$ErrorActionPreference = 'Stop'
+$item = Get-Item -LiteralPath $Source
+if (-not $item.PSIsContainer) { throw 'Source must be a folder' }
+$root = $item.FullName.TrimEnd('\')
+$out = [IO.Path]::GetFullPath($Output)
+if ($out.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase) -or $out -eq $root) { throw 'Output must be outside Source' }
+if (Test-Path -LiteralPath $out) { throw 'Output already exists' }
+$entries = @(Get-ChildItem -LiteralPath $root -Recurse -Force)
+if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+    @($entries | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) { throw 'Links/junctions are not supported' }
+$files = @($entries | Where-Object { -not $_.PSIsContainer } | Sort-Object FullName)
+if (-not $files.Count) { throw 'No files' }
+if ($ImageSize) { Add-Type -AssemblyName System.Drawing }
+$rows = @(foreach ($file in $files) {
+    $w = $null; $h = $null; $status = 'not_requested'
+    if ($ImageSize) {
+        $status = 'not_image'
+        if ($file.Extension -match '^\.(png|jpe?g|bmp|gif)$') {
+            $image = $null
+            try {
+                $image = [Drawing.Image]::FromFile($file.FullName)
+                $w = $image.Width; $h = $image.Height; $status = 'ok'
+            } catch { $status = 'read_error' }
+            finally { if ($image) { $image.Dispose() } }
+        }
+    }
+    [pscustomobject]@{
+        RelativePath = $file.FullName.Substring($root.Length + 1)
+        Name = $file.Name
+        Extension = $file.Extension
+        Bytes = $file.Length
+        Width = $w
+        Height = $h
+        ImageStatus = $status
+    }
+})
+# CreateNew prevents an existing CSV from being overwritten, including at write time.
+$stream = [IO.File]::Open($out, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+$writer = [IO.StreamWriter]::new($stream, [Text.UTF8Encoding]::new($true))
+try { $rows | ConvertTo-Csv -NoTypeInformation | ForEach-Object { $writer.WriteLine($_) } }
+finally { $writer.Dispose() }
+Write-Host ('Exported: ' + $rows.Count)

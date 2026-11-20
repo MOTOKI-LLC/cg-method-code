@@ -1,9 +1,10 @@
-cc=effect("targetControl")("スライダ");
-num=Math.floor(cc);
-nxtNum=num+1;
-start=effect("Target-"+num)("レイヤー").transform.xRotation;
-end=effect("Target-"+nxtNum)("レイヤー").transform.xRotation;
-if(effect("ease")("チェックボックス")==0){
-linear(cc,num,nxtNum,start,end)}
-else{
-ease(cc,num,nxtNum,start,end);}
+var startDistance = 500;
+var endDistance = 1500;
+var maxReduction = 50;
+var result = value;
+var camera = thisComp.activeCamera;
+if (camera && endDistance > startDistance && maxReduction >= 0) {
+    var d = length(thisLayer.toWorld(anchorPoint), camera.toWorld([0, 0, 0]));
+    result = value - linear(d, startDistance, endDistance, 0, maxReduction);
+}
+result;

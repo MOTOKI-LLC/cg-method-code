@@ -1,0 +1,7 @@
+[mcp_servers.everything]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-everything"]
+
+[mcp_servers.docs]
+url = "https://example.com/mcp"
+bearer_token_env_var = "DOCS_TOKEN"

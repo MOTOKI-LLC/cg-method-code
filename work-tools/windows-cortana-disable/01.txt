@@ -1,0 +1,8 @@
+#Requires AutoHotkey v2.0
+#SingleInstance Force
+
+; メモ帳以外では、Windows標準のキーをそのまま使う。
+#HotIf WinActive("ahk_exe notepad.exe")
+#q::MsgBox "メモ帳で Win+Q を押しました。"
+#w::MsgBox "メモ帳で Win+W を押しました。"
+#HotIf

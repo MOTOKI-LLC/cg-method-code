@@ -1,27 +1,42 @@
-using UnityEngine;
+using System;
+using System.IO;
 using UnityEditor;
-using System.Linq;
+using UnityEngine;
 
-public class CreateEmptyParent : Editor
+public static class CgmScreenshotPath
 {
-    [MenuItem("Edit/Group Selected %g")]
-    static void Group()
+    public static string Validate(string path)
     {
-        if (Selection.transforms.Length == 0) return;
+        if (string.IsNullOrWhiteSpace(path) || !Path.IsPathFullyQualified(path))
+            throw new ArgumentException("An absolute PNG path is required.");
+        string full = Path.GetFullPath(path);
+        if (!string.Equals(Path.GetExtension(full), ".png", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Use the .png extension.");
+        if (!Directory.Exists(Path.GetDirectoryName(full)))
+            throw new DirectoryNotFoundException("Choose an existing output directory.");
+        if (File.Exists(full) || Directory.Exists(full))
+            throw new IOException("Choose a new output filename.");
+        return full;
+    }
+}
 
-        var sorted = Selection.transforms
-            .OrderBy(t => t.GetSiblingIndex())
-            .ToArray();
-
-        GameObject group = new GameObject("Group");
-        Undo.RegisterCreatedObjectUndo(group, "Group Selected");
-
-        group.transform.SetParent(sorted[0].parent);
-        group.transform.SetSiblingIndex(sorted[0].GetSiblingIndex());
-
-        foreach (Transform t in sorted)
+// Assets/Editor/CgmCaptureGameView.cs
+public static class CgmCaptureGameView
+{
+    [MenuItem("Tools/CG Method/Request Game View PNG")]
+    private static void Capture()
+    {
+        if (!EditorApplication.isPlaying || EditorApplication.isPaused)
+        { Debug.LogWarning("Run Play Mode, unpause, and render the Game view first."); return; }
+        string path = EditorUtility.SaveFilePanel("New Game View PNG", "",
+            DateTime.Now.ToString("yyyyMMdd-HHmmss-fff"), "png");
+        if (string.IsNullOrEmpty(path)) return;
+        try
         {
-            Undo.SetTransformParent(t, group.transform, "Group Selected");
+            path = CgmScreenshotPath.Validate(path);
+            ScreenCapture.CaptureScreenshot(path, 1);
+            Debug.Log("PNG capture requested. Check the file after rendering: " + path);
         }
+        catch (Exception e) { Debug.LogException(e); }
     }
 }

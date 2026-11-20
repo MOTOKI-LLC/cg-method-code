@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│全マスクを表示・非表示する方法
+# Photoshopスクリプト（jsx）│グループのレイヤーマスクを一括で有効・無効にする方法
 
 解説記事: https://cg-method.com/photoshop/toggle-group-masks/
 

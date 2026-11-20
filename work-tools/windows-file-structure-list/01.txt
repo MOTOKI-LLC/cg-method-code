@@ -1,7 +1,18 @@
-project/
-├── src/
-│   ├── index.js
-│   └── utils.js
-├── docs/
-│   └── README.md
-└── package.json
+param([Parameter(Mandatory=$true)][string]$Source,
+      [Parameter(Mandatory=$true)][string]$Output)
+$ErrorActionPreference = 'Stop'
+$item = Get-Item -LiteralPath $Source
+if (-not $item.PSIsContainer) { throw 'Source must be a folder' }
+$root = $item.FullName.TrimEnd('\')
+$out = [IO.Path]::GetFullPath($Output)
+if ($out -eq $root -or $out.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Output must be outside Source' }
+if (Test-Path -LiteralPath $out) { throw 'Output already exists' }
+# tree.com writes in the Windows OEM code page, irrespective of chcp 65001.
+Add-Type -TypeDefinition 'public class CgmOem { [System.Runtime.InteropServices.DllImport("kernel32.dll")] public static extern uint GetOEMCP(); }'
+$savedEncoding = [Console]::OutputEncoding
+try {
+    [Console]::OutputEncoding = [Text.Encoding]::GetEncoding([int][CgmOem]::GetOEMCP())
+    $lines = @(& "$env:SystemRoot\System32\tree.com" $root /f /a)
+    if ($LASTEXITCODE -ne 0) { throw 'tree failed' }
+} finally { [Console]::OutputEncoding = $savedEncoding }
+$lines | Out-File -LiteralPath $out -Encoding UTF8 -NoClobber

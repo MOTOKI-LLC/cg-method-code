@@ -1,4 +1,4 @@
-# Unity│psdデータからuGUIにコンバートする方法 │Baum2
+# UnityでPSDをuGUIへ変換するBaum2の使い方【旧版保守】
 
 解説記事: https://cg-method.com/unity/unity-ugui-psd-convert/
 

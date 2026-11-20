@@ -1,4 +1,4 @@
-# Figmaプラグイン│インスタンスの入れ替え
+# Figmaインスタンスを一括で入れ替えるプラグイン｜対象登録と差し替え
 
 解説記事: https://cg-method.com/figma/figma-plugin-instance-swap/
 

@@ -1,0 +1,8 @@
+git status --short
+git lfs install --local
+git lfs track "*.png"
+git add -- .gitattributes
+git add --renormalize -- "Assets/Textures/body.png"
+git diff --cached --stat
+git commit -m "Use LFS for body.png from this commit"
+git lfs ls-files

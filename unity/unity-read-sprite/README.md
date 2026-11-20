@@ -1,4 +1,4 @@
-# Unity│SpriteおよびRawImage 画像を読み込む方法
+# UnityでUI画像を読み込む方法｜Image・Resources・RawImageの使い分け
 
 解説記事: https://cg-method.com/unity/unity-read-sprite/
 

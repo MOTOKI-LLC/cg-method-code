@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│一番上のレイヤー選択する方法
+# Photoshop JSXで最上位レイヤーを選択する｜layers[0]とグループの範囲
 
 解説記事: https://cg-method.com/photoshop/select-top-layer/
 

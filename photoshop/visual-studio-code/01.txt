@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "extendscript",
+      "type": "extendscript-debug",
       "request": "launch",
-      "name": "Run current script",
-      "program": "${file}"  // 現在開いているスクリプトファイルを実行対象に
+      "name": "Launch saved JSX in Adobe",
+      "script": "${file}"
     }
   ]
 }

@@ -1,0 +1,41 @@
+import csv
+from pathlib import Path
+from urllib.parse import urljoin, urlparse
+from bs4 import BeautifulSoup
+
+
+def extract_cards(source, base_url):
+    soup = BeautifulSoup(source, "html.parser")
+    rows, seen = [], set()
+    for card in soup.select("#main_content .p-postList__item"):
+        title = card.select_one(".p-postList__title")
+        link = card.select_one("a.p-postList__link[href]")
+        if title is None or link is None:
+            continue
+        label = " ".join(title.get_text(" ", strip=True).split())
+        target = urljoin(base_url, link["href"])
+        parsed = urlparse(target)
+        if not label or parsed.scheme not in ("http", "https") or not parsed.netloc:
+            continue
+        if target not in seen:
+            rows.append((label, target))
+            seen.add(target)
+    return rows
+
+
+def csv_text(value):
+    value = str(value)
+    # Avoid spreadsheet formula evaluation when a title begins with =,+,-,@.
+    if value.lstrip().startswith(("=", "+", "-", "@")):
+        return "'" + value
+    return value
+
+
+def write_csv(rows, output):
+    if not rows:
+        raise ValueError("No cards found; check the page and selector before writing.")
+    with Path(output).open("x", encoding="utf-8-sig", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(("ID", "TITLE", "URL"))
+        for number, (title, target) in enumerate(rows, 1):
+            writer.writerow((number, csv_text(title), csv_text(target)))

@@ -1,5 +1,8 @@
-//暗さ
-var value = thisComp.layer(index)
-str =" "+ thisComp.layer(index).name;
-if (comp("master").layer("controll").effect("状態制御")("スライダー")== str) 0 else 100
-if (comp("master").layer("controll").effect("状態制御")("スライダー")== 6) 0
+var requested = Math.round(thisComp.layer("controll").effect("キャラ1")(1).value);
+var step = thisLayer.source.frameDuration;
+var frames = Math.floor(thisLayer.source.duration / step + 0.000001);
+var result = value;
+if (isFinite(requested) && isFinite(step) && step > 0 && frames >= 1) {
+    result = (Math.max(1, Math.min(requested, frames)) - 1) * step;
+}
+result;

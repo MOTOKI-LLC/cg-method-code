@@ -1,45 +1,44 @@
-/*########################################################################################################################
-#   PSDを1クリックでインポートするスクリプト
-#   @author suimin 
-########################################################################################################################*/
-var sequences = new Array()
-var sequence_file = File.openDialog();
-if (sequence_file != null) {
-    sequences[sequences.length] = sequence_file;
-}
-import_sequences();
-main();
-function import_sequences() {
-    for (i = 0; i < sequences.length; i++) {
-        var io = new ImportOptions(sequences[i])
-        if (io.canImportAs(ImportAsType.COMP)) {
-            io.importAs = ImportAsType.COMP;
-        } else {
-            io.ImportAs = ImportAsType.FOOTAGE;
-        }
-        app.project.importFile(io);
+/* Import PSD as a composition; move only new direct footage sources. */
+(function () {
+    var project = app.project;
+    if (!project) { alert("プロジェクトを開いてください。"); return; }
+    var file = File.openDialog("レイヤーを持つPSDを1つ選択してください");
+    if (!file) return;
+    if (!file.exists || !/\.psd$/i.test(file.name)) {
+        alert("存在する.psdファイルを選択してください。"); return;
     }
-}
-function main() {
-    var psdFolderName = app.project.activeItem.name + " レイヤー";
-    for (var i = 1; i <= app.project.items.length; i++) {
-        var srcCompos = [];
-        srcCompos.push(app.project.item(i));
-        if ((app.project.item(i) instanceof FolderItem) && (app.project.item(i).name === psdFolderName)) {
-            myFunc(app.project.item(i).items);
+    var before = {}, options, imported, moved = 0;
+    try {
+        options = new ImportOptions(file);
+        if (!options.canImportAs(ImportAsType.COMP)) {
+            alert("このPSDをコンポジションとして読み込めません。標準の読み込みで確認してください。"); return;
         }
-    }
-    //フォルダの削除
-    for (var i = 1; i <= app.project.items.length; i++) {
-        if ((app.project.item(i) instanceof FolderItem) && (app.project.item(i).name === psdFolderName)) {
-            app.project.item(i).remove()
+        options.importAs = ImportAsType.COMP;
+        options.sequence = false;
+        for (var i = 1; i <= project.numItems; i++) before["id_" + project.item(i).id] = true;
+    } catch (error) { alert("読み込み前の確認に失敗しました。\n" + error.toString()); return; }
+    app.beginUndoGroup("PSDをコンポジションとして読み込み");
+    try {
+        imported = project.importFile(options);
+        if (!(imported instanceof CompItem) || before["id_" + imported.id]) {
+            throw new Error("新規コンポジションを取得できませんでした。");
         }
-    }
-    //フォルダ内のアイテム移動
-    function myFunc(items) {
-        var num = items.length;
-        for (var i = 1; i <= num; i++) {
-            items[1].parentFolder = items[1].parentFolder.parentFolder;
+        // Move only newly imported direct sources, identified by Item.id.
+        // Retain importer-created folders; never remove a project item.
+        var sources = [], seen = {};
+        for (var n = 1; n <= imported.numLayers; n++) {
+            var source = imported.layer(n).source;
+            if (!(source instanceof FootageItem)) continue;
+            var key = "id_" + source.id;
+            if (before[key] || seen[key]) continue;
+            seen[key] = true; sources.push(source);
         }
-    }
-}
+        for (var j = 0; j < sources.length; j++) {
+            sources[j].parentFolder = imported.parentFolder;
+            moved++;
+        }
+        alert("コンポジション「" + imported.name + "」を読み込み、新規素材" + moved + "個を同じ階層へ移しました。空のフォルダは残します。");
+    } catch (error) {
+        alert("処理が途中で止まりました。一部の読み込み・移動が残る場合があります。編集メニューで取り消して確認してください。\n" + error.toString());
+    } finally { app.endUndoGroup(); }
+}());

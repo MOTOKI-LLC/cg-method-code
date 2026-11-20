@@ -1,0 +1,10 @@
+{
+  "name": "com.cgmethod.editor-tools",
+  "version": "0.1.0",
+  "displayName": "CG Method Editor Tools",
+  "unity": "6000.3",
+  "description": "Scene selection examples; Unity Editor runtime validation pending.",
+  "dependencies": {
+    "com.unity.ugui": "2.0.0"
+  }
+}

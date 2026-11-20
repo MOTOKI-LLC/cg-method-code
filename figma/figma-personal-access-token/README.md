@@ -1,4 +1,4 @@
-# Figma│個人アクセストークンの取得方法とスコープ設定
+# Figmaの個人アクセストークンの取得方法｜スコープ・期限・401／403／429の確認
 
 解説記事: https://cg-method.com/figma/figma-personal-access-token/
 

@@ -1,0 +1,9 @@
+{
+  "color": {
+    "brand": { "type": "color", "value": "#167ac6" },
+    "button": { "type": "color", "value": "{color.brand}" }
+  },
+  "space": {
+    "small": { "type": "spacing", "value": "12px" }
+  }
+}

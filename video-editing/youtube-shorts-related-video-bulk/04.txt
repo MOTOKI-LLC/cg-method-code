@@ -1,0 +1,6 @@
+page.goto(f"https://studio.youtube.com/video/{short_id}/edit", wait_until="domcontentloaded")
+field = page.locator(
+    "ytcp-video-metadata-editor-sidepanel ytcp-dropdown-trigger",
+    has=page.locator(".label-text", has_text="関連動画"),
+)
+field.wait_for(timeout=30000)

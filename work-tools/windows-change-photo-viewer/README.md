@@ -1,4 +1,4 @@
-# Windows10│Windows7の「Windowsフォトビューアー」に戻す方法
+# Windowsフォトビューアー｜候補にあるか確認して既定アプリを変更する方法
 
 解説記事: https://cg-method.com/work-tools/windows-change-photo-viewer/
 

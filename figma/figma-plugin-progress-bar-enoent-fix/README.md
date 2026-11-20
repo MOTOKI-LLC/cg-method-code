@@ -1,9 +1,9 @@
-# Figmaプラグイン│プログレスバーの実装方法
+# Figmaプラグインのプログレスバー実装｜中止処理とENOENTの対処
 
 解説記事: https://cg-method.com/figma/figma-plugin-progress-bar-enoent-fix/
 
 このフォルダーのコードは、上の記事で説明しているものです。使い方・前提・注意点は記事を見てください。
 
-- `01.ts`
-- `02.html`
-- `03.js`
+- `01.json`
+- `02.js`
+- `03.html`

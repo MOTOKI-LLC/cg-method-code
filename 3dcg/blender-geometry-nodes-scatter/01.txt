@@ -1,0 +1,38 @@
+import bpy
+
+if bpy.data.objects.get("ScatterPractice"):
+    raise RuntimeError("ScatterPractice が既にあります。練習用の新規ファイルで実行してください。")
+bpy.ops.mesh.primitive_monkey_add()
+ob = bpy.context.object
+ob.name = "ScatterPractice"
+ng = bpy.data.node_groups.new("ScatterPractice", "GeometryNodeTree")
+ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
+ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
+ng.interface.new_socket("Density", in_out="INPUT", socket_type="NodeSocketFloat").default_value = 30.0
+ng.interface.new_socket("Size", in_out="INPUT", socket_type="NodeSocketFloat").default_value = 0.05
+n = ng.nodes
+gi = n.new("NodeGroupInput")
+go = n.new("NodeGroupOutput")
+dp = n.new("GeometryNodeDistributePointsOnFaces")
+iop = n.new("GeometryNodeInstanceOnPoints")
+ico = n.new("GeometryNodeMeshIcoSphere")
+ico.inputs["Subdivisions"].default_value = 1
+jg = n.new("GeometryNodeJoinGeometry")
+links = ng.links
+for output, target in [
+    (gi.outputs["Geometry"], dp.inputs["Mesh"]),
+    (gi.outputs["Density"], dp.inputs["Density"]),
+    (gi.outputs["Size"], ico.inputs["Radius"]),
+    (dp.outputs["Points"], iop.inputs["Points"]),
+    (ico.outputs["Mesh"], iop.inputs["Instance"]),
+    (gi.outputs["Geometry"], jg.inputs["Geometry"]),
+    (iop.outputs["Instances"], jg.inputs["Geometry"]),
+    (jg.outputs["Geometry"], go.inputs["Geometry"]),
+]:
+    links.new(output, target)
+mod = ob.modifiers.new("Scatter", "NODES")
+mod.node_group = ng
+for node, position in [(gi, (-600, 100)), (dp, (-350, 200)),
+                       (ico, (-350, -150)), (iop, (-100, 200)),
+                       (jg, (150, 100)), (go, (350, 100))]:
+    node.location = position

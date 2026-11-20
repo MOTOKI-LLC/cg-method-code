@@ -1,4 +1,4 @@
-# Unity│選択したフォルダ以下のPrefabをツリー表示にするツール
+# UnityのPrefabファイルをツリーCSV出力するEditor拡張：フォルダー階層
 
 解説記事: https://cg-method.com/unity/unity-prefab-tree-csv-export/
 

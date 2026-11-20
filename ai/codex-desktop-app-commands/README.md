@@ -1,4 +1,4 @@
-# Codexデスクトップアプリのコマンド一覧｜CLIとの違いと自作の方法
+# Codexのコマンド一覧｜アプリとCLIのスラッシュコマンド・サブコマンド
 
 解説記事: https://cg-method.com/ai/codex-desktop-app-commands/
 

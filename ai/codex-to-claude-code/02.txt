@@ -1,0 +1,5 @@
+# ~/.codex/config.toml
+# 旧workspace-write設定を使う環境だけの例
+# 現行のpermissionsプロファイルと併用しない
+[sandbox_workspace_write]
+network_access = true

@@ -1,0 +1,115 @@
+<script>
+// Dependency direction is source -> target: containing asset -> nested asset,
+// or variant -> immediate base. A visited set makes cycles terminate.
+function walkPrefabGraph(graph, start, direction, relation) {
+  if (!['dependencies','users'].includes(direction) || !['all','Nested','Variant'].includes(relation))
+    throw new Error('Unknown graph filter.');
+  if (!graph.nodes.some(node => node.id === start)) throw new Error('Unknown starting node.');
+  const ids = new Set([start]);
+  const edgeIds = new Set();
+  const queue = [start];
+  let offset = 0;
+  while (offset < queue.length) {
+    const current = queue[offset++];
+    for (const edge of graph.edges) {
+      if (relation !== 'all' && edge.relation !== relation) continue;
+      const from = direction === 'dependencies' ? edge.source : edge.target;
+      const to = direction === 'dependencies' ? edge.target : edge.source;
+      if (from !== current) continue;
+      edgeIds.add(edge.id);
+      if (!ids.has(to)) {ids.add(to); queue.push(to);}
+    }
+  }
+  return {nodeIds:[...ids], edgeIds:[...edgeIds]};
+}
+
+let prefabFullData = null;
+let prefabCy = null;
+const prefabStatus = document.getElementById('status');
+const prefabDetails = document.getElementById('details');
+const prefabControls = ['prefabSelect','direction','relation'].map(id => document.getElementById(id));
+const prefabReload = document.getElementById('reload');
+function prefabSetBusy(busy) {
+  prefabControls.forEach(control => {control.disabled = busy || !prefabFullData;});
+  prefabReload.disabled = busy;
+}
+function prefabFail(error) {
+  prefabFullData = null;
+  if (prefabCy) {prefabCy.destroy(); prefabCy = null;}
+  prefabDetails.textContent = 'ノードは表示されていません。';
+  prefabStatus.textContent = '読込失敗：' + (error && error.message ? error.message : String(error));
+  prefabSetBusy(false);
+}
+function prefabLoad() {
+  prefabSetBusy(true);
+  prefabStatus.textContent = 'スプレッドシートを読み込んでいます…';
+  if (typeof cytoscape !== 'function') {prefabFail(new Error('CytoscapeのCDN読込に失敗しました。接続を確認しページ全体を再読込してください。')); return;}
+  if (typeof google === 'undefined' || !google.script || !google.script.run)
+  {prefabFail(new Error('Apps ScriptのWebアプリで開いてください。')); return;}
+  google.script.run.withSuccessHandler(prefabInit).withFailureHandler(prefabFail).getPrefabGraphData();
+}
+function prefabInit(data) {
+  try {
+    if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.edges) || !data.nodes.length)
+      throw new Error('ノードのないデータです。CSVのNode行を確認してください。');
+    prefabFullData = data;
+    const select = prefabControls[0];
+    select.replaceChildren();
+    const all = document.createElement('option'); all.value = ''; all.textContent = '全体'; select.appendChild(all);
+    [...data.nodes].sort((a,b) => a.path.localeCompare(b.path)).forEach(node => {
+      const option = document.createElement('option'); option.value = node.id;
+      option.textContent = node.label + ' — ' + node.path;
+      select.appendChild(option);
+    });
+    prefabSetBusy(false);
+    prefabDraw();
+  } catch (error) {prefabFail(error);}
+}
+function prefabDraw() {
+  if (!prefabFullData) return;
+  try {
+    const start = prefabControls[0].value;
+    const direction = prefabControls[1].value;
+    const relation = prefabControls[2].value;
+    const selected = start ? walkPrefabGraph(prefabFullData, start, direction, relation) : null;
+    const nodeIds = selected ? new Set(selected.nodeIds) : new Set(prefabFullData.nodes.map(node => node.id));
+    const edgeIds = selected ? new Set(selected.edgeIds) : null;
+    const nodes = prefabFullData.nodes.filter(node => nodeIds.has(node.id));
+    const edges = prefabFullData.edges.filter(edge => (relation === 'all' || edge.relation === relation) &&
+      nodeIds.has(edge.source) && nodeIds.has(edge.target) && (!edgeIds || edgeIds.has(edge.id)));
+    if (prefabCy) prefabCy.destroy();
+    prefabCy = cytoscape({container:document.getElementById('cy'),
+      elements:[...nodes.map(node => ({data:node, classes:(!node.inScope ? 'external ' : '') + (node.scanStatus === 'Error' ? 'failed' : '')})),
+                ...edges.map(edge => ({data:edge}))],
+      style:[
+        {selector:'node', style:{'background-color':'#247d63','label':'data(label)','font-size':12,'text-wrap':'wrap','text-max-width':110,'text-valign':'bottom','text-margin-y':8,'border-width':2,'border-color':'#164a3b'}},
+        {selector:'node[assetType = "Variant"]', style:{'background-color':'#8050aa','border-color':'#51336b'}},
+        {selector:'node[assetType = "Model"]', style:{'background-color':'#747c86','border-color':'#414851'}},
+        {selector:'node.external', style:{'border-style':'dashed','border-width':3}},
+        {selector:'node.failed', style:{'background-color':'#b73535','border-color':'#781c1c'}},
+        {selector:'edge', style:{'width':2,'line-color':'#247d63','target-arrow-color':'#247d63','target-arrow-shape':'triangle','curve-style':'bezier'}},
+        {selector:'edge[relation = "Variant"]', style:{'line-color':'#245cb5','target-arrow-color':'#245cb5','line-style':'dashed'}},
+        {selector:':selected', style:{'overlay-color':'#e7a100','overlay-opacity':0.15}}
+      ],layout:{name:'grid',padding:40},minZoom:0.1,maxZoom:3});
+    prefabCy.on('tap','node',event => {
+      const node=event.target.data();
+      prefabDetails.textContent = node.label + ' | ' + node.path + ' | GUID: ' + node.guid +
+        ' | ' + node.assetType + ' | ' + node.scanStatus;
+    });
+    const summary=prefabFullData.summary;
+    prefabStatus.textContent = '表示 ' + nodes.length + 'ノード / ' + edges.length + '辺。全体の走査失敗 ' + summary.failedNodes +
+      '件、参照先のみ ' + summary.referencedOnlyNodes + '件。' + (summary.failedNodes ? '失敗したPrefabの関係は未取得です。UnityのConsoleを確認してください。' : '');
+    prefabDetails.textContent = 'ノードを選ぶと保存パスとGUIDを表示します。矢印を読むときは関係の凡例を確認してください。';
+  } catch (error) {prefabFail(error);}
+}
+prefabControls.forEach(control => control.addEventListener('change',prefabDraw));
+prefabReload.addEventListener('click',prefabLoad);
+function prefabResize() {
+  if (prefabCy) {prefabCy.resize(); prefabCy.fit(undefined,40);}
+}
+if (typeof ResizeObserver === 'function')
+  new ResizeObserver(prefabResize).observe(document.getElementById('cy'));
+else window.addEventListener('resize',prefabResize);
+prefabLoad();
+
+</script>

@@ -1,0 +1,22 @@
+const { widget } = figma
+const { AutoLayout, Text, useSyncedState } = widget
+
+function ReviewStatus() {
+  const [checked, setChecked] = useSyncedState<boolean>("checked", false)
+  return (
+    <AutoLayout
+      direction="horizontal"
+      spacing={8}
+      padding={12}
+      cornerRadius={8}
+      fill={checked ? "#E8F5E9" : "#FFF3E0"}
+      onClick={() => setChecked(value => !value)}
+    >
+      <Text fontSize={16} fill="#222222">
+        {checked ? "確認済み" : "確認待ち"}
+      </Text>
+    </AutoLayout>
+  )
+}
+
+widget.register(ReviewStatus)

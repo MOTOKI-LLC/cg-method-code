@@ -1,4 +1,4 @@
-# Googleスプレッドシート│結合セルを一括で解除する方法｜GAS
+# スプレッドシートのセル結合を解除する方法｜一括・ショートカット・スマホ・GAS
 
 解説記事: https://cg-method.com/google/google-sheets-release-all-merged-cells/
 

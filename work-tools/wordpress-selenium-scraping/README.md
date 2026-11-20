@@ -1,7 +1,8 @@
-# Selenium│ページの内のブログカードのリンクを取得する方法│スクレイピング
+# Selenium 4でブログカードのタイトルとURLをCSVに保存する方法
 
 解説記事: https://cg-method.com/work-tools/wordpress-selenium-scraping/
 
 このフォルダーのコードは、上の記事で説明しているものです。使い方・前提・注意点は記事を見てください。
 
-- `sample.py`
+- `01.txt`
+- `02.txt`

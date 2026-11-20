@@ -1,0 +1,17 @@
+& {
+  $ErrorActionPreference = 'Stop'
+  $work = 'C:\Users\ユーザー名\Documents\excel-images-実際のID\expanded'
+  $source = (Get-Item -LiteralPath $work -ErrorAction Stop).FullName.TrimEnd('\')
+  $dest = Join-Path (Split-Path -Parent $source) ('images-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $dest -ErrorAction Stop | Out-Null
+  Get-ChildItem -LiteralPath $source -Recurse -File |
+    Where-Object { $_.Extension -match '^\.(png|jpe?g|gif|bmp|tiff?|emf|wmf|svg)$' } |
+    ForEach-Object {
+      $relative = $_.FullName.Substring($source.Length + 1)
+      $target = Join-Path $dest $relative
+      $parent = Split-Path -Parent $target
+      [IO.Directory]::CreateDirectory($parent) | Out-Null
+      [IO.File]::Copy($_.FullName, $target, $false)
+    }
+  '画像の保存先: ' + $dest
+}

@@ -1,4 +1,4 @@
-# Photoshop│反転したマスクの作り方｜ベタ塗り＋マスクを自動化するスクリプトも
+# Photoshop│反転マスクの作り方とリンク状態の違い
 
 解説記事: https://cg-method.com/photoshop/create-inversion-mask/
 

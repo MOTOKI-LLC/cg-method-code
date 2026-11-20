@@ -1,0 +1,5 @@
+opencode/big-pickle
+opencode/deepseek-v4.1-flash-free
+opencode/glm-5.3-flash-free
+opencode/nemotron-3-ultra-free
+（ほか8個）

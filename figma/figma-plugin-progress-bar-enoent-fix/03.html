@@ -1,0 +1,22 @@
+<!doctype html><html lang="ja"><meta charset="utf-8">
+<button id="start">開始</button><button id="cancel" disabled>中止</button>
+<progress id="progress" aria-label="処理の進捗" max="100" value="0"></progress><p id="status">待機中</p>
+<script>
+const start = document.getElementById("start"), cancel = document.getElementById("cancel");
+const progress = document.getElementById("progress"), status = document.getElementById("status");
+function send(type) { parent.postMessage({ pluginMessage: { type } }, "*"); }
+start.onclick = () => { start.disabled = true; cancel.disabled = false; progress.value = 0; status.textContent = "処理中…"; send("start-task"); };
+cancel.onclick = () => { cancel.disabled = true; status.textContent = "中止を要求…"; send("cancel"); };
+window.onmessage = event => {
+  if (event.source !== parent) return;
+  const msg = event.data && event.data.pluginMessage;
+  if (!msg) return;
+  if (msg.type === "progress") {
+    progress.max = msg.total; progress.value = msg.completed;
+    status.textContent = `処理中 ${msg.completed}/${msg.total}`;
+  } else if (msg.type === "done" || msg.type === "error") {
+    start.disabled = false; cancel.disabled = true;
+    status.textContent = msg.type === "error" ? msg.message : msg.cancelled ? "中止しました" : "完了しました";
+  }
+};
+</script></html>

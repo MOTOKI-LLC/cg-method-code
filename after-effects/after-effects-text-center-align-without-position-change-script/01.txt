@@ -1,0 +1,44 @@
+(function () {
+    var TARGET = ParagraphJustification.CENTER_JUSTIFY;
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open a composition."); return; }
+    var layers = comp.selectedLayers, targets = [], i;
+    if (!layers.length || layers.length > 20) { alert("Select 1 to 20 practice text layers."); return; }
+    function staticProp(prop) { return prop && !prop.numKeys && prop.expression === ""; }
+    for (i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if (!(layer instanceof TextLayer) || layer.locked || layer.threeDLayer || layer.parent ||
+            layer.autoOrient !== AutoOrientType.NO_AUTO_ORIENT) {
+            alert("Use unlocked, unparented 2D text with auto-orient disabled."); return;
+        }
+        var text = layer.property("ADBE Text Properties"), source = text.property("ADBE Text Document");
+        var transform = layer.property("ADBE Transform Group");
+        var pos = transform.property("ADBE Position"), scale = transform.property("ADBE Scale");
+        var rot = transform.property("ADBE Rotate Z"), anchor = transform.property("ADBE Anchor Point");
+        var doc = source.value;
+        if (!staticProp(source) || !staticProp(pos) || !staticProp(scale) || !staticProp(rot) ||
+            !staticProp(anchor) || pos.dimensionsSeparated || !doc.pointText || /[\r\n]/.test(doc.text) ||
+            !doc.text.length || text.property("ADBE Text Animators").numProperties) {
+            alert("Use single-line point text without keys, expressions, separated position or text animators."); return;
+        }
+        targets.push({layer:layer, source:source, pos:pos, before:layer.sourceRectAtTime(comp.time, false),
+            scale:scale.value, rotation:rot.value, position:pos.value, oldDoc:source.value});
+    }
+    app.beginUndoGroup("Change text alignment and compensate position");
+    try {
+        for (i = 0; i < targets.length; i++) {
+            var t = targets[i], doc = t.source.value;
+            doc.justification = TARGET; t.source.setValue(doc);
+            var after = t.layer.sourceRectAtTime(comp.time, false);
+            var dx = (t.before.left - after.left) * t.scale[0] / 100;
+            var dy = (t.before.top - after.top) * t.scale[1] / 100;
+            var angle = t.rotation * Math.PI / 180;
+            var x = t.position[0] + dx * Math.cos(angle) - dy * Math.sin(angle);
+            var y = t.position[1] + dx * Math.sin(angle) + dy * Math.cos(angle);
+            if (!isFinite(x) || !isFinite(y)) { throw new Error("Invalid bounds or position."); }
+            t.pos.setValue([x, y]);
+        }
+    } catch (error) {
+        alert("Stopped. Some text may have changed. Undo or reopen your practice copy.\n" + error);
+    } finally { app.endUndoGroup(); }
+}());

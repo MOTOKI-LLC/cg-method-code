@@ -16,8 +16,8 @@
   /* ------------------------------------------------------------------
    * 2. 状態変数
    * ------------------------------------------------------------------*/
-  let allData   = [];   // スプレッドシート全件
-  let listData  = [];   // 画像あり・有効フラグ付きデータ
+  let allData   = [];   // 管理シートの7列（最大500件）
+  let listData  = [];   // 画像URLとアイテム名のあるデータ
   let filterKeys = ["rare", "type"];
   let chunks    = [];   // ページング用
   let selFilter = [], selChara = [], selTags = [];
@@ -28,9 +28,8 @@
   $(async () => {
     $('#btn-search').on('click', onSearchClick);
 
-    initModal();
-    await loadSheetData();
-    buildUI();
+    try { initModal(); await loadSheetData(); await buildUI(); }
+    catch (_) { $grid.empty().append($('<li>').text('初期化に失敗しました。ライブラリの読込み、シートの設定、実行権限を確認してください。')); }
   });
 
   /* ------------------------------------------------------------------
@@ -55,10 +54,11 @@
 
       const img = new Image();
       img.onload = function () {
-        const html = `<img src="${full}" alt="${alt}" class="modal_card">`;
+        const html = $('<img>', {src: full, alt: alt, class: 'modal_card'})[0].outerHTML;
         $modal.iziModal('setContent', html);
         $modal.iziModal('open');
       };
+      img.onerror = () => alert('画像を取得できません。閲覧権限とログイン状態を確認してください。');
       img.src = full;
     });
 
@@ -68,10 +68,10 @@
    * 5. データ取得
    * ------------------------------------------------------------------*/
     async function loadSheetData () {
-      const json = await new Promise(resolve => {
+      const json = await new Promise((resolve, reject) => {
         google.script.run
           .withSuccessHandler(resolve)
-          .withFailureHandler(() => alert('データ取得失敗'))
+          .withFailureHandler(reject)
           .getSSValues();
       });
 
@@ -125,11 +125,11 @@
 
     return filterKeys.every(key => {
       const keyOpts = getColumnValues(key);
-      const hit     = _.intersection(selected, keyOpts);
+      const hit = keyOpts.filter(value => selected.includes(JSON.stringify([key, value])));
       if (!hit.length) return true;
 
       const rowVals = splitCSV(row[key]);
-      return !rowVals.length || rowVals.some(v => hit.includes(v));
+      return rowVals.some(v => hit.includes(v));
     });
   }
 
@@ -149,6 +149,10 @@
 
   function renderGrid(data) {
     $grid.empty();
+    if (!data.length) {
+      $('<li>').text('一致する画像がありません。条件を解除するか、管理シートの画像URLとアイテム名を確認してください。').appendTo($grid);
+      return;
+    }
 
     data.forEach(d => {
       const $li = $('<li>', {
@@ -198,22 +202,13 @@
   /* ------------------------------------------------------------------
    * 9. フィルターセレクト生成
    * ------------------------------------------------------------------*/
-  async function getFilterHeader () {
-    const json = await new Promise(resolve => {
-      google.script.run
-        .withSuccessHandler(resolve)
-        .withFailureHandler(() => alert('フィルターキー取得失敗'))
-        .getFilterKeys();
-    });
-    return JSON.parse(json);
-  }
 
   function refreshFilterSelect () {
     $filter.empty();
     filterKeys.forEach(key => {
       const opts = getColumnValues(key);
       const $group = $('<optgroup>', { label: key });
-      opts.forEach(v => $('<option>', { value:v, text:v }).appendTo($group));
+      opts.forEach(v => $('<option>', { value: JSON.stringify([key, v]), text:v }).appendTo($group));
       $group.appendTo($filter);
     });
     $filter.selectpicker('refresh');
@@ -226,9 +221,20 @@
   const uniqCompact = arr => _.uniq(arr.filter(Boolean));       // 空文字除外＋重複排除
   const propArray   = (arr, key) => arr.map(o => o[key]);       // プロパティ抽出
   const toBool = v => String(v).toLowerCase() === 'true';
-  const splitCSV = str => (str ? str.split(',') : []);
-  const getThumb = d => d.image_path ? `${d.image_path}&sz=w400` : '';
-  const getFull  = d => d.image_path ? `${d.image_path}&sz=w1920` : '';
+  const splitCSV = str => String(str || '').split(',').map(v => v.trim()).filter(Boolean);
+  function imageUrl(d, size) {
+    try {
+      const url = new URL(d.image_path);
+      if (url.origin !== 'https://drive.google.com' || url.pathname !== '/thumbnail') return '';
+      if (!/^[A-Za-z0-9_-]+$/.test(url.searchParams.get('id') || '')) return '';
+      const clean = new URL('https://drive.google.com/thumbnail');
+      clean.searchParams.set('id', url.searchParams.get('id'));
+      clean.searchParams.set('sz', size);
+      return clean.href;
+    } catch (_) { return ''; }
+  }
+  const getThumb = d => imageUrl(d, 'w400');
+  const getFull = d => imageUrl(d, 'w1920');
 
   function populateSelect ($sel, items) {
     $sel.empty();

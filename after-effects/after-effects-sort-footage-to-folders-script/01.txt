@@ -1,0 +1,27 @@
+/* Project panel only. No disk moves or unused-footage deletion. Tested with PNG/JPG and two comps in AE 26.5 on Windows, 2026-10-14. */
+(function () {
+    var MODE = "comps"; // comps: all CompItems / extension: matching file-backed FootageItems
+    var EXTENSION = "png"; // extension mode only; no dot
+    var OUTPUT_NAME = "CGM_comps"; // must not already exist as a folder
+    var project = app.project, matches = [];
+    if (!project || project.numItems > 2000) { alert("プロジェクトを開き、2000アイテム以内で実行してください。"); return; }
+    if ((MODE !== "comps" && MODE !== "extension") || !/^[A-Za-z0-9]+$/.test(EXTENSION) || !OUTPUT_NAME) { alert("MODE・EXTENSION・OUTPUT_NAMEを確認してください。"); return; }
+    for (var i = 1; i <= project.numItems; i++) {
+        var item = project.item(i);
+        if (item instanceof FolderItem && item.name === OUTPUT_NAME) { alert("出力フォルダ名が既にあります。OUTPUT_NAMEを一意の名前にしてください。"); return; }
+        if (MODE === "comps" && item instanceof CompItem) matches.push(item);
+        else if (MODE === "extension" && item instanceof FootageItem && item.file) {
+            var parts = item.file.name.split(".");
+            if (parts.length > 1 && parts[parts.length - 1].toLowerCase() === EXTENSION.toLowerCase()) matches.push(item);
+        }
+    }
+    if (!matches.length) { alert("対象0件です。フォルダは作りません。"); return; }
+    if (matches.length > 200) { alert("対象が200件を超えています。プロジェクトを分けて確認してください。"); return; }
+    app.beginUndoGroup("種類別にプロジェクトアイテムを整理");
+    try {
+        var destination = project.items.addFolder(OUTPUT_NAME);
+        for (var n = 0; n < matches.length; n++) matches[n].parentFolder = destination;
+        alert(matches.length + "アイテムを「" + OUTPUT_NAME + "」へ移動しました。");
+    } catch (error) { alert("フォルダ作成や一部の移動が残る場合があります。編集メニューで取り消して確認してください。\n" + error.toString()); }
+    finally { app.endUndoGroup(); }
+}());

@@ -1,5 +1,9 @@
-temp=thisComp.layer("TRANSFORM").effect("Spread")("スライダー");
-if(temp<0){
-value+[temp,-temp,0];}
-else{
-value+[temp,0,0];}
+var control = thisComp.layer("TRANSFORM");
+var progress = clamp(control.effect("復元")(1).value, 0, 100);
+var distance = Math.max(0, control.effect("距離")(1).value);
+var match = /^MASK_(\d+)$/.exec(thisLayer.name);
+var part = match ? parseInt(match[1], 10) : 0;
+seedRandom(control.effect("シード")(1).value + part, true);
+var angle = random(0, Math.PI * 2);
+var offset = distance * (1 - progress / 100);
+[value[0] + Math.cos(angle) * offset, value[1] + Math.sin(angle) * offset];

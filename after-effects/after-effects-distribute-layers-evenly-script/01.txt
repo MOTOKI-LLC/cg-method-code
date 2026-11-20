@@ -1,0 +1,51 @@
+(function () {
+    var REVERSE = false;
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length === 0) {
+        alert("Open a composition and select layers."); return;
+    }
+    var layers = [], plans = [], i;
+    for (i = 0; i < comp.selectedLayers.length; i++) { layers.push(comp.selectedLayers[i]); }
+    layers.sort(function (a, b) { return a.index - b.index; });
+    if (REVERSE) { layers.reverse(); }
+    var start = comp.workAreaStart, length = comp.workAreaDuration;
+    var frame = comp.frameDuration;
+    if (!isFinite(start) || !(length > 0) || !isFinite(length) || !(frame > 0) || !isFinite(frame)) {
+        alert("Invalid work area or frame duration."); return;
+    }
+    var firstFrame = Math.round(start / frame);
+    var lastFrame = Math.round((start + length) / frame);
+    var count = lastFrame - firstFrame;
+    if (count < layers.length || Math.abs(firstFrame * frame - start) > 0.00001 ||
+        Math.abs(lastFrame * frame - start - length) > 0.00001) {
+        alert("Use frame-aligned work area with at least one frame per layer."); return;
+    }
+    for (i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        var targetIn = (firstFrame + Math.floor(i * count / layers.length)) * frame;
+        var targetOut = (firstFrame + Math.floor((i + 1) * count / layers.length)) * frame;
+        var shiftedStart = layer.startTime + targetIn - layer.inPoint;
+        if (layer.locked || layer.stretch !== 100 || layer.timeRemapEnabled ||
+            !isFinite(shiftedStart) || Math.abs(shiftedStart) > 10800 ||
+            targetIn < 0 || targetOut > comp.duration) {
+            alert("Locked, stretched, remapped, or out-of-range layer. Nothing changed."); return;
+        }
+        var source = layer.source;
+        if (source && !(source.mainSource && source.mainSource.isStill)) {
+            if (!isFinite(source.duration) || targetIn - shiftedStart < -0.00001 ||
+                targetOut - shiftedStart > source.duration + 0.00001) {
+                alert("Source does not cover the proposed interval. Nothing changed."); return;
+            }
+        }
+        plans.push({layer:layer, start:shiftedStart, inside:targetIn, outside:targetOut});
+    }
+    app.beginUndoGroup("Distribute selected layers in work area");
+    try {
+        for (i = 0; i < plans.length; i++) {
+            var plan = plans[i];
+            plan.layer.startTime = plan.start;
+            plan.layer.inPoint = plan.inside;
+            plan.layer.outPoint = plan.outside;
+        }
+    } finally { app.endUndoGroup(); }
+})();

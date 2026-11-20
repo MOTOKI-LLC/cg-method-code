@@ -1,0 +1,15 @@
+$ErrorActionPreference = 'Stop'
+$powercfg = Join-Path $env:SystemRoot 'System32\powercfg.exe'
+$lines = & $powercfg /query SCHEME_CURRENT SUB_BUTTONS LIDACTION 2>&1
+$commandExit = $LASTEXITCODE
+if ($commandExit -ne 0) { throw 'Read-only powercfg query failed. No settings were changed.' }
+$indices = @($lines | ForEach-Object {
+    if ($_ -match '0x[0-9a-fA-F]{8}') { $Matches[0] }
+})
+[pscustomobject]@{
+    QuerySucceeded = $true
+    CurrentIndices = @($indices | Select-Object -Last 2)
+    IndexCount = $indices.Count
+    SettingsWritten = $false
+    LidActuallyClosed = $false
+} | ConvertTo-Json

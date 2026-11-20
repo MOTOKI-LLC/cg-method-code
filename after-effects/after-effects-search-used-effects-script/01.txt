@@ -1,0 +1,33 @@
+(function () {
+    var QUERY = ""; // Empty: list all effects. Otherwise exact name or matchName.
+    var project = app.project, lines = [], found = 0, unreadable = 0;
+    var comps = 0, layers = 0, effects = 0, stopped = false;
+    if (!project) { alert("Open your practice project."); return; }
+    for (var i = 1; i <= project.numItems && !stopped; i++) {
+        var comp = project.item(i);
+        if (!(comp instanceof CompItem)) { continue; }
+        if (++comps > 500) { stopped = true; break; }
+        for (var j = 1; j <= comp.numLayers && !stopped; j++) {
+            if (++layers > 10000) { stopped = true; break; }
+            var layer = comp.layer(j);
+            try {
+                var group = layer.property("ADBE Effect Parade");
+                if (!group) { continue; }
+                for (var k = 1; k <= group.numProperties; k++) {
+                    if (++effects > 20000) { stopped = true; break; }
+                    var effect = group.property(k);
+                    if (QUERY && effect.name !== QUERY && effect.matchName !== QUERY) { continue; }
+                    found++;
+                    if (lines.length < 200) {
+                        lines.push("Comp #" + comp.id + " " + comp.name + " / Layer " + j +
+                            " " + layer.name + " / Effect " + k + " " + effect.name +
+                            " [" + effect.matchName + "] " + (effect.enabled ? "ON" : "OFF"));
+                    }
+                }
+            } catch (error) { unreadable++; }
+        }
+    }
+    alert((stopped ? "PARTIAL: scan limit reached.\n" : "Scan finished.\n") +
+        "Matches: " + found + "; unreadable layers: " + unreadable +
+        "; showing first " + lines.length + " rows.\n" + lines.join("\n"));
+}());

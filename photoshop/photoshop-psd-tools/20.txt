@@ -1,7 +1,7 @@
-# レイヤーとマスクを別々にエクスポート（合成なし）
-layer_image = layer.topil()
-layer_image.save('layer_no_mask.png')
+# PSD全体を合成
+image = psd.composite()
+image.save('output.png')
 
-if layer.has_mask():
-    mask_image = layer.mask.topil()
-    mask_image.save('mask.png')
+# 特定のビューポートで合成
+viewport = (0, 0, 300, 300)  # (x1, y1, x2, y2)
+image = psd.composite(viewport=viewport)

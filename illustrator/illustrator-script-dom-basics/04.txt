@@ -1,0 +1,5 @@
+var MM = 2.834645; // 1mm をポイントに直す数
+var sel = app.activeDocument.selection || [];
+for (var i = 0; i < sel.length; i++) {
+  sel[i].translate(10 * MM, 0);
+}

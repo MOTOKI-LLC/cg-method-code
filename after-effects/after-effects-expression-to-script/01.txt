@@ -1,6 +1,25 @@
-props = app.project.activeItem.selectedProperties;
-for (var i = 0; i < props.length; i++){
-  if (props[i].canSetExpression){
-    props[i].expression = "wiggle(50,100);";
-  }
-}
+(function () {
+    var EXPRESSION = "value + 10;";
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open a composition."); return; }
+    var selected = comp.selectedProperties, targets = [], i;
+    for (i = 0; i < selected.length; i++) {
+        var prop = selected[i];
+        if (prop.propertyType !== PropertyType.PROPERTY || !prop.canSetExpression) { continue; }
+        var owner = prop.propertyGroup(prop.propertyDepth);
+        if (owner.locked || prop.expression !== "" || prop.propertyValueType !== PropertyValueType.OneD) {
+            alert("Select unlocked scalar properties with no existing expression."); return;
+        }
+        targets.push(prop);
+    }
+    if (!targets.length || targets.length > 20) { alert("Select 1 to 20 scalar properties."); return; }
+    app.beginUndoGroup("Set selected scalar expressions");
+    try {
+        for (i = 0; i < targets.length; i++) {
+            targets[i].expression = EXPRESSION;
+            if (targets[i].expressionError) { throw new Error(targets[i].expressionError); }
+        }
+    } catch (error) {
+        alert("Stopped: " + error.toString() + "\nUndo or reopen your practice copy.");
+    } finally { app.endUndoGroup(); }
+})();

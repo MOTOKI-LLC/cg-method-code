@@ -1,4 +1,4 @@
-# After Effects│シナリオスクリプト風に画像切替をエクスプレッションで表示する方法
+# After Effectsの画像切替をスライダーで制御する｜明度・表情の式
 
 解説記事: https://cg-method.com/after-effects/after-effects-scenario-script-image-switch-expression/
 

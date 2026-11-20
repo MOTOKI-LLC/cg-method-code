@@ -1,0 +1,7 @@
+dialog = page.locator("ytcp-dialog.ytcp-video-pick-dialog")
+box = dialog.locator("input[placeholder='自分の動画を検索']")
+box.fill(main_title[:40])  # 題名で検索して候補をしぼる
+
+card = dialog.locator(f"ytcp-entity-card:has(div.thumbnail[style*='/{main_id}/'])").first
+card.click()
+dialog.locator("tp-yt-paper-dialog").wait_for(state="hidden")

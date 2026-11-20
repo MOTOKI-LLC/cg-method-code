@@ -1,0 +1,25 @@
+"""Make a new UTF-8 CFU list without touching its target folders."""
+import argparse
+from pathlib import Path, PureWindowsPath
+
+
+def write_cfu(output, folders):
+    paths = [str(PureWindowsPath(p)) for p in folders]
+    if not paths or any(not PureWindowsPath(p).is_absolute() or
+                        any(c in p for c in "\r\n\x00") or
+                        ".." in PureWindowsPath(p).parts for p in paths):
+        raise ValueError("Use absolute Windows folder paths without control characters or '..'.")
+    if Path(output).suffix.lower() != ".cfu":
+        raise ValueError("Output must have .cfu extension.")
+    paths = list(dict.fromkeys(paths))
+    with Path(output).open("x", encoding="utf-8", newline="") as stream:
+        stream.write("\r\n".join(paths) + "\r\n")
+    return len(paths)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("output")
+    parser.add_argument("folders", nargs="+")
+    args = parser.parse_args()
+    print(f"CFU references: {write_cfu(args.output, args.folders)}")

@@ -1,0 +1,14 @@
+@echo off
+setlocal DisableDelayedExpansion
+chcp 65001 >nul
+pushd "%~dp0" || exit /b 1
+if exist "practice-output" exit /b 1
+md "practice-output" || exit /b 1
+echo practice>"practice-output\元 資料 ! & [x].txt"
+ren "practice-output\元 資料 ! & [x].txt" "名前変更.txt" || exit /b 1
+md "practice-output\保管" || exit /b 1
+move /-Y "practice-output\名前変更.txt" "practice-output\保管\名前変更.txt" || exit /b 1
+copy /-Y "practice-output\保管\名前変更.txt" "practice-output\コピー.txt" || exit /b 1
+xcopy "practice-output\保管" "practice-output\フォルダーコピー\" /E /I || exit /b 1
+dir /s /b /a-d "practice-output"
+popd

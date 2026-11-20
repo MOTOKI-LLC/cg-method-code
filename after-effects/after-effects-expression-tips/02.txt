@@ -1,6 +1,5 @@
-var str = thisComp.name.split("_")[1];
-num = Number(str);
-$.evalFile("file://C:\\Users\\min\\Desktop\\text.txt");
-if (num == 1) text.sourceText = text1;
-if (num == 2) text.sourceText = text2;
-if (num == 3) text.sourceText = text3;
+var data = footage("labels.json").sourceData;
+var parts = thisComp.name.split("_");
+var n = Number(parts[parts.length - 1]);
+var index = isNaN(n) ? 0 : Math.max(0, Math.min(data.length - 1, Math.round(n) - 1));
+String(data[index].text);

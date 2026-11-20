@@ -1,0 +1,6 @@
+// プリコンポのタイムリマップへ貼付。等速・素材先頭から反復する例。
+var duration = thisLayer.source.duration;
+var frame = thisLayer.source.frameDuration;
+var elapsed = time - inPoint;
+var sourceTime = ((elapsed % duration) + duration) % duration;
+Math.min(sourceTime, Math.max(0, duration - frame));

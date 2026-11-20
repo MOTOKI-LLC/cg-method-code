@@ -1,0 +1,19 @@
+param([Parameter(Mandatory=$true)][string]$InputFile,
+      [Parameter(Mandatory=$true)][string]$OutputFile,
+      [int]$Quality = 22,
+      [string]$Preset = 'Fast 1080p30')
+$ErrorActionPreference = 'Stop'
+$src = Get-Item -LiteralPath $InputFile
+if ($src.PSIsContainer) { throw 'Input must be a file' }
+$dst = [IO.Path]::GetFullPath($OutputFile)
+if ($dst -eq $src.FullName) { throw 'Input and output must differ' }
+if (Test-Path -LiteralPath $dst) { throw 'Output already exists' }
+if (-not (Test-Path -LiteralPath ([IO.Path]::GetDirectoryName($dst)) -PathType Container)) { throw 'Output folder missing' }
+if ($Quality -lt 0 -or $Quality -gt 51) { throw 'Quality must be 0 to 51 for these x264 presets' }
+$before = (Get-FileHash -LiteralPath $src.FullName -Algorithm SHA256).Hash
+$arguments = @('-i',$src.FullName,'-o',$dst,'--preset',$Preset,'-q',"$Quality")
+& HandBrakeCLI @arguments
+if ($LASTEXITCODE -ne 0) { throw 'Encoding failed; any new output is incomplete' }
+if (-not (Test-Path -LiteralPath $dst) -or (Get-Item -LiteralPath $dst).Length -eq 0) { throw 'Output missing or empty' }
+if ((Get-FileHash -LiteralPath $src.FullName -Algorithm SHA256).Hash -ne $before) { throw 'Input changed; inspect before using output' }
+Write-Host 'Encoded; original bytes retained'

@@ -1,4 +1,4 @@
-#target aftereffects        // 最新のAfter Effects
+#target aftereffects        // 版番号を省略した指定（接続先を確認）
 #target aftereffects-13.8   // After Effects CC 2015.3
 #target aftereffects-13.7   // After Effects CC 2015.2
 #target aftereffects-13.6   // After Effects CC 2015.1

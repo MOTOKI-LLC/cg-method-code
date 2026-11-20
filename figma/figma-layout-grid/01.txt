@@ -1,0 +1,14 @@
+/* Frame 1 */
+position: absolute;
+width: 1200px;
+height: 344px;
+left: 120px;
+top: 326px;
+
+/* Rectangle 2 */
+position: absolute;
+width: 792px;
+height: 160px;
+left: 408px;
+top: 0px;
+background: #F2994A;

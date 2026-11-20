@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+id = "cgm_selected_renamer"
+version = "1.0.0"
+name = "CGM Selected Renamer"
+tagline = "Rename selected mesh objects with sequential numbers"
+maintainer = "CG METHOD"
+type = "add-on"
+blender_version_min = "4.2.0"
+license = ["SPDX:GPL-3.0-or-later"]

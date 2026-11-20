@@ -1,4 +1,4 @@
-# Googleスライド│PDFに変換して保存する方法とPDFを取り込む方法
+# Googleスライド│PDFに変換して保存する方法｜1ページだけ・ノート付き・GASで一括
 
 解説記事: https://cg-method.com/google/google-slides-to-pdf/
 

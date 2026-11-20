@@ -1,12 +1,14 @@
-function run_export_section() {
-  var fileKey = 'YOUR_FILE_KEY'; // ★https://www.figma.com/design/YOUR_FILE_KEY/
-
-  // セクション nodeId（例）
-  var sectionIds = ["'123:456", "'789:1011"]; // 1個なら "'123:456" でもOK
-
-  var result = exportSectionToSheet(fileKey, sectionIds, {
-    sheetName: 'Figma情報一覧'
+function runExportSection() {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('FIGMA_TOKEN');
+  const fileKey = props.getProperty('FIGMA_FILE_KEY');
+  const sectionIds = ['123:456'];
+  const result = FigmaSheet.exportSectionToSheet(fileKey, sectionIds, {
+    token: token,
+    sheetName: 'Figma情報一覧',
+    fields: ['nodeId', 'layerPath', 'componentKey', 'pageName',
+      'instanceName', 'componentSetName', 'characters'],
+    nodeTypes: ['INSTANCE', 'COMPONENT', 'COMPONENT_SET', 'TEXT']
   });
-
-  Logger.log(result);
+  console.log(result);
 }

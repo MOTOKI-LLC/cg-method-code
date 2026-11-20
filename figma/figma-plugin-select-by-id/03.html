@@ -98,39 +98,36 @@
         post("get-selected-ids", {});
       };
 
-      document.getElementById("copyBtn").onclick = function () {
-        var text = document.getElementById("output").value;
-        if (!text) {
-          alert("コピーする内容がありません");
-          return;
-        }
-        // Clipboard API（Figmaデスクトップ/ブラウザ双方で動作）
-        navigator.clipboard.writeText(text).then(
-          function () {
-            alert("コピーしました");
-          },
-          function () {
-            // フォールバック
-            var ta = document.getElementById("output");
-            ta.focus();
-            ta.select();
-            try {
-              document.execCommand("copy");
-              alert("コピーしました");
-            } catch (e) {
-              alert("コピーに失敗しました");
-            }
+      document.getElementById("copyBtn").onclick = async function () {
+        var ta = document.getElementById("output");
+        if (!ta.value) { alert("コピーする内容がありません"); return; }
+        try {
+          if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+            throw new Error("Clipboard API unavailable");
           }
-        );
+          await navigator.clipboard.writeText(ta.value);
+          alert("コピーしました");
+        } catch (_) {
+          ta.focus(); ta.select();
+          try {
+            const copied = document.execCommand("copy");
+            alert(copied ? "コピーしました" : "選択した文字を手動でコピーしてください");
+          } catch (_) {
+            alert("選択した文字を手動でコピーしてください");
+          }
+        }
       };
 
       // プラグイン本体からのメッセージ受信
       window.onmessage = function (event) {
+        if (event.source !== parent) return;
         var msg =
           event.data && event.data.pluginMessage
             ? event.data.pluginMessage
             : null;
         if (!msg) return;
+        if (msg.type === "selection-error") alert(msg.message);
+        if (msg.type === "selection-result") alert("選択" + msg.selected + "件 / スキップ" + msg.skipped + "件");
         if (msg.type === "selected-ids" && msg.ids) {
           document.getElementById("output").value = msg.ids.join("\n");
         }

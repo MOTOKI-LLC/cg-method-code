@@ -1,5 +1,12 @@
-# レイヤーを上に移動
-layer.move_up()
+# マスクの有無を確認
+if layer.has_mask():
+    # マスクを取得
+    mask = layer.mask
+    
+    # マスクを画像として出力
+    mask_image = mask.topil()
+    mask_image.save('mask.png')
 
-# レイヤーを下に移動
-layer.move_down()
+# ベクターマスクの確認
+if layer.has_vector_mask():
+    print(layer.vector_mask)

@@ -1,17 +1,35 @@
 using UnityEngine;
 using UnityEngine.UI;
+
+[RequireComponent(typeof(Text))]
 public class TimeScript : MonoBehaviour
 {
-private float time = 10;
-void Start()
-{
-    GetComponent<Text>().text = ((int)time).ToString();
-}
+    [SerializeField] private float duration = 10f;
+    private Text label;
+    private float remaining;
+    private int previousValue = -1;
 
-void Update()
-{
-    time -= Time.deltaTime;
-    if (time < 0) time = 0;
-    GetComponent<Text>().text = ((int)time).ToString();
-}
+    private void Awake() { label = GetComponent<Text>(); }
+
+    private void OnEnable()
+    {
+        if (label == null) label = GetComponent<Text>();
+        remaining = Mathf.Max(0f, duration);
+        previousValue = -1;
+        Refresh();
+    }
+
+    private void Update()
+    {
+        remaining = Mathf.Max(0f, remaining - Time.deltaTime);
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        int value = Mathf.CeilToInt(remaining);
+        if (label == null || value == previousValue) return;
+        label.text = value.ToString();
+        previousValue = value;
+    }
 }

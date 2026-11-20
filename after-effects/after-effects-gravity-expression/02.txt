@@ -1,6 +1,6 @@
-props = app.project.activeItem.selectedProperties;
-for (var i = 0; i < props.length; i++){
-  if (props[i].canSetExpression){
-    props[i].expression = "seedRandom(index,true); mGravBase=9.81;mGravVar=random(-1,1); mAccel=time*(mGravBase+mGravVar); X=value[0]; Y=value[1]+Math.pow(mAccel,2); [X,Y]";
-  }
-}
+// 変更前（2Dレイヤーの位置も対象外になっていた）
+!prop.dimensionsSeparated && prop.value.length === 2 && prop.numKeys === 0 &&
+
+// 変更後（レイヤーを取り出す1行を足し、3Dでないことで判定する）
+var layer = prop.propertyGroup(prop.propertyDepth);
+!layer.threeDLayer && !prop.dimensionsSeparated && prop.numKeys === 0 &&

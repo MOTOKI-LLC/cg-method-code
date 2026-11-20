@@ -1,0 +1,5 @@
+{
+  "spacing-small": { "$type": "number", "$value": 8 },
+  "spacing-button": { "$type": "number", "$value": "{spacing-small}" },
+  "label": { "$type": "string", "$value": "送信" }
+}

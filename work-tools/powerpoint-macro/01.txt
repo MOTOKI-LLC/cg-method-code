@@ -1,5 +1,9 @@
-Sub グリッド線に合わせる設定のオンオフを切り替える()
-With ActivePresentation
-.SnapToGrid = Not .SnapToGrid
-End With
+Option Explicit
+
+Public Sub CgmHello()
+    MsgBox "CG-method practice: macro reached.", vbInformation, "CG-method"
+End Sub
+
+Public Sub CgmRibbonHello(ByVal control As Office.IRibbonControl)
+    CgmHello
 End Sub

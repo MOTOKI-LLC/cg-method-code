@@ -1,0 +1,7 @@
+{
+  "token": "REPLACE_WITH_YOUR_PRACTICE_TOKEN",
+  "request_id": "practice-20261002-01",
+  "script": "demo.jsx",
+  "name": "practice-user",
+  "date": "2026-10-02"
+}

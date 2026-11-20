@@ -5,8 +5,8 @@
     <title>画像一覧</title>
 
     <!-- CSS & プラグイン読込  -->
-    <?!= include('plugin') ?>
-    <?!= include('css') ?>
+    <?!= include_('plugin') ?>
+    <?!= include_('css') ?>
   </head>
   <body>
   <!-- ===== フィルター・操作エリア ===== -->
@@ -30,15 +30,13 @@
   </nav>
     <!-- ================= 画像グリッド ================= -->
    <main>
-    <ul>
-      <div id="grid"></div>
-    </ul>
+    <ul id="grid"></ul>
   </main>
   
     <!-- ================= 画像モーダル ================= -->
     <div class="iziModal"></div>
 
     <!-- ================= JavaScript ================= -->
-    <?!= include('js') ?>
+    <?!= include_('js') ?>
 </body>
 </html>

@@ -1,4 +1,4 @@
-# vmeetsの使い方！自作Live2Dアバターを表示する方法
+# vmeetsで自作Live2Dアバターを表示した記録｜2019年テスト版
 
 解説記事: https://cg-method.com/vtuber/vmeets-live2d-avatar-setting/
 

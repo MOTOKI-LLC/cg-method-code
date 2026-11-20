@@ -1,0 +1,7 @@
+var result = value;
+if (numKeys > 0) {
+  seedRandom(index, true);
+  var n = Math.min(numKeys, Math.floor(random(numKeys)) + 1);
+  result = key(n).value;
+}
+result;

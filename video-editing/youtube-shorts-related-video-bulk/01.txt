@@ -1,0 +1,5 @@
+pip install playwright
+python shorts_related.py chrome
+python shorts_related.py scan pairs.csv
+python shorts_related.py set pairs.csv --only <ショートID>
+python shorts_related.py set pairs.csv

@@ -1,0 +1,8 @@
+# macOS・Linux・WSL
+echo $API_TIMEOUT_MS
+
+# PowerShell
+echo $env:API_TIMEOUT_MS
+
+# コマンドプロンプト
+echo %API_TIMEOUT_MS%

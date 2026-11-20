@@ -1,10 +1,25 @@
-var proj = app.project;
-var comp = proj.activeItem;
-if(comp){
-  var selectedLayers = comp.selectedLayers;
-  if(selectedLayers.length > 0){
-    for(var l = 0 ; l < selectedLayers.length ; l++){
-      selectedLayers[l].source.selected = true;
+/* Add selection only; no source replacement, disk write or menu command. */
+(function () {
+    var project = app.project, comp = project ? project.activeItem : null;
+    if (!(comp instanceof CompItem)) { alert("対象コンポジションをアクティブにしてください。"); return; }
+    var layers = comp.selectedLayers, sources = [], seen = {}, skipped = 0, added = [];
+    if (!layers.length || layers.length > 100) { alert("タイムラインで1〜100レイヤーを選択してください。"); return; }
+    for (var i = 0; i < layers.length; i++) {
+        if (!(layers[i] instanceof AVLayer)) { skipped++; continue; }
+        var source = layers[i].source;
+        if (!(source instanceof FootageItem) && !(source instanceof CompItem)) { skipped++; continue; }
+        var key = "id_" + source.id;
+        if (!seen[key]) { seen[key] = true; sources.push(source); }
     }
-  }
-}
+    if (!sources.length) { alert("選択レイヤーに選択できる素材ソースがありません。"); return; }
+    try {
+        for (var n = 0; n < sources.length; n++) {
+            if (!sources[n].selected) { added.push(sources[n]); sources[n].selected = true; }
+        }
+        alert(sources.length + "ソースを選択対象にしました。新規選択は" + added.length + "件、ソースなし/非AVは" + skipped + "レイヤーです。既存のプロジェクト選択は維持します。");
+    } catch (error) {
+        // Restore only selections added by this invocation if a later setter fails.
+        for (var j = 0; j < added.length; j++) { try { added[j].selected = false; } catch (ignored) {} }
+        alert("選択処理に失敗しました。プロジェクトパネルの選択状態を確認してください。\n" + error.toString());
+    }
+}());

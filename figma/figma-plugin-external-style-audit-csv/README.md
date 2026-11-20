@@ -1,4 +1,4 @@
-# Figmaプラグイン│外部スタイル参照を一括検出してCSV出力する
+# Figmaの外部スタイル参照をCSVに出力するプラグイン｜非同期API・混在テキスト対応
 
 解説記事: https://cg-method.com/figma/figma-plugin-external-style-audit-csv/
 

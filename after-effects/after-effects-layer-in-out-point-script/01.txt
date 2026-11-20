@@ -1,10 +1,25 @@
-comp = app.project.activeItem
-layer = myComp.selectedLayers
-for(i = 0; i < layer.length; i++){
-    layerIndex = layer[i].index
-    var start = comp.layer(layerIndex).startTime;
-    var end = comp.layer(layerIndex).outPoint
-    comp.layer(layerIndex).stretch = 100;
-    comp.layer(layerIndex).inPoint = start;
-    comp.layer(layerIndex).outPoint = end;
-}
+(function () {
+    var MODE = "IN";
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length === 0) {
+        alert("Open a composition and select layers."); return;
+    }
+    var layers = comp.selectedLayers, time = comp.time;
+    if (!isFinite(time) || time < 0 || time > comp.duration) { alert("Invalid current time."); return; }
+    for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if (layer.locked || !isFinite(layer.inPoint) || !isFinite(layer.outPoint) ||
+            time < layer.inPoint || time > layer.outPoint ||
+            (MODE === "IN" && time >= layer.outPoint) ||
+            (MODE === "OUT" && time <= layer.inPoint)) {
+            alert("Current time must leave a positive interval in every unlocked selected layer. Nothing changed."); return;
+        }
+    }
+    app.beginUndoGroup("Trim selected layers at current time");
+    try {
+        for (var j = 0; j < layers.length; j++) {
+            if (MODE === "IN") { var oldOut = layers[j].outPoint; layers[j].inPoint = time; layers[j].outPoint = oldOut; }
+            else { layers[j].outPoint = time; }
+        }
+    } finally { app.endUndoGroup(); }
+})();

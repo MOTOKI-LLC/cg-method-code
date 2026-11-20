@@ -1,0 +1,5 @@
+Usage limit reached for gemini-2.5-pro.
+Access resets at （戻る時刻）.
+/stats model for usage details
+/model to switch models.
+/auth to switch to API key.

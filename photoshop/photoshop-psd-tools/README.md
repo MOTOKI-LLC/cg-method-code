@@ -1,11 +1,11 @@
-# Photoshop│PythonでPSDファイルを操作できるpsd-toolsの使い方
+# PythonでPSDをPNGに変換する方法｜psd-toolsの使い方と合成の限界
 
 解説記事: https://cg-method.com/photoshop/photoshop-psd-tools/
 
 このフォルダーのコードは、上の記事で説明しているものです。使い方・前提・注意点は記事を見てください。
 
-- `01.txt`
-- `02.txt`
+- `01.py`
+- `02.py`
 - `03.txt`
 - `04.txt`
 - `05.txt`
@@ -33,3 +33,5 @@
 - `27.txt`
 - `28.txt`
 - `29.txt`
+- `30.txt`
+- `31.txt`

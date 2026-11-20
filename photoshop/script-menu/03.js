@@ -1,7 +1,7 @@
 /*
 <javascriptresource>
 <name>アラート</name>
-<menu>filter</menu>
+<menu>automate</menu>
 <category>Layers</category>
 <enableinfo>true</enableinfo>
 </javascriptresource>

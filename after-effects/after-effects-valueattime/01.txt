@@ -1,0 +1,6 @@
+var result = value;
+if (index > 1) {
+  var above = thisComp.layer(index - 1);
+  result = above.transform.position.valueAtTime(time - 0.1);
+}
+result;

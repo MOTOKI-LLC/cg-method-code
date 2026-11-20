@@ -1,4 +1,4 @@
-# After Effects│現在表示されているレイヤー名を表示するエクスプレッション
+# After Effectsで再生位置の曲名を表示｜IN・OUTと音声スイッチ
 
 解説記事: https://cg-method.com/after-effects/after-effects-display-current-layer-name-expression/
 

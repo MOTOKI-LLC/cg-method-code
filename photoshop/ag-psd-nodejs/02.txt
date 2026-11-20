@@ -1,0 +1,13 @@
+256x256
+- Background（ピクセル）
+- linked-png（スマートオブジェクト）
+- linked-psd（スマートオブジェクト）
+- embedded-png（スマートオブジェクト）
+
+256x256
+- Background（ピクセル）
+- Rectangle 1（ピクセル）
+- Brightness/Contrast 1（調整:brightness/contrast）
+- Levels 1（調整:levels）
+- Curves 1（調整:curves）
+- Hue/Saturation 1（調整:hue/saturation）

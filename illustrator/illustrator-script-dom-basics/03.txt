@@ -1,0 +1,6 @@
+var sel = app.activeDocument.selection || [];
+var lines = [];
+for (var i = 0; i < sel.length; i++) {
+  lines.push(sel[i].typename + " / " + sel[i].name);
+}
+alert(lines.join("\n"));

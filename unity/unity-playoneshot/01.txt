@@ -1,30 +1,25 @@
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlaySound : MonoBehaviour
 {
     public AudioClip sound01;
     public AudioClip sound02;
-
     private AudioSource audioSource;
 
-    void Start()
+    void Awake()
     {
-        // AudioSourceコンポーネントを取得
         audioSource = GetComponent<AudioSource>();
+        if (sound01 == null || sound02 == null)
+            Debug.LogWarning("Sound 01 / Sound 02にAudioClipを設定してください。", this);
     }
 
     void Update()
     {
-        // 左クリックで sound01 を再生
-        if (Input.GetMouseButtonUp(0))
-        {
+        if (audioSource == null || !audioSource.isActiveAndEnabled) return;
+        if (Input.GetMouseButtonUp(0) && sound01 != null)
             audioSource.PlayOneShot(sound01);
-        }
-
-        // 右クリックで sound02 を再生
-        if (Input.GetMouseButtonUp(1))
-        {
+        if (Input.GetMouseButtonUp(1) && sound02 != null)
             audioSource.PlayOneShot(sound02);
-        }
     }
 }

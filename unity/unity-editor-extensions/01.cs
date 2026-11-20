@@ -1,18 +1,21 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
-public class RemoveComponent : Editor
+public class MyFirstWindow : EditorWindow
 {
-    [MenuItem("Tools/Remove NewBehaviourScript")]
-    static void Remove()
+    [MenuItem("Tools/My First Window")]
+    public static void ShowWindow()
     {
-        foreach (GameObject obj in Selection.gameObjects)
+        MyFirstWindow window = GetWindow<MyFirstWindow>();
+        window.titleContent = new GUIContent("My First Window");
+    }
+
+    private void OnGUI()
+    {
+        GUILayout.Label("はじめてのエディタ拡張");
+        if (GUILayout.Button("選択数をConsoleに出す"))
         {
-            var component = obj.GetComponent<NewBehaviourScript>();
-            if (component != null)
-            {
-                DestroyImmediate(component);
-            }
+            Debug.Log("選択中のGameObject：" + Selection.gameObjects.Length + "個");
         }
     }
 }

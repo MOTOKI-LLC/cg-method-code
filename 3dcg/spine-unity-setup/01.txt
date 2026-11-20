@@ -1,0 +1,47 @@
+using Spine.Unity;
+using UnityEngine;
+
+// spine-unity 4.3: SkeletonAnimation と同じ GameObject に描画コンポーネントを配置。
+public class PlayWalk : MonoBehaviour
+{
+    public SkeletonAnimation skeletonAnimation;
+    public string firstAnimation = "walk";
+    public string nextAnimation = "run";
+    public float nextDelay = 2f;
+
+    void Start() { TryPlay(); }
+
+    public bool TryPlay()
+    {
+        if (skeletonAnimation == null || skeletonAnimation.Renderer == null ||
+            skeletonAnimation.SkeletonDataAsset == null)
+        {
+            Debug.LogError("SkeletonAnimation・描画コンポーネント・Skeleton Data Assetを確認してください。", this);
+            return false;
+        }
+        if (string.IsNullOrEmpty(firstAnimation) || string.IsNullOrEmpty(nextAnimation) ||
+            float.IsNaN(nextDelay) || float.IsInfinity(nextDelay) || nextDelay <= 0f)
+        {
+            Debug.LogError("アニメーション名と、0より大きい有限の待ち時間を指定してください。", this);
+            return false;
+        }
+        skeletonAnimation.Initialize(false);
+        var skeleton = skeletonAnimation.Skeleton;
+        var state = skeletonAnimation.AnimationState;
+        if (skeleton == null || state == null)
+        {
+            Debug.LogError("スケルトンを初期化できません。Consoleと書き出しデータを確認してください。", this);
+            return false;
+        }
+        var first = skeleton.Data.FindAnimation(firstAnimation);
+        var next = skeleton.Data.FindAnimation(nextAnimation);
+        if (first == null || next == null)
+        {
+            Debug.LogError("指定したアニメーションがデータにありません。大文字・小文字も確認してください。", this);
+            return false;
+        }
+        state.SetAnimation(0, first, true);
+        state.AddAnimation(0, next, true, nextDelay);
+        return true;
+    }
+}

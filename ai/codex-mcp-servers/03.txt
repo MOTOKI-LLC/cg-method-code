@@ -1,0 +1,8 @@
+everything
+  enabled: true
+  transport: stdio
+  command: npx
+  args: -y @modelcontextprotocol/server-everything
+  cwd: -
+  env: -
+  remove: codex mcp remove everything

@@ -1,0 +1,6 @@
+import json, sys
+data = json.load(sys.stdin)
+cmd = data.get("tool_input", {}).get("command", "")
+if "rm " in cmd:
+    print("rm は使わないでください。消すファイルは人が確かめます。", file=sys.stderr)
+    sys.exit(2)

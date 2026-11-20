@@ -1,4 +1,4 @@
-#target photoshop         // 最新のPhotoshop
+#target photoshop         // 版番号を省略した指定（接続先を確認）
 #target photoshop-110     // Photoshop CC 2017
 #target photoshop-100     // Photoshop CC 2015.5
 #target photoshop-90      // Photoshop CC 2015

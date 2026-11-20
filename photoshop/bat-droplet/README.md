@@ -1,4 +1,4 @@
-# Photoshop│バッチファイルからドロップレットを実行する方法
+# PhotoshopのドロップレットをBATから実行する方法｜指定したPSDと複数ファイル
 
 解説記事: https://cg-method.com/photoshop/bat-droplet/
 

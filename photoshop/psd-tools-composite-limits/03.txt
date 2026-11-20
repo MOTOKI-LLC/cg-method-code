@@ -1,0 +1,8 @@
+■ repo/tests/psd_files/fill_adjustments.psd  256x256  プレビュー画像: あり
+  - 'Rectangle 1': シェイプ（描くには composite の追加パッケージが要る）
+  - 'Vibrance 1': 調整レイヤー vibrance（合成は未対応）
+  - 'Color Balance 1': 調整レイヤー colorbalance（合成は未対応）
+  - 'Black & White 1': 調整レイヤー blackandwhite（合成は未対応）
+  - 'Gradient Map 1': 調整レイヤー gradientmap（合成は未対応）
+■ repo/tests/psd_files/text.psd  400x400  プレビュー画像: あり
+  - 'Line 1 Line 2 Line 3 and text': 文字レイヤー（フォントの描画は未対応）

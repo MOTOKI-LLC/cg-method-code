@@ -1,87 +1,42 @@
-// UI を表示
 figma.showUI(__html__, { width: 350, height: 520 });
-
-/** 余分な空白・末尾 :00 を取り除く（FigmaのIDコピペ差異に耐性） */
-function normalizeId(rawId) {
-  if (!rawId) return "";
-  var id = String(rawId).replace(/\s+/g, ""); // 全空白削除（全角含む）
-  id = id.replace(/:00$/, ""); // 末尾 :00 を除去
-  return id.trim();
+function normalizeId(raw) {
+  const fields = String(raw || "").trim().split("\t");
+  const id = fields[fields.length-1].trim();
+  return /^\d+-\d+$/.test(id) ? id.replace("-", ":") : id;
 }
-
-/** 生配列 → 正規化 → 空要素除去 → 重複排除 */
-function toUniqueNormalizedIds(rawIds) {
-  var seen = {};
-  var result = [];
-  if (!Array.isArray(rawIds)) return result;
-  for (var i = 0; i < rawIds.length; i++) {
-    var id = normalizeId(rawIds[i]);
-    if (id && !seen[id]) {
-      seen[id] = true;
-      result.push(id);
+function pageOf(node) {
+  let n = node;
+  while (n && n.type !== "PAGE") n = n.parent;
+  return n;
+}
+function reportSelection() {
+  figma.ui.postMessage({ type: "selected-ids", ids: figma.currentPage.selection.map(n => n.name.replace(/[\t\r\n]/g," ")+"\t"+n.id) });
+}
+let busy = false;
+figma.ui.onmessage = async msg => {
+  if (!msg || busy) return;
+  if (msg.type === "get-selected-ids") { reportSelection(); return; }
+  if (msg.type !== "select-by-id" || !Array.isArray(msg.ids)) return;
+  busy = true;
+  try {
+    const ids = Array.from(new Set(msg.ids.map(normalizeId).filter(Boolean)));
+    const nodes = []; let page = null, skipped = 0;
+    for (const id of ids) {
+      let node;
+      try { node = await figma.getNodeByIdAsync(id); } catch (_) { skipped++; continue; }
+      if (!node || !("visible" in node)) { skipped++; continue; }
+      const p = pageOf(node);
+      if (!p || (page && p.id !== page.id)) { skipped++; continue; }
+      page = p; nodes.push(node);
     }
-  }
-  return result;
-}
-
-/** ID -> Node 変換（存在しないIDは無視） */
-function nodesFromIds(ids) {
-  var nodes = [];
-  for (var i = 0; i < ids.length; i++) {
-    var n = figma.getNodeById(ids[i]);
-    // getNodeById は DocumentNode を返す可能性があるので SceneNode のみ許可
-    if (n && "type" in n && "visible" in n) {
-      nodes.push(n);
-    }
-  }
-  return nodes;
-}
-
-/** 選択とズーム */
-function selectAndReveal(nodes) {
-  figma.currentPage.selection = nodes;
-  if (nodes.length > 0) {
-    try {
+    if (nodes.length) {
+      await figma.setCurrentPageAsync(page);
+      figma.currentPage.selection = nodes;
       figma.viewport.scrollAndZoomIntoView(nodes);
-    } catch (e) {}
-  }
-}
-
-/** UI からのメッセージ受け取り */
-figma.ui.onmessage = function (msg) {
-  if (!msg || typeof msg !== "object" || !("type" in msg)) return;
-
-  if (msg.type === "select-by-id") {
-    var inputIds = Array.isArray(msg.ids) ? msg.ids : [];
-    var ids = toUniqueNormalizedIds(inputIds);
-    var nodes = nodesFromIds(ids);
-
-    if (nodes.length > 0) {
-      selectAndReveal(nodes);
-      figma.notify(nodes.length + "件のレイヤーを選択しました");
-    } else {
-      figma.currentPage.selection = [];
-      figma.notify("有効なレイヤーIDが見つかりませんでした", { error: true });
     }
-  }
-
-  if (msg.type === "get-selected-ids") {
-    var selected = figma.currentPage.selection;
-    var lines = [];
-    for (var i = 0; i < selected.length; i++) {
-      var node = selected[i];
-      lines.push(node.name + "\t" + node.id); // 「名前[TAB]ID」
-    }
-    figma.ui.postMessage({ type: "selected-ids", ids: lines });
-  }
+    figma.ui.postMessage({ type: "selection-result", selected: nodes.length, skipped });
+    reportSelection();
+  } catch (_) { figma.ui.postMessage({ type: "selection-error", message: "ページ切り替え・選択・表示のいずれかで失敗しました。現在の選択を確認してください。" }); }
+  finally { busy = false; }
 };
-
-/** エディタ側で選択が変わったら UI に反映 */
-figma.on("selectionchange", function () {
-  var sel = figma.currentPage.selection;
-  var lines = [];
-  for (var i = 0; i < sel.length; i++) {
-    lines.push(sel[i].name + "\t" + sel[i].id);
-  }
-  figma.ui.postMessage({ type: "selected-ids", ids: lines });
-});
+figma.on("selectionchange", reportSelection);

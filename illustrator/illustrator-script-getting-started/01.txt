@@ -1,0 +1,7 @@
+// 選択ツールで選んだオブジェクトの数を表示する
+if (app.documents.length === 0) {
+  alert("ファイルを開いてから実行してください");
+} else {
+  var sel = app.activeDocument.selection || [];
+  alert("選んでいるオブジェクト：" + sel.length + "個");
+}

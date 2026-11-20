@@ -1,0 +1,22 @@
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length < 2) {
+        alert("Open a composition and select at least two layers."); return;
+    }
+    var layers = [], plans = [], i;
+    for (i = 0; i < comp.selectedLayers.length; i++) { layers.push(comp.selectedLayers[i]); }
+    layers.sort(function (a, b) { return a.index - b.index; });
+    for (i = 0; i < layers.length - 1; i++) {
+        var layer = layers[i], end = layers[i + 1].inPoint;
+        if (layer.locked || !isFinite(end) || !isFinite(layer.inPoint) ||
+            !isFinite(layer.outPoint) || end <= layer.inPoint ||
+            end > layer.outPoint || Math.abs(end) > 10800) {
+            alert("Only overlapping, unlocked selected layers can be trimmed. Nothing changed."); return;
+        }
+        plans.push({layer:layer, end:end});
+    }
+    app.beginUndoGroup("Trim overlap of selected layers");
+    try {
+        for (i = 0; i < plans.length; i++) { plans[i].layer.outPoint = plans[i].end; }
+    } finally { app.endUndoGroup(); }
+})();

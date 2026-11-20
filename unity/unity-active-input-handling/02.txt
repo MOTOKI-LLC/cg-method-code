@@ -1,0 +1,9 @@
+#if ENABLE_INPUT_SYSTEM
+    var keyboard = UnityEngine.InputSystem.Keyboard.current;
+    bool jump = keyboard != null && keyboard.spaceKey.wasPressedThisFrame;
+#elif ENABLE_LEGACY_INPUT_MANAGER
+    bool jump = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Space);
+#else
+    bool jump = false;
+#endif
+// jumpがtrueなら、自分のジャンプ処理を呼ぶ

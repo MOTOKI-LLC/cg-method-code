@@ -1,0 +1,24 @@
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem) || comp.selectedLayers.length === 0) {
+        alert("Open a composition and select layers."); return;
+    }
+    var layers = comp.selectedLayers, plans = [];
+    for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if (layer.locked || !(layer.stretch > 0) || layer.timeRemapEnabled ||
+            !isFinite(layer.inPoint) || !isFinite(layer.outPoint) || layer.inPoint >= layer.outPoint ||
+            !(layer.source && layer.source.mainSource && layer.source.mainSource.isStill)) {
+            alert("This example supports unlocked still-source layers with positive stretch only. Nothing changed."); return;
+        }
+        plans.push({layer:layer, inside:layer.inPoint, outside:layer.outPoint});
+    }
+    app.beginUndoGroup("Reset stretch and preserve visible interval");
+    try {
+        for (var j = 0; j < plans.length; j++) {
+            plans[j].layer.stretch = 100;
+            plans[j].layer.inPoint = plans[j].inside;
+            plans[j].layer.outPoint = plans[j].outside;
+        }
+    } finally { app.endUndoGroup(); }
+})();

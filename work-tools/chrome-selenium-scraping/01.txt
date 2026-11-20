@@ -1,0 +1,32 @@
+import argparse
+from urllib.parse import urlparse
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+def practice_login(url):
+    parsed = urlparse(url)
+    if parsed.scheme != "http" or parsed.hostname not in ("127.0.0.1", "localhost"):
+        raise ValueError("This demo accepts local practice pages only.")
+    driver = webdriver.Chrome()
+    try:
+        driver.set_page_load_timeout(30)
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        user = wait.until(EC.visibility_of_element_located((By.ID, "demo-user")))
+        password = driver.find_element(By.ID, "demo-password")
+        user.send_keys("demo@example.invalid")
+        password.send_keys("practice-only")
+        wait.until(EC.element_to_be_clickable((By.ID, "demo-submit"))).click()
+        wait.until(EC.text_to_be_present_in_element((By.ID, "result"), "Welcome, demo"))
+        print(driver.find_element(By.ID, "result").text)
+    finally:
+        driver.quit()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--url", default="http://127.0.0.1:8767/login-practice.html")
+    practice_login(parser.parse_args().url)

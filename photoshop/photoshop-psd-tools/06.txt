@@ -1,6 +1,5 @@
-# グループ内のレイヤーを反復処理
-for layer in psd:
-    if layer.is_group():
-        print(f"グループ: {layer.name}")
-        for child in layer:
-            print(f"  - {child.name}")
+# 最初のレイヤーを取得
+first_layer = psd[0]
+
+# ネストしたレイヤーにアクセス
+nested_layer = psd[0][0]

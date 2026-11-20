@@ -1,0 +1,18 @@
+var names = ["画像_1", "画像_2", "画像_3", "画像_4", "画像_5", "画像_6"];
+var gap = 40;
+var result = value;
+var order = -1;
+var widths = [];
+var total = gap * (names.length - 1);
+for (var i = 0; i < names.length; i++) {
+    if (names[i] == thisLayer.name) order = i;
+    var layer = thisComp.layer(names[i]);
+    widths[i] = layer.width * Math.abs(layer.scale[0]) / 100;
+    total += widths[i];
+}
+if (order >= 0 && gap >= 0) {
+    var x = thisComp.width / 2 - total / 2;
+    for (var j = 0; j < order; j++) x += widths[j] + gap;
+    result = [x + widths[order] / 2, thisComp.height / 2];
+}
+result;

@@ -1,0 +1,7 @@
+function greet(name) {
+  return 'こんにちは、' + String(name);
+}
+
+function testGreeting() {
+  console.log(greet('練習'));
+}

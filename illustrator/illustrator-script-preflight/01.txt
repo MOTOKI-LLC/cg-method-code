@@ -1,0 +1,42 @@
+// 入稿前に、よくある問題を一覧にする（何も書き換えない）
+function isWhite(c) {
+  if (c.typename === "CMYKColor") return c.cyan === 0 && c.magenta === 0 && c.yellow === 0 && c.black === 0;
+  if (c.typename === "RGBColor") return c.red === 255 && c.green === 255 && c.blue === 255;
+  if (c.typename === "GrayColor") return c.gray === 0;
+  return false;
+}
+
+function main() {
+  if (app.documents.length === 0) { alert("ファイルを開いてから実行してください"); return; }
+  var doc = app.activeDocument;
+  var msgs = [];
+
+  if (doc.documentColorSpace === DocumentColorSpace.RGB) msgs.push("カラーモードが RGB です");
+
+  if (doc.textFrames.length > 0) msgs.push("アウトライン化していない文字：" + doc.textFrames.length + " 個");
+
+  var missing = 0;
+  var unknownLinks = 0;
+  for (var i = 0; i < doc.placedItems.length; i++) {
+    try { if (!doc.placedItems[i].file.exists) missing++; } catch (e) { unknownLinks++; }
+  }
+  if (missing > 0) msgs.push("リンク切れの画像：" + missing + " 個");
+  if (unknownLinks > 0) msgs.push("リンク情報を確認できない項目：" + unknownLinks + " 個（手動で確認）");
+
+  var rgbImages = 0;
+  for (var j = 0; j < doc.rasterItems.length; j++) {
+    if (doc.rasterItems[j].imageColorSpace === ImageColorSpace.RGB) rgbImages++;
+  }
+  if (rgbImages > 0) msgs.push("埋め込みの RGB 画像：" + rgbImages + " 個");
+
+  var whiteOp = 0;
+  for (var k = 0; k < doc.pathItems.length; k++) {
+    var p = doc.pathItems[k];
+    if (p.filled && p.fillOverprint && isWhite(p.fillColor)) whiteOp++;
+    else if (p.stroked && p.strokeOverprint && isWhite(p.strokeColor)) whiteOp++;
+  }
+  if (whiteOp > 0) msgs.push("オーバープリントの付いた白：" + whiteOp + " 個");
+
+  alert(msgs.length === 0 ? "このスクリプトの対象範囲では検出0件です。入稿条件は別途確認してください" : msgs.join("\n"));
+}
+main();

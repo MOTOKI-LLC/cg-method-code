@@ -1,5 +1,0 @@
-Sub グリッド線の表示を切り替える()
-With Application
-.DisplayGridLines = Not .DisplayGridLines
-End With
-End Sub

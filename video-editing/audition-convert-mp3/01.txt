@@ -1,0 +1,31 @@
+param([Parameter(Mandatory=$true)][string]$Source,
+      [Parameter(Mandatory=$true)][string]$Output,
+      [switch]$Apply)
+$ErrorActionPreference = 'Stop'
+$item = Get-Item -LiteralPath $Source
+if (-not $item.PSIsContainer) { throw 'Source must be a folder' }
+$root = $item.FullName.TrimEnd('\')
+$out = [IO.Path]::GetFullPath($Output).TrimEnd('\')
+if ($out -eq $root -or $out.StartsWith($root+'\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Output must be outside Source' }
+if (Test-Path -LiteralPath $out) { throw 'Output already exists' }
+$entries = @($item) + @(Get-ChildItem -LiteralPath $root -Recurse -Force)
+if (@($entries | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) { throw 'Links/junctions are not supported' }
+$plan = @(foreach ($f in $entries | Where-Object { -not $_.PSIsContainer -and $_.Extension -ieq '.wav' }) {
+    $probeText = & ffprobe -v error -select_streams a -show_entries stream=codec_name,channels -of json $f.FullName
+    if ($LASTEXITCODE -ne 0) { throw 'Invalid WAV input' }
+    $audio = @(($probeText -join "`n" | ConvertFrom-Json).streams)
+    if ($audio.Count -ne 1 -or $audio[0].channels -notin @(1,2)) { throw 'Expected one mono/stereo audio stream' }
+    $relative = $f.FullName.Substring($root.Length+1)
+    [pscustomobject]@{Relative=$relative;Source=$f.FullName;Destination=(Join-Path $out ([IO.Path]::ChangeExtension($relative,'.mp3')));SHA256=(Get-FileHash -LiteralPath $f.FullName -Algorithm SHA256).Hash}
+})
+if (-not $plan.Count) { throw 'No WAV files' }
+$plan | Format-List Relative,Destination
+if (-not $Apply) { Write-Host 'Preview only'; return }
+foreach ($row in $plan) {
+    if ((Get-FileHash -LiteralPath $row.Source -Algorithm SHA256).Hash -ne $row.SHA256) { throw 'Source changed' }
+    [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($row.Destination)) | Out-Null
+    & ffmpeg -hide_banner -nostdin -n -i $row.Source -vn -c:a libmp3lame -b:a 192k -ar 48000 $row.Destination
+    if ($LASTEXITCODE -ne 0) { throw 'Encoding failed; new output is incomplete' }
+    if ((Get-FileHash -LiteralPath $row.Source -Algorithm SHA256).Hash -ne $row.SHA256) { throw 'Source changed during encoding' }
+}
+Write-Host ('MP3 files: '+$plan.Count)

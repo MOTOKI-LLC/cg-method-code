@@ -1,0 +1,6 @@
+var result = value;
+if (numKeys >= 2) {
+  if (time < key(1).time) result = loopIn("cycle");
+  else if (time > key(numKeys).time) result = loopOut("cycle");
+}
+result;

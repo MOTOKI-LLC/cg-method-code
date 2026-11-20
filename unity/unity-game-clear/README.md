@@ -1,4 +1,4 @@
-# Unity│15分でできる！キャラが触れるとゲームクリアの文字を表示する方法│VRoid
+# Unityでゴールに触れたらクリア文字を表示する方法｜3D TriggerとUI
 
 解説記事: https://cg-method.com/unity/unity-game-clear/
 

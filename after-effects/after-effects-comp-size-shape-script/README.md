@@ -1,4 +1,4 @@
-# After Effects│コンポサイズのシェイプを作成するスクリプト
+# After Effectsでコンポサイズのシェイプを作成｜黒背景と調整レイヤー
 
 解説記事: https://cg-method.com/after-effects/after-effects-comp-size-shape-script/
 

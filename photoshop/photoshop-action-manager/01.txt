@@ -1,0 +1,9 @@
+var id19 = charIDToTypeID( "Embs" );
+var desc4 = new ActionDescriptor();
+var id20 = charIDToTypeID( "Angl" );
+desc4.putInteger( id20, 135 );
+var id21 = charIDToTypeID( "Hght" );
+desc4.putInteger( id21, 3 );
+var id22 = charIDToTypeID( "Amnt" );
+desc4.putInteger( id22, 100 );
+executeAction( id19, desc4 ,DialogModes.NO);

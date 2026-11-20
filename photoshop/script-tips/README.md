@@ -1,4 +1,4 @@
-# Photoshop│スクリプト作成によく使うスクリプト集とTIPS
+# Photoshop JSXの書き方とコード例｜文書・レイヤー・ファイル・エラー処理
 
 解説記事: https://cg-method.com/photoshop/script-tips/
 

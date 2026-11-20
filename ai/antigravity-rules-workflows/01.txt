@@ -1,0 +1,6 @@
+---
+trigger: glob
+globs: "*.ts, *.tsx"
+---
+
+TypeScript では any を使わない。

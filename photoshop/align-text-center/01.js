@@ -1,87 +1,38 @@
-app.bringToFront();  
-app.activeDocument.suspendHistory("位置を変えずに中央揃え", "main()");
-app.preferences.rulerUnits = Units.PIXELS;
-function main() {
-    var just = Justification.CENTER;
-    //var just = Justification.LEFT
-    //var just = Justification.RIGHT
-	if (app.documents.length) {
-		var docRef = app.activeDocument;
-		if (docRef.layers.length) {
-			var selected = getSelectedLayersIdx();
-			for (var i = 0; i < selected.length; i++) {
-                selectByIndex(selected[i]);
-                layObj = activeDocument.activeLayer.bounds;
-                x1 = parseInt(layObj[0]); $.writeln(x1);
-                y1 = parseInt(layObj[1]); $.writeln(y1);
-                var sel = activeDocument.activeLayer;  
-                sel.textItem.justification = just ;
-                MoveLayerTo(sel,x1,y1);
-			}
-		}
-	}
+#target photoshop
+function cgmCenterPointText() {
+    if (!app.documents.length) {
+        alert('文字のある文書を開いてください。');
+        return;
+    }
+    var doc = app.activeDocument;
+    var layer = doc.activeLayer;
+    if (layer.typename !== 'ArtLayer' || layer.kind !== LayerKind.TEXT ||
+        layer.textItem.kind !== TextType.POINTTEXT) {
+        alert('ポイント文字のレイヤーを1つ選んでください。');
+        return;
+    }
+    if (layer.allLocked || layer.positionLocked) {
+        alert('文字レイヤーのロックを確認してください。');
+        return;
+    }
+    var units = app.preferences.rulerUnits;
+    try {
+        app.preferences.rulerUnits = Units.PIXELS;
+        doc.suspendHistory('位置を補正して中央揃え', 'cgmCenterPointTextMain()');
+    } catch (e) {
+        alert('処理を完了できませんでした。文書を確認し、必要なら取り消してください。\n' + e.message);
+    } finally {
+        app.preferences.rulerUnits = units;
+    }
 }
-
-function MoveLayerTo(fLayer,fX,fY) {
-  var Position = fLayer.bounds;
-  Position[0] = fX - Position[0];
-  Position[1] = fY - Position[1];
-  fLayer.translate(-Position[0],-Position[1]);
+function cgmCenterPointTextMain() {
+    var layer = app.activeDocument.activeLayer;
+    var before = layer.bounds;
+    var x = before[0].as('px');
+    var y = before[1].as('px');
+    layer.textItem.justification = Justification.CENTER;
+    var after = layer.bounds;
+    layer.translate(new UnitValue(x - after[0].as('px'), 'px'),
+                    new UnitValue(y - after[1].as('px'), 'px'));
 }
-
-function getSelectedLayersIdx() {
-	var selectedLayers = new Array;
-	var ref = new ActionReference();
-	ref.putEnumerated(charIDToTypeID("Dcmn"), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
-	var desc = executeActionGet(ref);
-
-	if (desc.hasKey(stringIDToTypeID('targetLayers'))) {
-		desc = desc.getList(stringIDToTypeID('targetLayers'));
-		var c = desc.count
-		var selectedLayers = new Array();
-		for (var i = 0; i < c; i++) {
-			try {
-				activeDocument.backgroundLayer;
-				selectedLayers.push(desc.getReference(i).getIndex());
-			} catch (e) {
-				selectedLayers.push(desc.getReference(i).getIndex() + 1);
-			}
-		}
-	} else {
-		var ref = new ActionReference();
-		ref.putProperty(charIDToTypeID("Prpr"), charIDToTypeID("ItmI"));
-		ref.putEnumerated(charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt"));
-		try {
-			activeDocument.backgroundLayer;
-			selectedLayers.push(executeActionGet(ref).getInteger(charIDToTypeID("ItmI")) - 1);
-		} catch (e) {
-			selectedLayers.push(executeActionGet(ref).getInteger(charIDToTypeID("ItmI")));
-		}
-
-		var vis = app.activeDocument.activeLayer.visible;
-		if (vis == true) app.activeDocument.activeLayer.visible = false;
-		var desc9 = new ActionDescriptor();
-		var list9 = new ActionList();
-		var ref9 = new ActionReference();
-		ref9.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
-		list9.putReference(ref9);
-		desc9.putList(charIDToTypeID('null'), list9);
-		executeAction(charIDToTypeID('Shw '), desc9, DialogModes.NO);
-		if (app.activeDocument.activeLayer.visible == false) selectedLayers.shift();
-		app.activeDocument.activeLayer.visible = vis;
-	}
-	return selectedLayers;
-}
-
-function selectByIndex(idx) {
-	if (idx == 0) return;
-	if (idx.length != undefined) {
-		idx = idx[0];
-	}
-	var desc = new ActionDescriptor();
-	var ref = new ActionReference();
-	ref.putIndex(charIDToTypeID('Lyr '), idx);
-	desc.putReference(charIDToTypeID('null'), ref);
-	executeAction(charIDToTypeID('slct'), desc, DialogModes.NO);
-	return app.activeDocument.activeLayer;
-}
+cgmCenterPointText();

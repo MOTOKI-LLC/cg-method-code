@@ -1,0 +1,11 @@
+{
+    "manifestVersion": 5,
+    "id": "YOUR_ID_HERE",
+    "name": "Name of your plugin",
+    "version": "1.0.0",
+    "main": "index.html",
+    "host": {
+        "app": "PS",
+        "minVersion": "23.3.0"
+    }
+}

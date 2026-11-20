@@ -1,0 +1,7 @@
+my-plugin/
+├─ .claude-plugin/plugin.json   ← 設定（マニフェスト）
+├─ skills/名前/SKILL.md
+├─ commands/*.md
+├─ agents/*.md
+├─ hooks/hooks.json
+└─ .mcp.json

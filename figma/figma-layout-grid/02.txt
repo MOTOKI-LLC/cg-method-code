@@ -1,0 +1,8 @@
+display: grid;
+width: 703px;
+height: 299px;
+row-gap: 24px;
+column-gap: 24px;
+grid-template-rows: repeat(2,minmax(0,1fr));
+grid-template-columns: repeat(3,minmax(0,1fr));
+grid-auto-flow: row;

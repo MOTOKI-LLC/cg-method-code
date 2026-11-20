@@ -1,4 +1,4 @@
-#target illustrator         // 最新のIllustrator
+#target illustrator         // 版番号を省略した指定（接続先を確認）
 #target illustrator-20      // Illustrator CC 2015.3
 #target illustrator-19.2    // Illustrator CC 2015.2
 #target illustrator-19.0    // Illustrator CC 2015

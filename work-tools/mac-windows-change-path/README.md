@@ -1,4 +1,4 @@
-# MacとWindowsのパスを相互に変換する方法│Automator
+# MacとWindowsの共有パスを変換する方法｜UNC・SMBとAutomatorの範囲
 
 解説記事: https://cg-method.com/work-tools/mac-windows-change-path/
 

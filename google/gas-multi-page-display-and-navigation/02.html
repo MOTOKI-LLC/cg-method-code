@@ -1,9 +1,16 @@
 <!DOCTYPE html>
-<html>
-<head><base target="_top"></head>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <style>body{font:18px/1.7 sans-serif;margin:2rem;max-width:42rem}nav{display:flex;gap:1rem;flex-wrap:wrap}a{padding:.5rem;border:1px solid #2768af;border-radius:4px;color:#14569b}a:focus-visible{outline:3px solid #e09319;outline-offset:3px}</style>
+</head>
 <body>
   <h1>Indexページ</h1>
-  <a href="<?= ScriptApp.getService().getUrl() ?>?p=menu1">Menu1</a><br>
-  <a href="<?= ScriptApp.getService().getUrl() ?>?p=menu2">Menu2</a>
+  <p>練習用のトップ画面です。Menu1、Menu2へ移動して戻れます。</p>
+  <nav aria-label="練習ページ">
+    <a href="<?= appUrl ?>?p=index">トップ</a>
+    <a href="<?= appUrl ?>?p=menu1">Menu1</a>
+    <a href="<?= appUrl ?>?p=menu2">Menu2</a>
+  </nav>
 </body>
 </html>

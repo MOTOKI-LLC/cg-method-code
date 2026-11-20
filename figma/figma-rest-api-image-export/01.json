@@ -1,0 +1,6 @@
+{
+  "images": {
+    "1:2": "https://example.com/temporary-image.png",
+    "3:4": null
+  }
+}

@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│一番下のレイヤー選択する方法
+# Photoshop JSXで最下位レイヤーを選択する｜末尾の添字・背景・グループ
 
 解説記事: https://cg-method.com/photoshop/select-bottom-layer/
 

@@ -1,7 +1,7 @@
-freq = 0.3; //1秒あたりの変化数
-amp = 90; //振幅
-loopSec = 6; //0から6秒までのリピート
-t = time % loopSec;
-wiggle1 = wiggle(freq, amp, 1, 0.5, t);
-wiggle2 = wiggle(freq, amp, 1, 0.5, t - loopSec);
-ease(t, 0, loopSec, wiggle1, wiggle2)
+var freq = 0.3;
+var amp = 90;
+var loopSec = 6;
+var t = ((time - inPoint) % loopSec + loopSec) % loopSec;
+var a = wiggle(freq, amp, 1, 0.5, t);
+var b = wiggle(freq, amp, 1, 0.5, t - loopSec);
+ease(t, 0, loopSec, a, b);

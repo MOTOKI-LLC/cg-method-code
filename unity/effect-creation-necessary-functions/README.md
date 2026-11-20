@@ -1,4 +1,4 @@
-# Unity│エフェクト制作に必要な要素・機能・組み込みのまとめ
+# Unityエフェクト素材の設定：UV・頂点色・スクロール・Billboard・連番
 
 解説記事: https://cg-method.com/unity/effect-creation-necessary-functions/
 

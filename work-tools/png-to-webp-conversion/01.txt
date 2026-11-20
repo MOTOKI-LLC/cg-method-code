@@ -1,9 +1,28 @@
 from pathlib import Path
-from PIL import Image
+from PIL import Image, features
 
-for src in Path("対象のフォルダー").glob("*.png"):
-    im = Image.open(src)
-    # 画素を変えない
-    im.save(src.with_suffix(".webp"), "WEBP", lossless=True)
-    # 小さくしたい場合
-    # im.save(src.with_suffix(".webp"), "WEBP", quality=80)
+source = Path("png-source").resolve(strict=True)
+output = source.parent / "webp-new"
+if output.exists():
+    raise FileExistsError(output)
+if not features.check("webp"):
+    raise RuntimeError("PillowにWebP対応が必要です")
+files = sorted(source.glob("*.png"))
+if not files:
+    raise ValueError("PNGがありません")
+# 全入力を先に確認。通常の8bit RGB/RGBA・静止画が対象。
+for src in files:
+    if src.is_symlink() or src.read_bytes()[24] != 8:
+        raise ValueError(f"対象外のPNG: {src.name}")
+    with Image.open(src) as im:
+        if im.format != "PNG" or im.mode not in ("RGB", "RGBA") or getattr(im, "n_frames", 1) != 1:
+            raise ValueError(f"対象外のPNG: {src.name}")
+        im.load()
+output.mkdir()
+for src in files:
+    with Image.open(src) as im:
+        options = {k: im.info[k] for k in ("icc_profile", "exif") if k in im.info}
+        dest = output / (src.stem + ".webp")
+        with dest.open("xb") as stream:
+            im.save(stream, "WEBP", lossless=True, exact=True, **options)
+        print(src.name, src.stat().st_size, dest.stat().st_size)

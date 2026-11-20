@@ -1,19 +1,29 @@
-lay = app.project.activeItem.selectedLayers;
-for (i = 0; i < lay.length; i++) {
-  var myComp = app.project.activeItem;
-  var myTextLayer = lay[i];
-  var mySourceText = myTextLayer.property("ADBE Text Properties").property("ADBE Text Document");
-  var myTextDoc = mySourceText.value;
-  var myColor = [0 / 255, 0 / 255, 0 / 255];
-
-  //文字の設定
-  myTextDoc.fillColor = myColor; //塗り
-  myTextDoc.applyStroke = true; //線をON
-  myTextDoc.strokeColor = [255 / 255, 255 / 255, 255 / 255]; //線
-  mySourceText.setValue(myTextDoc);
-
-  //境界線の設定
-  app.executeCommand(9008);
-  myTextLayer.property("Layer Styles").property("Stroke")("Color").setValue(myColor);
-  myTextLayer.property("Layer Styles").property("Stroke")("Size").setValue(8);
-}
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) { alert("Open a composition."); return; }
+    var layers = comp.selectedLayers, targets = [];
+    if (!layers.length || layers.length > 20) { alert("Select 1 to 20 static text layers."); return; }
+    for (var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        if (!(layer instanceof TextLayer) || layer.locked) {
+            alert("Select unlocked text layers only."); return;
+        }
+        var source = layer.property("ADBE Text Properties").property("ADBE Text Document");
+        if (source.numKeys || source.expression !== "") {
+            alert("Source Text must have no keys or existing expression."); return;
+        }
+        targets.push({source:source, doc:source.value});
+    }
+    var changed = 0;
+    app.beginUndoGroup("Change selected text fill and stroke");
+    try {
+        for (i = 0; i < targets.length; i++) {
+            var doc = targets[i].doc;
+            doc.applyFill = true; doc.fillColor = [0, 0, 0];
+            doc.applyStroke = true; doc.strokeColor = [1, 1, 1]; doc.strokeWidth = 2;
+            targets[i].source.setValue(doc); changed++;
+        }
+    } catch (error) {
+        alert("Stopped after " + changed + " changes. Undo or reopen the practice copy.\n" + error);
+    } finally { app.endUndoGroup(); }
+}());

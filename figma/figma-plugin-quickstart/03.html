@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="utf-8">
+<label>個数 <input id="count" type="number" min="1" max="100" step="1" value="3"></label>
+<button id="create" type="button">作る</button>
+<p id="status" role="status"></p>
+<script>
+const countInput = document.getElementById('count');
+const statusEl = document.getElementById('status');
+document.getElementById('create').onclick = () => {
+  const count = Number(countInput.value);
+  if (!Number.isInteger(count) || count < 1 || count > 100) {
+    statusEl.textContent = '1〜100の整数を入力してください';
+    return;
+  }
+  parent.postMessage({ pluginMessage: { type: 'create-rects', count } }, '*');
+};
+window.onmessage = event => {
+  const msg = event.data && event.data.pluginMessage;
+  if (!msg || typeof msg !== 'object') return;
+  if (msg.type === 'done') statusEl.textContent = msg.count + '個作りました';
+  if (msg.type === 'error') statusEl.textContent = msg.message;
+};
+</script>
+</html>

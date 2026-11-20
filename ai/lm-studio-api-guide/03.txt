@@ -1,0 +1,47 @@
+import argparse
+import json
+import os
+import urllib.error
+import urllib.request
+
+parser = argparse.ArgumentParser(description="LM StudioのローカルAPIを確認")
+parser.add_argument("model", nargs="?", help="一覧に表示されたチャットモデルのID")
+args = parser.parse_args()
+
+base_url = "http://127.0.0.1:1234/v1"
+headers = {"Content-Type": "application/json"}
+token = os.environ.get("LM_API_TOKEN")
+if token:
+    headers["Authorization"] = "Bearer " + token
+
+def request(path, payload=None):
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(base_url + path, data=body, headers=headers)
+    with urllib.request.urlopen(req, timeout=120) as response:
+        return json.load(response)
+
+try:
+    if args.model is None:
+        result = request("/models")
+        for item in result.get("data", []):
+            print(item["id"])
+        if not result.get("data"):
+            print("モデルがありません。LM Studioのダウンロード・読み込みを確認してください。")
+    else:
+        result = request("/chat/completions", {
+            "model": args.model,
+            "messages": [{"role": "user", "content": "日本語で短い挨拶を1文だけ返してください。"}],
+            "stream": False,
+            "max_tokens": 256
+        })
+        print(result["choices"][0]["message"]["content"])
+except urllib.error.HTTPError as error:
+    print("HTTP", error.code)
+    print(error.read().decode("utf-8", errors="replace"))
+    raise SystemExit(1)
+except urllib.error.URLError as error:
+    print("接続エラー:", error.reason)
+    raise SystemExit(1)
+except TimeoutError:
+    print("時間内に応答しませんでした。サーバーログとモデルの読み込み状態を確認してください。")
+    raise SystemExit(1)

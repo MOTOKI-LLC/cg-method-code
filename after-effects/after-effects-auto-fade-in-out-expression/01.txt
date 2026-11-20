@@ -1,0 +1,16 @@
+var mode = "both"; // "in"・"out"・"both"
+var fadeSeconds = 1;
+var step = thisComp.frameDuration;
+var last = outPoint - step; // 最後の表示フレームの時刻
+var span = last - inPoint;
+var amount = 1;
+if (isFinite(step) && step > 0 && span >= 2 * step - 0.000001 &&
+        isFinite(fadeSeconds) && fadeSeconds > 0) {
+    var f = Math.min(fadeSeconds, span / 2);
+    var up = ease(time, inPoint, inPoint + f, 0, 1);
+    var down = ease(time, last - f, last, 1, 0);
+    if (mode == "in") amount = up;
+    else if (mode == "out") amount = down;
+    else if (mode == "both") amount = Math.min(up, down);
+}
+value * amount;

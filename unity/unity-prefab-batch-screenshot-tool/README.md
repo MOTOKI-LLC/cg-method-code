@@ -1,4 +1,4 @@
-# Unity│選択したフォルダ内のPrefabを一括でスクショするツール│2Dスプライト向け
+# Unityで2D Prefabを一括PNG出力する｜SpriteRenderer用Editor拡張
 
 解説記事: https://cg-method.com/unity/unity-prefab-batch-screenshot-tool/
 

@@ -1,0 +1,12 @@
+Claude Code doctor
+
+Running: native (2.1.289)
+Platform: win32-x64
+Path: C:\Users\（ユーザー名）\.local\bin\claude.exe
+Config install method: native
+Search: OK (bundled)
+Auto-updates: disabled (set by env: DISABLE_AUTOUPDATER)
+Auto-update channel: latest
+Last update attempt: success → 2.1.289 (2026-10-05)
+（中略）
+No installation issues found.

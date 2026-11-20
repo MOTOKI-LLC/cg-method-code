@@ -1,8 +1,8 @@
 ; VRoid Studioのインストール先ディレクトリ
 ; 例「C:\Program Files\pixiv\VRoid Studio」
-install_dir=D:VRoid Studiobin
+install_dir=D:\VRoid Studio\bin
 ;=======================================
-; 以下はpixivの仕様変更がない限り編集不要
+; 以下は2018年の接続先。現在の動作は未確認
 ; =======================================
 
 ; サイト

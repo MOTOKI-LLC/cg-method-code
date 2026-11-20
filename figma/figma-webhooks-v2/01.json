@@ -1,0 +1,7 @@
+{
+  "event_type": "FILE_COMMENT",
+  "context": "file",
+  "context_id": "FILE_KEY",
+  "endpoint": "https://example.com/figma-hook",
+  "passcode": "REPLACE_WITH_A_PRIVATE_RANDOM_VALUE"
+}

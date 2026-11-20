@@ -1,0 +1,9 @@
+{
+  "loggedIn": true,
+  "authMethod": "claude.ai",
+  "apiProvider": "firstParty",
+  "email": "（伏せ字）",
+  "orgId": "（伏せ字）",
+  "orgName": "（伏せ字）",
+  "subscriptionType": "max"
+}

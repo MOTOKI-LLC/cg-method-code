@@ -1,4 +1,4 @@
-# Unity│パーティクルに関するエフェクト小技集まとめ│Shuriken
+# Unityパーティクルの使い方：UI重ね・文字・サイズ・衝突の設定
 
 解説記事: https://cg-method.com/unity/unity-effect-particle/
 

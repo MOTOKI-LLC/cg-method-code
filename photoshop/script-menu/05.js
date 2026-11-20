@@ -4,7 +4,6 @@
 <menu>help</menu>
 <category>Layers</category>
 <enableinfo>true</enableinfo>
-<about>アラートの説明</about>
 </javascriptresource>
 */
 alert("アラート！");

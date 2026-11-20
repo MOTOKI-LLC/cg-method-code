@@ -1,0 +1,72 @@
+/* AE 26.5x89 日本語環境で平面・プリコンポ・フォルダ条件・取り消しを確認。実案件では別名保存してから実行してください。 */
+(function () {
+    var MODE = "include"; // all: 全対象 / include: 指定フォルダ内 / exclude: 指定フォルダ外
+    var FOLDER_NAME = "comp"; // include/exclude時だけ使用。プロジェクト内で一意にする
+    var INCLUDE_SUBFOLDERS = true;
+    var comp = app.project ? app.project.activeItem : null;
+    if (!(comp instanceof CompItem)) {
+        alert("対象のコンポジションを選択してから実行してください。");
+        return;
+    }
+    if (MODE !== "all" && MODE !== "include" && MODE !== "exclude") {
+        alert("MODEはall、include、excludeのいずれかにしてください。");
+        return;
+    }
+    var filterFolder = null;
+    if (MODE !== "all") {
+        var matches = [];
+        for (var i = 1; i <= app.project.numItems; i++) {
+            var item = app.project.item(i);
+            if (item instanceof FolderItem && item.name === FOLDER_NAME) {
+                matches.push(item);
+            }
+        }
+        if (matches.length !== 1) {
+            alert("対象フォルダ名に一致するフォルダが" + matches.length + "個あります。一意な名前にしてください。");
+            return;
+        }
+        filterFolder = matches[0];
+    }
+    function isInside(source) {
+        var parent = source.parentFolder;
+        if (!INCLUDE_SUBFOLDERS) return parent === filterFolder;
+        while (parent && parent !== app.project.rootFolder) {
+            if (parent === filterFolder) return true;
+            parent = parent.parentFolder;
+        }
+        return parent === filterFolder;
+    }
+    var sources = [];
+    var seen = {};
+    for (var n = 1; n <= comp.numLayers; n++) {
+        var layer = comp.layer(n);
+        if (!(layer instanceof AVLayer)) continue;
+        var source = layer.source;
+        if (!(source instanceof FootageItem) && !(source instanceof CompItem)) continue;
+        if (MODE !== "all") {
+            var inside = isInside(source);
+            if ((MODE === "include" && !inside) || (MODE === "exclude" && inside)) continue;
+        }
+        var key = "item_" + source.id;
+        if (!seen[key]) {
+            seen[key] = true;
+            sources.push(source);
+        }
+    }
+    if (!sources.length) {
+        alert("条件に一致する直接参照ソースがありません。フォルダは作成しません。");
+        return;
+    }
+    app.beginUndoGroup("使用ソースをプロジェクト内で整理");
+    try {
+        var destination = app.project.items.addFolder(comp.name + "_used_sources");
+        for (var j = 0; j < sources.length; j++) {
+            sources[j].parentFolder = destination;
+        }
+        alert(sources.length + "個のソースを「" + destination.name + "」へ移動しました。");
+    } catch (error) {
+        alert("整理を完了できませんでした。編集メニューから取り消し、状態を確認してください。\n" + error.toString());
+    } finally {
+        app.endUndoGroup();
+    }
+}());

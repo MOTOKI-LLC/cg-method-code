@@ -1,7 +1,33 @@
-seedRandom(index,true)
-mGravBase=9.81; //basic gravity
-mGravVar=random(-1,1); //gravity variation
-mAccel=time*(mGravBase+mGravVar);
-X=value[0];
-Y=value[1]+Math.pow(mAccel,2);
-[X,Y]
+(function () {
+    var comp = app.project && app.project.activeItem;
+    if (!(comp instanceof CompItem)) {
+        alert("Open a composition and select 2D Position properties.");
+        return;
+    }
+    var props = comp.selectedProperties;
+    var targets = [];
+    for (var i = 0; i < props.length; i++) {
+        var prop = props[i];
+        var layer = prop.propertyGroup(prop.propertyDepth);
+        if (prop.canSetExpression && prop.matchName === "ADBE Position" &&
+            !layer.threeDLayer && !prop.dimensionsSeparated && prop.numKeys === 0 &&
+            !prop.expression) {
+            targets.push(prop);
+        }
+    }
+    if (targets.length === 0) {
+        alert("No eligible static 2D Position. Existing keys/expressions are preserved.");
+        return;
+    }
+    var expr = "var t = Math.max(0, time - inPoint);\n" +
+        "var g = 400;\n[value[0], value[1] + 0.5 * g * t * t];";
+    app.beginUndoGroup("Apply 2D gravity expression");
+    try {
+        for (var j = 0; j < targets.length; j++) {
+            targets[j].expression = expr;
+        }
+    } finally {
+        app.endUndoGroup();
+    }
+    alert("Applied: " + targets.length + ". Undo with Ctrl+Z / Command+Z.");
+})();

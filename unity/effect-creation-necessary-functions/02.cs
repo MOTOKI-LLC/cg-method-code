@@ -2,17 +2,20 @@ using UnityEngine;
 
 public class Billboard : MonoBehaviour
 {
-    public Camera targetCamera;
+    [SerializeField] private Camera targetCamera;
+    [SerializeField] private Vector3 localEulerOffset = Vector3.zero;
 
-    void Start()
+    private void LateUpdate()
     {
-        if (targetCamera == null)
-            targetCamera = Camera.main;
-    }
+        if (targetCamera == null) targetCamera = Camera.main;
+        if (targetCamera == null) return;
 
-    void Update()
-    {
-        transform.LookAt(targetCamera.transform.position);
-        transform.Rotate(90, 0, 0); // Plane用の補正
+        Vector3 direction = targetCamera.orthographic
+            ? targetCamera.transform.forward
+            : transform.position - targetCamera.transform.position;
+        if (direction.sqrMagnitude < 0.000001f) return;
+
+        transform.rotation = Quaternion.LookRotation(direction, targetCamera.transform.up)
+            * Quaternion.Euler(localEulerOffset);
     }
 }

@@ -1,6 +1,53 @@
-親フォルダ
-　　L子フォルダ
-　　　　L孫フォルダA
-　　　　　LfileA_001.png
-　　　　L孫フォルダB
-         LfileB_001.png
+param([string]$Source,
+      [string]$Output,
+      [switch]$Apply)
+if (-not $Source) { $Source = Join-Path $PSScriptRoot 'input' }
+if (-not $Output) { $Output = Join-Path $PSScriptRoot 'output' }
+
+$ErrorActionPreference = 'Stop'
+$rootItem = Get-Item -LiteralPath $Source
+if (-not $rootItem.PSIsContainer) { throw 'Source must be a folder' }
+$root = $rootItem.FullName.TrimEnd('\')
+$out = [IO.Path]::GetFullPath($Output).TrimEnd('\')
+if ($out -eq $root -or $out.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Output must be outside Source'
+}
+if (Test-Path -LiteralPath $out) { throw 'Output already exists; choose a new name' }
+$entries = @(Get-ChildItem -LiteralPath $root -Recurse -Force)
+if (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+    @($entries | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) {
+    throw 'Links/junctions are not supported'
+}
+$files = @($entries | Where-Object { -not $_.PSIsContainer })
+
+if (-not $files.Count) { throw 'No matching files' }
+
+$i = 0
+$plan = @(foreach ($file in $files) {
+    $i++
+    $name = $file.Name
+    if ([string]::IsNullOrWhiteSpace($name) -or $name.IndexOfAny([IO.Path]::GetInvalidFileNameChars()) -ge 0 -or
+        $name -match '[. ]$|^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)') { throw 'Invalid output name' }
+    $relative = $name
+    [pscustomobject]@{
+        Source = $file.FullName
+        RelativeOutput = $relative
+        Destination = [IO.Path]::Combine($out, 'data', $relative)
+        SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+    }
+})
+if (@($plan | Group-Object Destination | Where-Object Count -gt 1).Count) {
+    throw 'Duplicate destination names; nothing copied'
+}
+$plan | Format-List Source, RelativeOutput
+if (-not $Apply) { Write-Host 'Preview only'; return }
+[IO.Directory]::CreateDirectory($out) | Out-Null
+$plan | Export-Csv -LiteralPath ([IO.Path]::Combine($out, 'mapping.csv')) -NoTypeInformation -Encoding UTF8
+foreach ($row in $plan) {
+    [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($row.Destination)) | Out-Null
+    [IO.File]::Copy($row.Source, $row.Destination, $false)
+    if ((Get-FileHash -LiteralPath $row.Destination -Algorithm SHA256).Hash -ne $row.SHA256) {
+        throw 'Hash mismatch; keep originals and inspect output'
+    }
+}
+Write-Host ('Copied: ' + $plan.Count)

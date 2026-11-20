@@ -1,0 +1,5 @@
+// 比較用。4行のうち1行だけを貼る。
+loopOut("cycle")
+loopOut("pingpong")
+loopOut("offset")
+loopOut("continue")

@@ -1,212 +1,59 @@
-/************************************************
- * シート2（マスタ） → シート1（反映先）
- * A〜C列を「複合キー」にして行を同期＆並び替えするスクリプト
- *
- * 前提：
- *  - シート1 … 情報を加筆する側（D列以降に追記してOK）
- *  - シート2 … 取得・更新した「最新情報」のシート
- *
- * 仕様：
- *  - キー       ：A〜C列（keyColumns）
- *  - 同期対象   ：A〜C列（syncColumns）
- *  - 行の順番   ：シート2の行順にシート1を並び替え
- *  - D列以降   ：キーに紐づいてそのまま引き継ぐ
- *  - マスタに無い行：シート1から削除（余りの行はクリア）
- ************************************************/
+const SYNC = {spreadsheetId:'COPY_SPREADSHEET_ID',master:'シート2',target:'シート1',apply:false};
+function syncKey_(row) {
+  const parts=row.slice(0,3);
+  if(parts.every(v=>v===''))throw new Error('A:Cがすべて空の行があります');
+  return JSON.stringify(parts.map(v=>v instanceof Date?['date',v.getTime()]:[typeof v,v]));
+}
+function syncPlan_(master,target,width) {
+  const map=new Map(), seen=new Set();
+  for(const row of target){const k=syncKey_(row);if(map.has(k))throw new Error('シート1のキー重複');map.set(k,row);}
+  let added=0,matched=0;
+  const values=master.map(row=>{
+    const k=syncKey_(row);if(seen.has(k))throw new Error('シート2のキー重複');seen.add(k);
+    const previous=map.get(k);if(previous)matched++;else added++;
+    const out=previous?previous.slice():Array(width).fill('');
+    row.slice(0,3).forEach((v,i)=>out[i]=v);return out;
+  });
+  return {values,added,matched,removed:target.length-matched};
+}
+function syncSnapshot_(rows) {
+  return JSON.stringify(rows.map(row => row.map(v =>
+    v instanceof Date ? ['date', v.getTime()] : [typeof v, v])));
+}
+function syncRead_(sheet,width) {
+  const last=sheet.getLastRow();
+  if(last<1 || last>1001)throw new Error('見出しが必要です。データは1000行以内にしてください');
+  const range=sheet.getRange(1,1,last,width);
+  if(range.isPartOfMerge())throw new Error('結合セルは対象外です');
+  if(range.getFormulas().some(r=>r.some(Boolean)))throw new Error('数式は対象外です。値だけの練習表にしてください');
+  return range.getValues();
+}
 function syncSheetsByKeyAndOrder() {
-  /** 設定値（シート名・キー列など） */
-  const CONFIG = {
-    masterSheetName: 'シート2', // マスタ側シート名（最新データ）
-    targetSheetName: 'シート1', // 反映先シート名（加筆あり）
-    keyColumns: [1, 2, 3],     // ★キーに使う列（A,B,C列）
-    syncColumns: [1, 2, 3],    // マスタから同期したい列（A,B,C列）
-    hasHeader: true            // 1行目がヘッダー行なら true
-  };
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const masterSheet = ss.getSheetByName(CONFIG.masterSheetName);
-  const targetSheet = ss.getSheetByName(CONFIG.targetSheetName);
-
-  if (!masterSheet || !targetSheet) {
-    throw new Error('設定されたシート名が存在しません。CONFIG.masterSheetName / targetSheetName を確認してください。');
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(1000))throw new Error('別の同期が実行中です');
+  try {
+    if(SYNC.master===SYNC.target)throw new Error('異なるシートを指定してください');
+    const ss=SpreadsheetApp.openById(SYNC.spreadsheetId),m=ss.getSheetByName(SYNC.master),t=ss.getSheetByName(SYNC.target);
+    if(!m||!t)throw new Error('シート名を確認してください');
+    const width=Math.max(4,t.getLastColumn());
+    if(width>26)throw new Error('シート1はZ列までにしてください');
+    const master=syncRead_(m,3),target=syncRead_(t,width);
+    if(master.length<2)throw new Error('シート2が空のため停止します。全消去はしません');
+    if(JSON.stringify(master[0])!==JSON.stringify(target[0].slice(0,3)))throw new Error('A:Cの見出しをそろえてください');
+    const plan=syncPlan_(master.slice(1),target.slice(1),width);
+    console.log(JSON.stringify({追加:plan.added,維持:plan.matched,除外:plan.removed,反映:SYNC.apply}));
+    if(!SYNC.apply)return;
+    const backup=t.copyTo(ss).setName('同期前_'+Utilities.getUuid().replace(/-/g,''));
+    console.log('バックアップ：'+backup.getName());
+    if(syncSnapshot_(syncRead_(m,3))!==syncSnapshot_(master) || t.getLastColumn()>width || syncSnapshot_(syncRead_(t,width))!==syncSnapshot_(target))throw new Error('読み取り後に内容が変わりました。同期は中止しました');
+    const safe=v=>typeof v==='string' && /^[\s]*[=+@-]/.test(v)?"'"+v:v;
+    const values=plan.values.map(r=>r.map(safe));
+    if(t.getMaxRows()<values.length+1)t.insertRowsAfter(t.getMaxRows(),values.length+1-t.getMaxRows());
+    t.getRange(2,1,values.length,width).setValues(values);
+    if(target.length-1>values.length)t.getRange(values.length+2,1,target.length-1-values.length,width).clearContent();
+  } finally {
+    try {SpreadsheetApp.flush();}
+    finally {lock.releaseLock();}
   }
-
-  // データ開始行（ヘッダーありなら2行目、なしなら1行目）
-  const startRow = CONFIG.hasHeader ? 2 : 1;
-
-  /***********************
-   * ① マスタ側（シート2）の読込
-   ***********************/
-  const masterValues = getSheetValues(
-    masterSheet,
-    startRow,
-    Math.max(...CONFIG.syncColumns) // 同期対象の最大列まで取得（A〜C）
-  );
-
-  // マスタに1行もデータがなければ何もしない
-  if (masterValues.length === 0) return;
-
-  /***********************
-   * ② 反映先（シート1）の読込
-   ***********************/
-  const targetLastCol = targetSheet.getLastColumn(); // D列以降も含めた最終列
-  const targetValues = getSheetValues(
-    targetSheet,
-    startRow,
-    targetLastCol
-  );
-
-  /***********************
-   * ③ 反映先を「複合キー → 行データ」のマップに変換
-   *    例）"AAA1|BBB1|CCC1" → [AAA1, BBB1, CCC1, りんご, ...]
-   ***********************/
-  const targetMap = buildKeyRowMapByColumns(
-    targetValues,
-    CONFIG.keyColumns
-  );
-
-  /***********************
-   * ④ マスタの行順で「新しいシート1の行配列」を組み立て
-   *    - 既存行があればその行をベースに（D列以降を維持）
-   *    - 同期列（A〜C）はマスタの値で上書き
-   ***********************/
-  const newTargetValues = masterValues.map(masterRow => {
-    // マスタ側の行から複合キーを生成（A+B+C）
-    const key = createCompositeKey(masterRow, CONFIG.keyColumns);
-    // 反映先に既に同じキーの行があれば、それをベースにする
-    const existingRow = targetMap[key] || null;
-
-    return buildMergedRow({
-      masterRow,
-      existingRow,
-      targetLastCol,
-      syncColumns: CONFIG.syncColumns
-    });
-  });
-
-  /***********************
-   * ⑤ シート1へ書き戻し＆余分な古い行をクリア
-   ***********************/
-  writeBackValues(targetSheet, startRow, targetLastCol, newTargetValues);
-}
-
-/* ==========================================================
- * 共通ヘルパー関数群
- * ==========================================================*/
-
-/**
- * 指定シートから「startRow〜最終行」までを取得するヘルパー
- *
- * @param {Sheet} sheet     対象シート
- * @param {number} startRow データ開始行
- * @param {number} lastCol  取得したい最終列番号
- * @return {any[][]}        2次元配列のシートデータ
- */
-function getSheetValues(sheet, startRow, lastCol) {
-  const lastRow = sheet.getLastRow();
-  if (lastRow < startRow) return []; // データなし
-
-  const numRows = lastRow - startRow + 1;
-  return sheet.getRange(startRow, 1, numRows, lastCol).getValues();
-}
-
-/**
- * 1行のデータから「複合キー文字列」を作成する
- * 例：keyColumns=[1,2,3] の場合
- *   A=AAA1, B=BBB1, C=CCC1 → "AAA1|BBB1|CCC1"
- *
- * @param {any[]} row           1行分の配列
- * @param {number[]} keyColumns キーに使う列番号配列
- * @return {string}             複合キー文字列（全て空なら ""）
- */
-function createCompositeKey(row, keyColumns) {
-  const parts = keyColumns.map(colIndex => {
-    const value = row[colIndex - 1];
-    return value === undefined || value === null ? '' : String(value);
-  });
-
-  // すべて空ならキーなしとして扱う
-  const allEmpty = parts.every(v => v === '');
-  return allEmpty ? '' : parts.join('|'); // 区切り文字は任意（ここでは "|"）
-}
-
-/**
- * シート全体の値から「複合キー → 行データ」のマップを作成する
- *
- * @param {any[][]} values      シートの2次元配列データ
- * @param {number[]} keyColumns キーに使う列番号配列
- * @return {Object.<string, any[]>} key → 行データ のマップ
- */
-function buildKeyRowMapByColumns(values, keyColumns) {
-  const map = {};
-
-  values.forEach(row => {
-    const key = createCompositeKey(row, keyColumns);
-    if (key) {
-      // 同じキーが複数ある場合は「最後に出てきた行」が優先される
-      map[key] = row;
-    }
-  });
-
-  return map;
-}
-
-/**
- * マスタ行と既存行をマージして「新しい1行分の配列」を作成する
- *
- * ルール：
- *  - existingRow があればそれをベースにする（D列以降を維持）
- *  - existingRow がなければ空行を作る
- *  - syncColumns（例：A〜C）は masterRow の値で上書き
- *
- * @param {Object} params
- * @param {any[]} params.masterRow    マスタ側の1行（A〜Cまで）
- * @param {any[]|null} params.existingRow 既存の1行（D以降の情報付き）なければ null
- * @param {number} params.targetLastCol   反映先の最終列番号
- * @param {number[]} params.syncColumns   同期対象列番号の配列
- * @return {any[]}                        新しい1行分の配列
- */
-function buildMergedRow({ masterRow, existingRow, targetLastCol, syncColumns }) {
-  // 既存行があればそれをコピー（D列以降もそのまま引き継ぐ）
-  // 無ければ、全列空文字の新規行を作る
-  const row = existingRow
-    ? existingRow.slice()
-    : new Array(targetLastCol).fill('');
-
-  // A〜C列など、同期対象の列はマスタの値で上書き
-  syncColumns.forEach(colIndex => {
-    row[colIndex - 1] = masterRow[colIndex - 1];
-  });
-
-  return row;
-}
-
-/**
- * 新しい配列データをシートに書き戻し、
- * 以前より行数が少ない場合は余分な行をクリアする。
- *
- * @param {Sheet} sheet   書き込み対象シート
- * @param {number} startRow データ開始行
- * @param {number} lastCol  最終列番号
- * @param {any[][]} values  新しい2次元配列データ
- */
-function writeBackValues(sheet, startRow, lastCol, values) {
-  if (values.length === 0) return;
-
-  const lastRowBefore = sheet.getLastRow();
-
-  // 新しいデータを書き込み（ヘッダー下から values.length 行ぶん）
-  const range = sheet.getRange(startRow, 1, values.length, lastCol);
-  range.setValues(values);
-
-  // 以前のデータ行数を計算し、多かった分だけ下側をクリア
-  const oldDataRows = lastRowBefore >= startRow
-    ? (lastRowBefore - startRow + 1)
-    : 0;
-
-  if (oldDataRows > values.length) {
-    const extraRows = oldDataRows - values.length;
-    const clearStartRow = startRow + values.length;
-    sheet.getRange(clearStartRow, 1, extraRows, lastCol).clearContent();
-  }
+  console.log('同期処理終了。キーと備考を照合してください');
 }

@@ -1,0 +1,10 @@
+// .claude/settings.json（プロジェクト）
+{
+  "env": { "DEMO_LEVEL": "project" },
+  "permissions": { "allow": ["Bash(echo *)"] }
+}
+
+// .claude/settings.local.json（ローカル）
+{
+  "env": { "DEMO_LEVEL": "local" }
+}

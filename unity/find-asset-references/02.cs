@@ -1,5 +1,6 @@
-// 変更前
-[MenuItem("Assets/Find References In Project")]
+// ReferenceViewer.csの2つのMenuItemを、それぞれ変更します。
+// 検証メソッド FindValidate の属性
+[MenuItem("Assets/Legacy Tools/ReferenceViewer Find References", true)]
 
-// 変更後
-[MenuItem("Assets/Find References In Project %f")]
+// 実行メソッド Find の属性
+[MenuItem("Assets/Legacy Tools/ReferenceViewer Find References")]

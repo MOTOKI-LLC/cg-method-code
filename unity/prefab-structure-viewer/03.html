@@ -1,38 +1,28 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ja">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <base target="_top">
   <script src="https://unpkg.com/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
-  <!-- 共通ノード／エッジスタイル -->
   <?!= include('css'); ?>
 </head>
 <body>
-  <h2 class="title-header">
-    Prefab 参照構造ビューア
-    <span class="legend">
-      <span class="legend-item">
-        <span class="legend-color parent"></span> 親Prefab
-      </span>
-      <span class="legend-item">
-        <span class="legend-color variant"></span> Variant
-      </span>
-      <span class="legend-item">
-        <span class="legend-color standalone"></span> 単独Prefab
-      </span>
-    </span>
-  </h2>
-
-  <!-- プルダウンメニュー -->
-  <label for="prefabSelect">親Prefabを選択：</label>
-  <select id="prefabSelect">
-    <option value="">（すべて表示）</option>
-  </select>
-
-  <label><input type="radio" name="direction" value="down" checked> 親→子</label>
-  <label><input type="radio" name="direction" value="up"> 子→親</label>
-
-  <div id="cy" class="graph-area"></div>
-
+  <main>
+    <h1>Prefab参照グラフ</h1>
+    <p>矢印は依存する側から参照先へ。Nestedは全階層に含まれるPrefab、Variantは直近の派生元です。</p>
+    <div class="controls">
+      <label>起点Prefab <select id="prefabSelect" disabled><option value="">全体</option></select></label>
+      <label>たどる方向 <select id="direction" disabled><option value="dependencies">参照先をたどる</option><option value="users">このPrefabを使う側をたどる</option></select></label>
+      <label>関係 <select id="relation" disabled><option value="all">両方</option><option value="Nested">Nestedのみ</option><option value="Variant">Variantのみ</option></select></label>
+      <button id="reload" type="button">再読込</button>
+    </div>
+    <p id="status" role="status" aria-live="polite">読み込み前です。</p>
+    <p class="legend">ノード：通常＝緑、Variant＝紫、Model＝灰色、走査失敗＝赤。破線の枠＝参照先のみ。矢印：Nested＝緑実線、Variant＝青破線。</p>
+    <div id="cy" aria-label="Prefab参照グラフ"></div>
+    <p id="details">ノードを選ぶと保存パスとGUIDを表示します。</p>
+    <noscript>JavaScriptを有効にして再読込してください。</noscript>
+  </main>
   <?!= include('js'); ?>
 </body>
 </html>

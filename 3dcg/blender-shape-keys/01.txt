@@ -1,0 +1,12 @@
+import bpy
+
+if bpy.data.objects.get("ShapePractice"):
+    raise RuntimeError("ShapePractice が既にあります。練習用の新規ファイルで実行してください。")
+bpy.ops.mesh.primitive_monkey_add()
+ob = bpy.context.object
+ob.name = "ShapePractice"
+basis = ob.shape_key_add(name="Basis", from_mix=False)
+puff = ob.shape_key_add(name="Puff", from_mix=False)
+for i, vertex in enumerate(ob.data.vertices):
+    puff.data[i].co = basis.data[i].co + vertex.normal * 0.25
+puff.value = 0.5

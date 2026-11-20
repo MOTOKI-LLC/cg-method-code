@@ -1,0 +1,38 @@
+param([Parameter(Mandatory=$true)][string]$Project,
+      [Parameter(Mandatory=$true)][string]$Output,
+      [switch]$Apply)
+$ErrorActionPreference = 'Stop'
+$projectItem = Get-Item -LiteralPath $Project
+if (-not $projectItem.PSIsContainer) { throw 'Project must be a folder' }
+$root = $projectItem.FullName.TrimEnd('\')
+$out = [IO.Path]::GetFullPath($Output).TrimEnd('\')
+if ($out -eq $root -or $out.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Output must be outside Project' }
+if (Test-Path -LiteralPath $out) { throw 'Output already exists' }
+if ($projectItem.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Links/junctions are not supported' }
+$plan = @(foreach ($folder in @('Assets','Packages','ProjectSettings')) {
+    $dir = Get-Item -LiteralPath (Join-Path $root $folder)
+    if (-not $dir.PSIsContainer) { throw 'Required core folder is missing' }
+    $entries = @($dir) + @(Get-ChildItem -LiteralPath $dir.FullName -Recurse -Force)
+    if (@($entries | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }).Count) { throw 'Links/junctions are not supported' }
+    foreach ($file in $entries | Where-Object { -not $_.PSIsContainer }) {
+        [pscustomobject]@{
+            Relative = $file.FullName.Substring($root.Length + 1)
+            Source = $file.FullName
+            SHA256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+        }
+    }
+})
+if (-not $plan.Count) { throw 'No core files' }
+$plan | Format-List Relative, SHA256
+if (-not $Apply) { Write-Host 'Preview only'; return }
+[IO.Directory]::CreateDirectory($out) | Out-Null
+foreach ($folder in @('Assets','Packages','ProjectSettings')) { [IO.Directory]::CreateDirectory((Join-Path $out $folder)) | Out-Null }
+foreach ($row in $plan) {
+    $dst = Join-Path $out $row.Relative
+    if ((Get-FileHash -LiteralPath $row.Source -Algorithm SHA256).Hash -ne $row.SHA256) { throw 'Source changed during copy' }
+    [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dst)) | Out-Null
+    [IO.File]::Copy($row.Source, $dst, $false)
+    if ((Get-FileHash -LiteralPath $dst -Algorithm SHA256).Hash -ne $row.SHA256) { throw 'Copy hash mismatch' }
+}
+$plan | Select-Object Relative,SHA256 | Export-Csv -LiteralPath (Join-Path $out 'core-hashes.csv') -NoTypeInformation -Encoding UTF8
+Write-Host ('Core files copied: ' + $plan.Count)

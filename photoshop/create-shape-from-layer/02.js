@@ -2,7 +2,7 @@ function DrawShape() {
     var doc = app.activeDocument;
     var y = arguments.length;
     var i = 0;
-    
+
     var lineArray = [];
     for (i = 0; i < y; i++) {
         lineArray[i] = new PathPointInfo;
@@ -17,7 +17,7 @@ function DrawShape() {
     lineSubPathArray.operation = ShapeOperation.SHAPEADD;
     lineSubPathArray.entireSubPath = lineArray;
     var myPathItem = doc.pathItems.add("myPath", [lineSubPathArray]);
-    
+
     var desc88 = new ActionDescriptor();
     var ref60 = new ActionReference();
     ref60.putClass(stringIDToTypeID("contentLayer"));
@@ -33,17 +33,24 @@ function DrawShape() {
     desc89.putObject(charIDToTypeID("Type"), stringIDToTypeID("solidColorLayer"), desc90);
     desc88.putObject(charIDToTypeID("Usng"), stringIDToTypeID("contentLayer"), desc89);
     executeAction(charIDToTypeID("Mk  "), desc88, DialogModes.NO);
-    
+
     myPathItem.remove();
 }
 
-function GetImageSize() {  
+function GetImageSize() {
+    var k = 72 / activeDocument.resolution;
     layObj = activeDocument.activeLayer.bounds;
-    x1 = parseInt(layObj[0]);
-    y1 = parseInt(layObj[1]);
-    x2 = parseInt(layObj[2]);
-    y2 = parseInt(layObj[3]);
+    x1 = layObj[0].as("px") * k;
+    y1 = layObj[1].as("px") * k;
+    x2 = layObj[2].as("px") * k;
+    y2 = layObj[3].as("px") * k;
 }
 
-GetImageSize();
-DrawShape([x1, y1], [x1, y2], [x2, y2], [x2, y1]);
+var savedUnits = app.preferences.rulerUnits;
+app.preferences.rulerUnits = Units.PIXELS;
+try {
+    GetImageSize();
+    DrawShape([x1, y1], [x1, y2], [x2, y2], [x2, y1]);
+} finally {
+    app.preferences.rulerUnits = savedUnits;
+}

@@ -1,0 +1,40 @@
+#target photoshop
+(function () {
+    var FIND = "2025";
+    var REPLACE = "2026";
+    var DRY_RUN = true; // First count matches. Set false only after reviewing the result.
+    if (app.documents.length === 0) { alert("Open a practice PSD first."); return; }
+    if (!FIND.length || FIND === REPLACE) { alert("Use a non-empty, different search string."); return; }
+    var source = app.activeDocument;
+    // Changes are confined to an unsaved duplicate; the original stays open.
+    var work = DRY_RUN ? source : source.duplicate(source.name + "-text-preview");
+    var matchedLayers = 0, occurrences = 0, changedLayers = 0, skipped = 0, errors = [];
+    function walk(layers, parentLocked) {
+        for (var i = 0; i < layers.length; i++) {
+            var layer = layers[i];
+            var locked = parentLocked || layer.allLocked;
+            if (layer.typename === "LayerSet") {
+                walk(layer.layers, locked);
+            } else if (layer.typename === "ArtLayer" && layer.kind === LayerKind.TEXT) {
+                if (locked) { skipped++; continue; }
+                try {
+                    var text = layer.textItem.contents;
+                    var parts = text.split(FIND);
+                    if (parts.length > 1) {
+                        matchedLayers++;
+                        occurrences += parts.length - 1;
+                        if (!DRY_RUN) {
+                            layer.textItem.contents = parts.join(REPLACE);
+                            changedLayers++;
+                        }
+                    }
+                } catch (e) { errors.push(layer.name + ": " + e.message); }
+            }
+        }
+    }
+    walk(work.layers, false);
+    alert((DRY_RUN ? "PREVIEW ONLY" : "UNSAVED DUPLICATE") +
+        "\nMatched layers: " + matchedLayers + "\nOccurrences: " + occurrences +
+        "\nChanged layers: " + changedLayers + "\nLocked text layers skipped: " + skipped +
+        "\nErrors: " + errors.length + "\n" + errors.join("\n"));
+}());

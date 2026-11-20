@@ -1,12 +1,62 @@
-Sub FitPicsWidth()
-Dim sp As Shape
-For Each sp In ActiveSheet.Shapes
-If sp.Type = msoPicture Then
-sp.LockAspectRatio = msoTrue
-sp.Top = sp.TopLeftCell.Top
-sp.Left = sp.TopLeftCell.Left
-sp.Height = sp.TopLeftCell.Height
-sp.Width = sp.TopLeftCell.Width
-End If
-Next
+Option Explicit
+
+Public Sub PreviewFitSelectedPictures()
+    FitPictures False
+End Sub
+
+Public Sub ApplyFitSelectedPictures()
+    FitPictures True
+End Sub
+
+Private Sub FitPictures(ByVal applyChanges As Boolean)
+    Dim selected As ShapeRange, pic As Shape, box As Range
+    Dim factor As Double, newWidth As Double, newHeight As Double
+    Dim changed As Long
+    If TypeName(ActiveSheet) <> "Worksheet" Then Exit Sub
+    If ActiveWorkbook.ReadOnly Or ActiveSheet.ProtectDrawingObjects Then
+        MsgBox "Use an editable, unprotected COPY of this workbook."
+        Exit Sub
+    End If
+    On Error Resume Next
+    Set selected = Selection.ShapeRange
+    On Error GoTo Failed
+    If selected Is Nothing Then
+        MsgBox "Select floating pictures first."
+        Exit Sub
+    End If
+    ' Preflight every selected object before making any changes.
+    For Each pic In selected
+        If pic.Type <> msoPicture Then
+            MsgBox "Select pictures only; groups, charts and buttons are excluded."
+            Exit Sub
+        End If
+        Set box = pic.TopLeftCell.MergeArea
+        If box.Width <= 0 Or box.Height <= 0 Or pic.Width <= 0 Or pic.Height <= 0 Then
+            MsgBox "A picture or target cell has zero size. No changes made."
+            Exit Sub
+        End If
+    Next pic
+    If applyChanges Then
+        If MsgBox("Resize selected pictures in this COPY?", vbYesNo) <> vbYes Then Exit Sub
+    End If
+    For Each pic In selected
+        Set box = pic.TopLeftCell.MergeArea
+        factor = WorksheetFunction.Min(box.Width / pic.Width, box.Height / pic.Height)
+        newWidth = pic.Width * factor
+        newHeight = pic.Height * factor
+        Debug.Print pic.Name, box.Address, newWidth, newHeight
+        If applyChanges Then
+            pic.LockAspectRatio = msoTrue
+            pic.Width = newWidth
+            pic.Left = box.Left + (box.Width - pic.Width) / 2
+            pic.Top = box.Top + (box.Height - pic.Height) / 2
+            pic.Placement = xlMoveAndSize
+            changed = changed + 1
+        End If
+    Next pic
+    MsgBox "Finished. Pictures changed: " & changed & ". Preview is in the Immediate window."
+    Exit Sub
+Failed:
+    MsgBox "Stopped: " & Err.Description & ". Changes so far: " & changed & _
+           ". If needed, close this COPY without saving and start from your backup."
 End Sub

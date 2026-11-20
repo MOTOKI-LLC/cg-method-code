@@ -1,4 +1,4 @@
-# Unity│選択したフォルダ内のPrefabを一括でスクショするツール│uGUI
+# UnityでuGUI Prefabを一括PNG出力する｜Imageの範囲とCanvas設定
 
 解説記事: https://cg-method.com/unity/unity-ugui-prefab-screenshot/
 

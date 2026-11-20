@@ -1,44 +1,90 @@
-var myComps = new Array();
-var selItem = app.project.selection;
-for(var i = 0; i < selItem.length; i++){
-  if(selItem[i] instanceof CompItem){
-  myComps.push(selItem[i]);
-  }
-}
-if(myComps.length !=0){
-  //チェックをOFFにしてレンダリング
-  for (var i = 1; i <= app.project.numItems; i ++) {
-    if ((app.project.item(i) instanceof CompItem) && (app.project.item(i).name === 'コンポ1')) {
-    myComp = app.project.item(i);
-    myComp.layer("ヌル 1").effect("チェックボックス制御")("チェックボックス").setValue(false);
-    break;
+(function () {
+    var DRY_RUN = true; // First check the plan. Set false only in your practice copy.
+    var RENDER_TEMPLATE = "Practice Render", OUTPUT_TEMPLATE = "Practice MOV";
+    var project = app.project;
+    if (!project) { alert("Open a practice project."); return; }
+    var queue = project.renderQueue, comps = [], files = [], created = [], i, j;
+    if (queue.rendering || queue.numItems !== 0) { alert("Use an empty, idle render queue."); return; }
+    if (!project.selection.length || project.selection.length > 5) { alert("Select 1 to 5 compositions in the Project panel."); return; }
+    for (i = 0; i < project.selection.length; i++) {
+        if (!(project.selection[i] instanceof CompItem)) { alert("Select compositions only."); return; }
+        comps.push(project.selection[i]);
     }
-  }
-  for(var i=0; i < myComps.length; i++) {
-  var RQ = app.project.renderQueue.items.add(myComps[i]);
-  RQ.applyTemplate("最良設定");
-  var OM = RQ.outputModule(1);
-  OM.applyTemplate("ロスレス圧縮");
-  OM.file = new File("C:/Users/ユーザー名/Desktop/" + myComps[i].name +"_A");
-  }
-  app.project.renderQueue.render();
-  //チェックをONにしてレンダリング
-  for (var i = 1; i <= app.project.numItems; i ++) {
-      if ((app.project.item(i) instanceof CompItem) && (app.project.item(i).name === 'コンポ1')) {
-          myComp = app.project.item(i);
-          myComp.layer("ヌル 1").effect("チェックボックス制御")("チェックボックス").setValue(true);
-          break;
-      }
-  }    
-  for(var i=0; i < myComps.length; i++) {
-      var RQ = app.project.renderQueue.items.add(myComps[i]);
-      RQ.applyTemplate("最良設定");
-      var OM = RQ.outputModule(1);
-      OM.applyTemplate("ロスレス圧縮");
-      OM.file = new File("C:/Users/ユーザー名/Desktop/" + myComps[i].name +"_B");
-  }
-  app.project.renderQueue.render();    
-}
-else{
-  alert("コンポを選択して実行してください。");
-}
+    var controlComp = null, controlLayer = null, effect = null, matches = 0;
+    for (i = 1; i <= project.numItems; i++) {
+        var item = project.item(i);
+        if (item instanceof CompItem && item.name === "PracticeSwitch") { controlComp = item; matches++; }
+    }
+    if (matches !== 1) { alert("Use exactly one PracticeSwitch comp."); return; }
+    matches = 0;
+    for (i = 1; i <= controlComp.numLayers; i++) {
+        if (controlComp.layer(i).name === "Ctrl") { controlLayer = controlComp.layer(i); matches++; }
+    }
+    if (matches !== 1 || controlLayer.locked) { alert("Use one unlocked Ctrl layer."); return; }
+    var effects = controlLayer.property("ADBE Effect Parade"); matches = 0;
+    if (effects) {
+        for (i = 1; i <= effects.numProperties; i++) {
+            if (effects.property(i).name === "Toggle") { effect = effects.property(i); matches++; }
+        }
+    }
+    if (matches !== 1 || effect.matchName !== "ADBE Checkbox Control") { alert("Use one Toggle Checkbox Control."); return; }
+    var checkbox = effect.property("ADBE Checkbox Control-0001");
+    if (!checkbox || checkbox.numKeys !== 0 || checkbox.expression !== "" || (checkbox.value !== 0 && checkbox.value !== 1)) {
+        alert("Use a static 0/1 checkbox without an expression."); return;
+    }
+    var folder = Folder.selectDialog("Choose an existing empty practice output folder");
+    if (!folder) { return; }
+    if (!folder.exists || folder.getFiles().length !== 0) { alert("Choose an empty folder."); return; }
+    var plan = [];
+    for (i = 0; i < comps.length; i++) {
+        var stem = (i + 1) + "_" + comps[i].name.replace(/[^A-Za-z0-9_-]/g, "_");
+        files[i] = [new File(folder.fsName + "/" + stem + "_OFF.mov"), new File(folder.fsName + "/" + stem + "_ON.mov")];
+        for (j = 0; j < 2; j++) {
+            if (files[i][j].exists) { alert("Output already exists."); return; }
+            plan.push(files[i][j].fsName);
+        }
+    }
+    if (DRY_RUN) {
+        alert("Plan only: no checkbox change, queue addition or render.\nTemplates: " + RENDER_TEMPLATE + " / " + OUTPUT_TEMPLATE + "\n" + plan.join("\n")); return;
+    }
+    if (queue.rendering || queue.numItems !== 0) { alert("Queue changed. Stop and review."); return; }
+    var original = checkbox.value, cleanupErrors = [], completed = 0;
+    function contains(values, target) {
+        for (var k = 0; k < values.length; k++) { if (values[k] === target) { return true; } }
+        return false;
+    }
+    function removeCreated() {
+        for (var k = created.length - 1; k >= 0; k--) {
+            try { created[k].remove(); } catch (error) { cleanupErrors.push(error.toString()); }
+        }
+        created = [];
+    }
+    try {
+        for (j = 0; j < 2; j++) {
+            checkbox.setValue(j);
+            for (i = 0; i < comps.length; i++) {
+                if (files[i][j].exists) { throw new Error("Output appeared; refusing overwrite."); }
+                var rq = queue.items.add(comps[i]); created.push(rq);
+                var om = rq.outputModule(1);
+                if (!contains(rq.templates, RENDER_TEMPLATE) || !contains(om.templates, OUTPUT_TEMPLATE)) {
+                    throw new Error("Save the named render and MOV output templates first.");
+                }
+                rq.applyTemplate(RENDER_TEMPLATE); om.applyTemplate(OUTPUT_TEMPLATE);
+                om = rq.outputModule(1); om.file = files[i][j]; rq.render = true;
+            }
+            // render() returns after the queue finishes. Do not queue both states together.
+            queue.render();
+            for (i = 0; i < created.length; i++) {
+                if (created[i].status !== RQItemStatus.DONE) { throw new Error("Render stopped or failed; do not start the next state."); }
+            }
+            completed++; removeCreated();
+            if (cleanupErrors.length) { throw new Error("Queue cleanup failed; inspect the queue."); }
+        }
+    } catch (error) { alert("Stopped: " + error.toString() + "\nInspect and keep any partial practice output."); }
+    finally {
+        try { checkbox.setValue(original); } catch (error) { cleanupErrors.push("Checkbox restore: " + error.toString()); }
+        removeCreated();
+        if (cleanupErrors.length) { alert("Manual restoration needed:\n" + cleanupErrors.join("\n")); }
+    }
+    alert("Completed states: " + completed + " of 2. Check both files and the restored checkbox. Rendered files cannot be undone with Ctrl+Z.");
+})();

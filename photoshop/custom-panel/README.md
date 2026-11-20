@@ -1,4 +1,4 @@
-# Photoshop│拡張機能でカスタムパネルを作成する方法
+# PhotoshopのCEPカスタムパネルを作る方法｜最小構成・JSX連携・表示されない原因
 
 解説記事: https://cg-method.com/photoshop/custom-panel/
 

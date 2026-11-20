@@ -1,0 +1,5 @@
+@echo off
+setlocal DisableDelayedExpansion
+if "%~1"=="" exit /b 1
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%~dp0png-names.ps1" -Target "%~1" -ToClipboard
+exit /b %errorlevel%

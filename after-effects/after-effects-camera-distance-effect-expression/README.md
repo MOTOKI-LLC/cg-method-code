@@ -1,4 +1,4 @@
-# After Effects│カメラとの距離によってエフェクトの値を調整するエクスプレッション
+# After Effectsでカメラとの距離に応じて変化｜ワールド座標とターゲット制御
 
 解説記事: https://cg-method.com/after-effects/after-effects-camera-distance-effect-expression/
 
@@ -8,6 +8,3 @@
 - `02.txt`
 - `03.txt`
 - `04.txt`
-- `05.txt`
-- `06.txt`
-- `07.txt`

@@ -1,4 +1,4 @@
-# 【VRoid】ワンクリックで最新のバージョンに更新する方法［VRoid Studio アップデーター］
+# 【VRoid】旧アップデーターの使用記録と現在の更新時の注意点
 
 解説記事: https://cg-method.com/vtuber/vroid-updater/
 

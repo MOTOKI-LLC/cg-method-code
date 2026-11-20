@@ -1,0 +1,5 @@
+var source = String(thisComp.layer("source text").text.sourceText.value);
+var lines = source.split(/\r\n|\r|\n/);
+var match = thisLayer.name.match(/^text_([1-9][0-9]*)$/);
+var row = match ? Number(match[1]) : 0;
+(row >= 1 && row <= lines.length) ? lines[row - 1] : "";

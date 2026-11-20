@@ -1,4 +1,4 @@
-# Photoshopスクリプト（jsx）│非表示のレイヤーでも可！1つ下の表示レイヤーを選択する方法
+# Photoshop JSXで非表示を含む1つ下を選ぶ｜同じ親・ID指定
 
 解説記事: https://cg-method.com/photoshop/select-layer-below-with-hidden/
 

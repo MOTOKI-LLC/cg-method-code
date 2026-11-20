@@ -1,0 +1,18 @@
+param([Parameter(Mandatory=$true)][string]$Target,
+      [string]$Output,
+      [switch]$ToClipboard)
+$ErrorActionPreference = 'Stop'
+if (-not $Output) { $Output = Join-Path $PSScriptRoot 'png-names.txt' }
+$item = Get-Item -LiteralPath $Target
+$folder = if ($item.PSIsContainer) { $item.FullName } else { $item.DirectoryName }
+$names = @(Get-ChildItem -LiteralPath $folder -File -Force |
+    Where-Object Extension -ieq '.png' | Sort-Object Name | Select-Object -ExpandProperty Name)
+if (-not $names.Count) { throw 'No PNG files; clipboard unchanged' }
+if ($ToClipboard) {
+    Set-Clipboard -Value ($names -join [Environment]::NewLine)
+} else {
+    if (Test-Path -LiteralPath $Output) { throw 'Output exists; choose a new filename' }
+    $text = ($names -join [Environment]::NewLine) + [Environment]::NewLine
+    [IO.File]::WriteAllText([IO.Path]::GetFullPath($Output), $text, [Text.UTF8Encoding]::new($true))
+}
+$names

@@ -1,4 +1,4 @@
-# 7-Zip│ZIPファイルをダブルクリックで解凍できるようにする方法
+# 7-Zipのダブルクリックは閲覧か解凍か｜出力先を決めてZIPを展開
 
 解説記事: https://cg-method.com/work-tools/7zip-double-click-extract/
 

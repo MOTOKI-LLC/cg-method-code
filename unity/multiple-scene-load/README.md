@@ -1,4 +1,4 @@
-# Unity│シーン遷移と画面切り替えの実装方法│ノーコード
+# Unityでシーンを切り替える方法｜SceneManagerとUI画面の違い
 
 解説記事: https://cg-method.com/unity/multiple-scene-load/
 

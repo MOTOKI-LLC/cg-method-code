@@ -1,0 +1,7 @@
+// 現在の公式リファレンスの例。結果を数値で返す。
+var elapsed = 0;
+if (numKeys > 0) {
+  var k = thisProperty.previousKey(time);
+  if (k.time <= time) elapsed = time - k.time;
+}
+elapsed;

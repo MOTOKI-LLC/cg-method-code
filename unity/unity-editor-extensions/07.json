@@ -1,0 +1,6 @@
+{
+  "name": "CGMethod.EditorTools",
+  "references": ["Unity.ugui"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

@@ -1,12 +1,14 @@
-Run, C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
-
-Sleep, 100
-
-Loop, {
-  Sleep, 20
-  IfWinExist, ahk_class Chrome_WidgetWin_1
-  {
-    WinMinimize, ahk_class Chrome_WidgetWin_1
-    Break
-  }
+#Requires AutoHotkey v2.0
+if A_Args.Length != 1 || !FileExist(A_Args[1]) {
+    MsgBox "対象アプリの実在するEXEパスを1つ指定してください。"
+    ExitApp
 }
+; 既に動作中のアプリへ合流すると、PIDが一致しない場合がある。
+Run('"' A_Args[1] '"', , , &pid)
+hwnd := WinWait("ahk_pid " pid, , 10)
+if !hwnd {
+    MsgBox "10秒以内に、このPIDの画面を確認できませんでした。"
+    ExitApp
+}
+WinMinimize("ahk_id " hwnd)
+; ウィンドウを閉じず、最小化だけを行う。

@@ -1,0 +1,16 @@
+& {
+  $ErrorActionPreference = 'Stop'
+  $book = 'C:\Users\ユーザー名\Documents\商品カタログ.xlsx'
+  $base = 'C:\Users\ユーザー名\Documents'
+  $run = Join-Path $base ('excel-images-' + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $run -ErrorAction Stop | Out-Null
+  $zip = Join-Path $run 'book.zip'
+  $work = Join-Path $run 'expanded'
+  Copy-Item -LiteralPath $book -Destination $zip -ErrorAction Stop
+  Expand-Archive -LiteralPath $zip -DestinationPath $work -ErrorAction Stop
+  Remove-Item -LiteralPath $zip -ErrorAction Stop
+  Get-ChildItem -LiteralPath $work -Recurse -File |
+    Where-Object { $_.Extension -match '^\.(png|jpe?g|gif|bmp|tiff?|emf|wmf|svg)$' } |
+    Select-Object FullName, Length
+  '展開先: ' + $work
+}

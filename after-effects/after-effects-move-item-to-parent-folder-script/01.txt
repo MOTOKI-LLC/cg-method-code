@@ -1,0 +1,23 @@
+/* Project-panel hierarchy only. Parent/root and Undo tested in AE 26.5 on Windows, 2026-10-14. */
+(function () {
+    var MODE = "parent"; // parent: one level up / root: project root
+    var project = app.project;
+    if (!project || (MODE !== "parent" && MODE !== "root")) { alert("プロジェクトとMODEを確認してください。"); return; }
+    var items = project.selection.slice(0), jobs = [], skipped = 0;
+    if (!items.length || items.length > 100) { alert("1〜100アイテムを選択してください。"); return; }
+    // Capture ALL destinations before moving a selected parent folder.
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i], parent = item.parentFolder;
+        if (item === project.rootFolder || parent === project.rootFolder) { skipped++; continue; }
+        var target = MODE === "root" ? project.rootFolder : parent.parentFolder;
+        if (!(target instanceof FolderItem) || target === item) { alert("移動先を確認できないため、変更せずに中止しました。"); return; }
+        jobs.push({item:item,target:target});
+    }
+    if (!jobs.length) { alert("対象は既にルート階層です。変更しません。"); return; }
+    app.beginUndoGroup("選択アイテムの階層を移動");
+    try {
+        for (var j = 0; j < jobs.length; j++) jobs[j].item.parentFolder = jobs[j].target;
+        alert(jobs.length + "アイテムを移動しました。ルート階層の" + skipped + "アイテムは変更していません。");
+    } catch (error) { alert("一部の移動が残る場合があります。編集メニューで取り消して確認してください。\n" + error.toString()); }
+    finally { app.endUndoGroup(); }
+}());

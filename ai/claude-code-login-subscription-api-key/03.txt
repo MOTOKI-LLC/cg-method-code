@@ -1,0 +1,5 @@
+# Git Bash など
+unset ANTHROPIC_API_KEY
+
+# PowerShell
+Remove-Item Env:ANTHROPIC_API_KEY -ErrorAction SilentlyContinue

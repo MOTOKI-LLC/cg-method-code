@@ -1,5 +1,28 @@
-for(var i=1;i<=app.project.numItems;i++){
-    if(app.project.item(i).name.indexOf(".png")> -1){
-        app.project.item(i).label=(2)
+/* Create a named, empty working structure. Never reuse/rename/delete existing items. */
+(function () {
+    var ROOT_NAME = "CGM_work";
+    var COMP_NAME = "CGM_main";
+    var WIDTH = 1920, HEIGHT = 1080, FPS = 30, DURATION = 10;
+    var project = app.project;
+    if (!project || project.numItems > 2000) { alert("プロジェクトを開き、2000アイテム以内で実行してください。"); return; }
+    function finite(value) { return typeof value === "number" && isFinite(value); }
+    if (!ROOT_NAME || !COMP_NAME || !finite(WIDTH) || !finite(HEIGHT) || WIDTH % 1 || HEIGHT % 1 || WIDTH < 4 || WIDTH > 30000 || HEIGHT < 4 || HEIGHT > 30000 || !finite(FPS) || FPS < 1 || FPS > 99 || !finite(DURATION) || DURATION <= 0 || DURATION > 10800) {
+        alert("名前と寸法・フレームレート・尺を確認してください。"); return;
     }
-}
+    for (var i = 1; i <= project.numItems; i++) {
+        var item = project.item(i);
+        if ((item instanceof FolderItem && item.name === ROOT_NAME) || (item instanceof CompItem && item.name === COMP_NAME)) {
+            alert("同名の出力フォルダまたはコンポがあります。新しい名前を指定してください。"); return;
+        }
+    }
+    app.beginUndoGroup("作業コンポとフォルダを作成");
+    try {
+        var root = project.items.addFolder(ROOT_NAME);
+        var comps = project.items.addFolder("comps"); comps.parentFolder = root;
+        var footage = project.items.addFolder("footage"); footage.parentFolder = root;
+        var comp = project.items.addComp(COMP_NAME, WIDTH, HEIGHT, 1, DURATION, FPS);
+        comp.parentFolder = comps;
+        alert(ROOT_NAME + "内にcomps・footageを作成し、" + COMP_NAME + "をcompsへ配置しました。コンポは手動で開いて確認してください。");
+    } catch (error) { alert("一部の作成が残る場合があります。編集メニューで取り消して確認してください。\n" + error.toString()); }
+    finally { app.endUndoGroup(); }
+}());

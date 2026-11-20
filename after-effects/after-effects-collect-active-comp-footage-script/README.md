@@ -1,4 +1,4 @@
-# After Effects│アクティブなコンポで使われている素材をフォルダにまとめるスクリプト
+# After Effectsの使用素材をフォルダにまとめるスクリプト｜プロジェクトパネル内の整理
 
 解説記事: https://cg-method.com/after-effects/after-effects-collect-active-comp-footage-script/
 

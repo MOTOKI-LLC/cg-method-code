@@ -1,23 +1,76 @@
 Option Explicit
+Dim fso, inputPath, outputPath, oldPath, newPath
+Dim stream, text, doc, nodes, node, count, token, parts, result
+oldPath = "C:\practice\old\test.psd"
+newPath = "C:\practice\new\test.psd"
+If WScript.Arguments.Count <> 1 And WScript.Arguments.Count <> 3 Then
+    WScript.Echo "Usage: cscript //nologo relink-copy.vbs input.aepx [oldPath newPath]"
+    WScript.Quit 2
+End If
+Set fso = CreateObject("Scripting.FileSystemObject")
+inputPath = fso.GetAbsolutePathName(WScript.Arguments(0))
+If WScript.Arguments.Count = 3 Then
+    oldPath = WScript.Arguments(1)
+    newPath = WScript.Arguments(2)
+End If
+If LCase(fso.GetExtensionName(inputPath)) <> "aepx" Or Not fso.FileExists(inputPath) Then
+    WScript.Echo "An existing .aepx input is required."
+    WScript.Quit 2
+End If
+If oldPath = "" Or newPath = "" Or oldPath = newPath Then
+    WScript.Echo "Supply different non-empty paths."
+    WScript.Quit 2
+End If
+If Not fso.FileExists(newPath) Then
+    WScript.Echo "New source file does not exist."
+    WScript.Quit 2
+End If
+outputPath = fso.BuildPath(fso.GetParentFolderName(inputPath), fso.GetBaseName(inputPath) & "-relinked.aepx")
+If fso.FileExists(outputPath) Or fso.FolderExists(outputPath) Then
+    WScript.Echo "Output already exists; nothing overwritten."
+    WScript.Quit 2
+End If
+Set stream = CreateObject("ADODB.Stream")
+stream.Type = 2
+stream.Charset = "UTF-8"
+stream.Open
+stream.LoadFromFile inputPath
+text = stream.ReadText(-1)
+stream.Close
+Set doc = CreateObject("Msxml2.DOMDocument.6.0")
+doc.async = False
+doc.resolveExternals = False
+doc.setProperty "ProhibitDTD", True
+If Not doc.loadXML(text) Then
+    WScript.Echo "Invalid XML or disallowed DTD; no output."
+    WScript.Quit 2
+End If
+Set nodes = doc.selectNodes("//*[local-name()='fileReference' and @fullpath]")
+count = 0
+For Each node In nodes
+    If node.getAttribute("fullpath") = oldPath Then count = count + 1
+Next
+token = "fullpath=""" & XmlEscape(oldPath) & """"
+parts = Split(text, token, -1, 0)
+If count = 0 Or UBound(parts) <> count Then
+    WScript.Echo "No exact double-quoted match, or ambiguous text; no output."
+    WScript.Quit 2
+End If
+result = Replace(text, token, "fullpath=""" & XmlEscape(newPath) & """", 1, -1, 0)
+If Not doc.loadXML(result) Then
+    WScript.Echo "Result XML is invalid; no output."
+    WScript.Quit 2
+End If
+stream.Open
+stream.WriteText result
+stream.SaveToFile outputPath, 1
+stream.Close
+WScript.Echo "Replaced attributes: " & count & "; wrote a separate -relinked.aepx copy."
 
-Dim filename, instream, outstream, text
-
-filename = WScript.Arguments(0)
-
-Set instream = CreateObject("ADODB.Stream")
-instream.Type = 2
-instream.Charset = "UTF-8"
-instream.Open
-instream.LoadFromFile filename
-text = instream.ReadText(-1)
-instream.Close
-
-text = Replace(text, "置換前の文字列", "置換後の文字列")
-
-Set outstream = CreateObject("ADODB.Stream")
-outstream.Type = 2
-outstream.Charset = "UTF-8"
-outstream.Open
-outstream.WriteText text
-outstream.SaveToFile filename, 2
-outstream.Close
+Function XmlEscape(value)
+    value = Replace(value, "&", "&amp;")
+    value = Replace(value, "<", "&lt;")
+    value = Replace(value, ">", "&gt;")
+    value = Replace(value, """", "&quot;")
+    XmlEscape = value
+End Function

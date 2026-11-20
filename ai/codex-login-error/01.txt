@@ -1,0 +1,8 @@
+Configuration
+  ✓ config       loaded
+  ✓ auth         auth is configured
+
+Connectivity
+  ✓ network      no proxy env vars
+  ✓ websocket    connected (HTTP 101 Switching Protocols) · 15s timeout
+  ✓ reachability active provider endpoints are reachable over HTTP

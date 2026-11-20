@@ -1,0 +1,27 @@
+$ErrorActionPreference = 'Stop'
+$ids = [ordered]@{
+    OneDriveLegacy = '{018D5C66-4533-4307-9B53-224DE2ED1FE6}'
+    DropboxLegacy = '{E31EA727-12ED-4702-820C-4B6445F28E1A}'
+    BoxSyncLegacy = '{4A8FCD9F-623C-4283-96F0-10F41846A98A}'
+    CreativeCloudLegacy = '{0E270DAA-1BE6-48F2-AC49-CF737426AF10}'
+}
+$rows = foreach ($entry in $ids.GetEnumerator()) {
+    foreach ($root in @('HKCU:\Software\Classes\CLSID', 'Registry::HKEY_CLASSES_ROOT\CLSID')) {
+        $path = Join-Path $root $entry.Value
+        $exists = Test-Path -LiteralPath $path
+        $pinned = $null
+        if ($exists) {
+            $item = Get-ItemProperty -LiteralPath $path
+            $property = $item.PSObject.Properties['System.IsPinnedToNameSpaceTree']
+            if ($null -ne $property) { $pinned = $property.Value }
+        }
+        [pscustomobject]@{
+            LegacyEntry = $entry.Key
+            View = $(if ($root.StartsWith('HKCU:')) { 'CurrentUser' } else { 'MergedClasses' })
+            KeyExists = $exists
+            PinnedValue = $pinned
+            RegistryWritten = $false
+        }
+    }
+}
+$rows | ConvertTo-Json

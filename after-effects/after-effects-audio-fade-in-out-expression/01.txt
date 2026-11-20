@@ -1,9 +1,15 @@
-fadeTime = 1;
-audio.audioLevelsMin = -48;
-audio.audioLevelsMax = 0;
-layerDuration = outPoint - inPoint;
-singleFrame = thisComp.frameDuration;
-animateIn = linear(time, inPoint, (inPoint + fadeTime), audio.audioLevelsMin, audio.audioLevelsMax);
-animateOut = linear(time, (outPoint - fadeTime+1), (outPoint-singleFrame), audio.audioLevelsMax, audio.audioLevelsMin);
-if(time < (layerDuration/2+inPoint)){[animateIn,animateIn];
-}else{[animateIn,animateIn];}
+var mode = "both"; // "in"・"out"・"both"
+var fadeSeconds = 1;
+var floorDB = -48; // 完全な無音ではなく減衰量
+var duration = outPoint - inPoint;
+var gain = 0;
+if (duration > 0 && isFinite(fadeSeconds) && fadeSeconds > 0 &&
+        isFinite(floorDB) && floorDB <= 0) {
+    var f = Math.min(fadeSeconds, duration / 2);
+    var up = linear(time, inPoint, inPoint + f, floorDB, 0);
+    var down = linear(time, outPoint - f, outPoint, 0, floorDB);
+    if (mode == "in") gain = up;
+    else if (mode == "out") gain = down;
+    else if (mode == "both") gain = Math.min(up, down);
+}
+[value[0] + gain, value[1] + gain];

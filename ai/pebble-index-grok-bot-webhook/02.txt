@@ -1,0 +1,10 @@
+{
+  "source": "pebble",
+  "text": "Index webhook test event",
+  "test": true,
+  "trigger": "test-event",
+  "delivery": "（送信ごとのID）",
+  "recordedAt": "（録音した時刻）",
+  "receivedAt": "（Workerが受け取った時刻）",
+  "raw": { "transcription": "Index webhook test event", "recordedAt": "…", "client": "ring", "test": "true" }
+}

@@ -1,32 +1,72 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Networking;
+using System;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(RawImage))]
 public class GetNetworkImage : MonoBehaviour
 {
-    [SerializeField] private string url = "https://example.com/image.png";
-    
-    private RawImage rawImage;
+    [SerializeField] private string url = "";
+    [SerializeField] private bool useNativeSize = false;
+    private RawImage target;
+    private UnityWebRequest activeRequest;
+    private Texture2D ownedTexture;
 
-    IEnumerator Start()
+    void Awake() { target = GetComponent<RawImage>(); }
+    void OnEnable() { StartCoroutine(Load()); }
+
+    IEnumerator Load()
     {
-        rawImage = GetComponent<RawImage>();
-        
-        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+        Uri uri;
+        if (target == null || !Uri.TryCreate(url, UriKind.Absolute, out uri)
+            || uri.Scheme != Uri.UriSchemeHttps)
         {
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                rawImage.texture = texture;
-                rawImage.SetNativeSize(); // 画像の元サイズで表示
-            }
-            else
-            {
-                Debug.LogError("画像の取得に失敗: " + request.error);
-            }
+            Debug.LogWarning("RawImageとHTTPS画像URLを確認してください。", this);
+            yield break;
         }
+
+        activeRequest = UnityWebRequestTexture.GetTexture(uri.AbsoluteUri, true);
+        activeRequest.timeout = 15;
+        try
+        {
+            yield return activeRequest.SendWebRequest();
+            if (activeRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("画像取得に失敗。HTTP="
+                    + activeRequest.responseCode + " / " + activeRequest.error, this);
+                yield break;
+            }
+
+            ownedTexture = DownloadHandlerTexture.GetContent(activeRequest);
+            if (ownedTexture == null) yield break;
+            if (target == null)
+            {
+                Destroy(ownedTexture);
+                ownedTexture = null;
+                yield break;
+            }
+            target.texture = ownedTexture;
+            if (useNativeSize) target.SetNativeSize();
+        }
+        finally { ReleaseRequest(); }
+    }
+
+    void ReleaseRequest()
+    {
+        if (activeRequest == null) return;
+        if (!activeRequest.isDone) activeRequest.Abort();
+        activeRequest.Dispose();
+        activeRequest = null;
+    }
+
+    void OnDisable()
+    {
+        StopAllCoroutines();
+        ReleaseRequest();
+        if (ownedTexture == null) return;
+        if (target != null && target.texture == ownedTexture) target.texture = null;
+        Destroy(ownedTexture);
+        ownedTexture = null;
     }
 }

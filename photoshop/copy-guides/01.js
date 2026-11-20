@@ -32,13 +32,13 @@ gH=gH.replace(/,$/,'');
 gV=gV.replace(/,$/,'');
 currentGuides = 'Layer Guides' + "⌘" + gH + "⌘" + gV;
 var desc2 = new ActionDescriptor();
-desc2.putString(0, currentGuides.toSource());
+desc2.putString(stringIDToTypeID('layerGuides'), currentGuides.toSource());
 app.putCustomOptions('7a301ec0-afde-11e1-afa6-0800200c9a66', desc2, true );
 }
 function displayGuides(){
 try{
 var desc1 = app.getCustomOptions('7a301ec0-afde-11e1-afa6-0800200c9a66');
-var layerGuides = eval(desc1.getString(0));
+var layerGuides = eval(desc1.getString(stringIDToTypeID('layerGuides')));
     }catch(e){return;}
 clearGuides();
 var ar1 = layerGuides.toString().split('⌘');

@@ -1,4 +1,4 @@
-# Unity│Assets内で使用している素材を検索する方法
+# Unityのアセット参照を検索する方法｜使う側・依存先・Sceneの違い
 
 解説記事: https://cg-method.com/unity/find-asset-references/
 

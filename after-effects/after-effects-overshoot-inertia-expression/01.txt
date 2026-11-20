@@ -1,0 +1,16 @@
+var amp = 0.06;
+var freq = 3.0;
+var decay = 5.0;
+var n = 0;
+if (numKeys > 0) {
+  n = nearestKey(time).index;
+  if (key(n).time > time) n--;
+}
+var result = value;
+if (numKeys >= 2 && n == numKeys) {
+  var t = time - key(n).time;
+  var v = velocityAtTime(key(n).time - thisComp.frameDuration / 10);
+  var amount = amp * Math.sin(freq * t * 2 * Math.PI) / Math.exp(decay * t);
+  result = add(value, mul(v, amount));
+}
+result;

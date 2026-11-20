@@ -1,4 +1,4 @@
-# Unity│Prefab参照構造ビューア
+# UnityのPrefab参照関係を可視化｜Nested・VariantとGUIDのCSV出力
 
 解説記事: https://cg-method.com/unity/prefab-structure-viewer/
 
@@ -7,5 +7,5 @@
 - `01.cs`
 - `02.js`
 - `03.html`
-- `04.js`
-- `05.css`
+- `04.html`
+- `05.html`

@@ -1,5 +1,6 @@
-seedRandom(index,true);
-var x = thisComp.layer(index).transform.position[0];
-var y = thisComp.layer(index).transform.position[1];
-var z = thisComp.layer(index).transform.position[2]+random(2000);
-[x,y,z];
+var result = value;
+if (value.length === 3) {
+    seedRandom(index, true);
+    result = [value[0], value[1], value[2] + random(0, 2000)];
+}
+result;
